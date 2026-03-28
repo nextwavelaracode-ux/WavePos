@@ -35,29 +35,20 @@ class AuthController extends Controller
             return redirect()->route('dashboard')->with('success', 'Bienvenido al sistema.');
         }
 
-        // Si falla, revisamos exactamente por qué para depuración
+        // Si falla, revisamos si es por estado
         $user = \App\Models\User::where('email', $request->email)->first();
-        
-        if (!$user) {
+        if ($user && !\Hash::check($request->password, $user->password)) {
             return back()->withErrors([
-                'email' => 'DEBUG: USUARIO NO ENCONTRADO EN LA BD',
+                'email' => 'Las credenciales no coinciden con nuestros registros.',
             ])->onlyInput('email');
-        }
-        
-        if (!\Hash::check($request->password, $user->password)) {
+        } else if ($user && !$user->estado) {
             return back()->withErrors([
-                'email' => 'DEBUG: CONTRASEÑA INCORRECTA (HASH NO COINCIDE)',
-            ])->onlyInput('email');
-        } 
-        
-        if (!$user->estado) {
-            return back()->withErrors([
-                'email' => 'DEBUG: USUARIO INACTIVO ESTADO FALSE',
+                'email' => 'Su cuenta está inactiva. Comuníquese con el administrador.',
             ])->onlyInput('email');
         }
 
         return back()->withErrors([
-            'email' => 'DEBUG: EL USUARIO Y LA CLAVE ESTAN BIEN PERO AUTH::ATTEMPT FALLÓ POR OTRA RAZON',
+            'email' => 'Las credenciales no coinciden con nuestros registros.',
         ])->onlyInput('email');
     }
 
