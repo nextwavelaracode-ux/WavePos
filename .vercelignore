@@ -1,0 +1,22 @@
+# Ignorar en el despliegue a Vercel
+node_modules
+.git
+.env
+.env.*
+!.env.example
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/app/public/*
+tests
+*.test.js
+*.spec.js
+build_log.txt
+build_log_utf8.txt
+standard_error.txt
+migrate_error.txt
+tailadmin-laravel.png
+phpunit.xml
+.editorconfig
+.vscode
