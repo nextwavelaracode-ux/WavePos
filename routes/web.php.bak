@@ -1,0 +1,249 @@
+<?php
+
+use App\Http\Controllers\CajaController;
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\CompraController;
+use App\Http\Controllers\DevolucionController;
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ProveedorController;
+use App\Http\Controllers\RolController;
+use App\Http\Controllers\SubcategoriaController;
+use App\Http\Controllers\SucursalController;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\VentaController;
+use App\Http\Controllers\VentaEsperaController;
+use App\Http\Controllers\CuentaPorPagarController;
+use App\Http\Controllers\CuentaPorCobrarController;
+use Illuminate\Support\Facades\Route;
+
+
+
+
+
+
+// dashboard pages
+Route::get('/', function () {
+    return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
+})->name('dashboard');
+
+// calender pages
+Route::get('/calendar', function () {
+    return view('pages.calender', ['title' => 'Calendar']);
+})->name('calendar');
+
+// profile pages
+Route::get('/profile', function () {
+    return view('pages.profile', ['title' => 'Profile']);
+})->name('profile');
+
+// form pages
+Route::get('/form-elements', function () {
+    return view('pages.form.form-elements', ['title' => 'Form Elements']);
+})->name('form-elements');
+
+// tables pages
+Route::get('/basic-tables', function () {
+    return view('pages.tables.basic-tables', ['title' => 'Basic Tables']);
+})->name('basic-tables');
+
+// pages
+Route::get('/blank', function () {
+    return view('pages.blank', ['title' => 'Blank']);
+})->name('blank');
+
+// error pages
+Route::get('/error-404', function () {
+    return view('pages.errors.error-404', ['title' => 'Error 404']);
+})->name('error-404');
+
+// chart pages
+Route::get('/line-chart', function () {
+    return view('pages.chart.line-chart', ['title' => 'Line Chart']);
+})->name('line-chart');
+
+Route::get('/bar-chart', function () {
+    return view('pages.chart.bar-chart', ['title' => 'Bar Chart']);
+})->name('bar-chart');
+
+// authentication pages
+Route::get('/signin', function () {
+    return view('pages.auth.signin', ['title' => 'Sign In']);
+})->name('signin');
+
+Route::get('/signup', function () {
+    return view('pages.auth.signup', ['title' => 'Sign Up']);
+})->name('signup');
+
+// ui elements pages
+Route::get('/alerts', function () {
+    return view('pages.ui-elements.alerts', ['title' => 'Alerts']);
+})->name('alerts');
+
+Route::get('/avatars', function () {
+    return view('pages.ui-elements.avatars', ['title' => 'Avatars']);
+})->name('avatars');
+
+Route::get('/badge', function () {
+    return view('pages.ui-elements.badges', ['title' => 'Badges']);
+})->name('badges');
+
+Route::get('/buttons', function () {
+    return view('pages.ui-elements.buttons', ['title' => 'Buttons']);
+})->name('buttons');
+
+Route::get('/image', function () {
+    return view('pages.ui-elements.images', ['title' => 'Images']);
+})->name('images');
+
+Route::get('/videos', function () {
+    return view('pages.ui-elements.videos', ['title' => 'Videos']);
+})->name('videos');
+
+// ============================================================
+// POS - CONFIGURACIÓN
+// ============================================================
+Route::group(['prefix' => 'configuracion', 'as' => 'configuracion.'], function () {
+
+    // Empresa (singleton - show + update)
+    Route::get('/empresa', [EmpresaController::class, 'show'])->name('empresa');
+    Route::put('/empresa', [EmpresaController::class, 'update'])->name('empresa.update');
+
+    // Sucursales (CRUD)
+    Route::get('/sucursales', [SucursalController::class, 'index'])->name('sucursales');
+    Route::post('/sucursales', [SucursalController::class, 'store'])->name('sucursales.store');
+    Route::put('/sucursales/{sucursal}', [SucursalController::class, 'update'])->name('sucursales.update');
+    Route::delete('/sucursales/{sucursal}', [SucursalController::class, 'destroy'])->name('sucursales.destroy');
+
+    // Usuarios (CRUD)
+    Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios');
+    Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
+    Route::put('/usuarios/{usuario}', [UsuarioController::class, 'update'])->name('usuarios.update');
+    Route::delete('/usuarios/{usuario}', [UsuarioController::class, 'destroy'])->name('usuarios.destroy');
+
+    // Roles y Permisos (CRUD)
+    Route::get('/roles', [RolController::class, 'index'])->name('roles');
+    Route::post('/roles', [RolController::class, 'store'])->name('roles.store');
+    Route::put('/roles/{rol}', [RolController::class, 'update'])->name('roles.update');
+    Route::delete('/roles/{rol}', [RolController::class, 'destroy'])->name('roles.destroy');
+
+});
+
+// ============================================================
+// POS - INVENTARIO
+// ============================================================
+Route::prefix('inventario')->name('inventario.')->group(function () {
+
+    // Categorias (CRUD)
+    Route::get('/categorias', [CategoriaController::class, 'index'])->name('categorias');
+    Route::post('/categorias', [CategoriaController::class, 'store'])->name('categorias.store');
+    Route::put('/categorias/{categoria}', [CategoriaController::class, 'update'])->name('categorias.update');
+    Route::delete('/categorias/{categoria}', [CategoriaController::class, 'destroy'])->name('categorias.destroy');
+
+    // Subcategorias (CRUD)
+    Route::get('/subcategorias', [SubcategoriaController::class, 'index'])->name('subcategorias');
+    Route::post('/subcategorias', [SubcategoriaController::class, 'store'])->name('subcategorias.store');
+    Route::put('/subcategorias/{subcategoria}', [SubcategoriaController::class, 'update'])->name('subcategorias.update');
+    Route::delete('/subcategorias/{subcategoria}', [SubcategoriaController::class, 'destroy'])->name('subcategorias.destroy');
+
+    // Proveedores (CRUD)
+    Route::get('/proveedores', [ProveedorController::class, 'index'])->name('proveedores');
+    Route::post('/proveedores', [ProveedorController::class, 'store'])->name('proveedores.store');
+    Route::put('/proveedores/{proveedor}', [ProveedorController::class, 'update'])->name('proveedores.update');
+    Route::delete('/proveedores/{proveedor}', [ProveedorController::class, 'destroy'])->name('proveedores.destroy');
+
+    // Productos (CRUD)
+    Route::get('/productos', [ProductoController::class, 'index'])->name('productos');
+    Route::post('/productos', [ProductoController::class, 'store'])->name('productos.store');
+    Route::put('/productos/{producto}', [ProductoController::class, 'update'])->name('productos.update');
+    Route::delete('/productos/{producto}', [ProductoController::class, 'destroy'])->name('productos.destroy');
+
+    // Control de Inventario
+    Route::get('/stock', [InventarioController::class, 'index'])->name('stock');
+    Route::get('/movimientos', [InventarioController::class, 'movimientos'])->name('movimientos');
+    Route::get('/alertas', [InventarioController::class, 'alertas'])->name('alertas');
+    Route::post('/entrada', [InventarioController::class, 'entrada'])->name('entrada');
+    Route::post('/salida', [InventarioController::class, 'salida'])->name('salida');
+    Route::post('/ajuste', [InventarioController::class, 'ajuste'])->name('ajuste');
+
+});
+
+// ============================================================
+// POS - CLIENTES
+// ============================================================
+Route::prefix('clientes')->name('clientes.')->group(function () {
+    Route::get('/', [ClienteController::class, 'index'])->name('index');
+    Route::post('/', [ClienteController::class, 'store'])->name('store');
+    Route::put('/{cliente}', [ClienteController::class, 'update'])->name('update');
+    Route::delete('/{cliente}', [ClienteController::class, 'destroy'])->name('destroy');
+});
+
+// ============================================================
+// POS - COMPRAS
+// ============================================================
+Route::prefix('compras')->name('compras.')->group(function () {
+    Route::get('/', [CompraController::class, 'index'])->name('index');
+    Route::get('/crear', [CompraController::class, 'create'])->name('create');
+    Route::post('/', [CompraController::class, 'store'])->name('store');
+    Route::get('/{compra}', [CompraController::class, 'show'])->name('show');
+    Route::post('/{compra}/anular', [CompraController::class, 'anular'])->name('anular');
+    Route::get('/{compra}/pdf', [CompraController::class, 'pdf'])->name('pdf');
+});
+
+// ============================================================
+// POS - CAJA (VENTAS)
+// ============================================================
+Route::prefix('caja')->name('caja.')->group(function () {
+
+    // Estado / Apertura de caja
+    Route::get('/', [CajaController::class, 'index'])->name('index');
+    Route::post('/abrir', [CajaController::class, 'abrir'])->name('abrir');
+    Route::post('/cerrar', [CajaController::class, 'cerrar'])->name('cerrar');
+    Route::get('/historial-cajas/{caja}', [CajaController::class, 'show'])->name('show');
+
+    // Pantalla POS
+    Route::get('/pos', [VentaController::class, 'pos'])->name('pos');
+
+    // Ventas
+    Route::post('/ventas', [VentaController::class, 'store'])->name('ventas.store');
+    Route::get('/ventas/historial', [VentaController::class, 'historial'])->name('ventas.historial');
+    Route::get('/ventas/{venta}', [VentaController::class, 'show'])->name('ventas.show');
+    Route::post('/ventas/{venta}/anular', [VentaController::class, 'anular'])->name('ventas.anular');
+    Route::get('/ventas/{venta}/pdf', [VentaController::class, 'pdf'])->name('ventas.pdf');
+    Route::get('/ventas/{venta}/ticket', [VentaController::class, 'ticket'])->name('ventas.ticket');
+
+    // Devoluciones
+    Route::get('/devoluciones', [DevolucionController::class, 'index'])->name('devoluciones.index');
+    Route::post('/devoluciones', [DevolucionController::class, 'store'])->name('devoluciones.store');
+
+    // Ventas en espera
+    Route::get('/espera', [VentaEsperaController::class, 'index'])->name('espera.index');
+    Route::post('/espera', [VentaEsperaController::class, 'store'])->name('espera.store');
+    Route::post('/espera/{id}/retomar', [VentaEsperaController::class, 'retomar'])->name('espera.retomar');
+    Route::delete('/espera/{id}', [VentaEsperaController::class, 'destroy'])->name('espera.destroy');
+});
+
+// ============================================================
+// POS - CUENTAS POR PAGAR
+// ============================================================
+Route::prefix('cuentas-por-pagar')->name('cuentas-por-pagar.')->group(function () {
+    Route::get('/', [CuentaPorPagarController::class, 'index'])->name('index');
+    Route::get('/historial', [CuentaPorPagarController::class, 'historial'])->name('historial');
+    Route::get('/vencidas', [CuentaPorPagarController::class, 'vencidas'])->name('vencidas');
+    Route::get('/reporte', [CuentaPorPagarController::class, 'reporteProveedores'])->name('reporte');
+    Route::get('/{compra}', [CuentaPorPagarController::class, 'show'])->name('show');
+    Route::post('/{compra}/pago', [CuentaPorPagarController::class, 'storePago'])->name('store_pago');
+});
+
+// ============================================================
+// POS - CUENTAS POR COBRAR (ACCOUNTS RECEIVABLE)
+// ============================================================
+Route::prefix('cuentas-por-cobrar')->name('cuentas.')->group(function () {
+    Route::get('/', [CuentaPorCobrarController::class, 'index'])->name('index');
+    Route::get('/{cuenta}', [CuentaPorCobrarController::class, 'show'])->name('show');
+    Route::post('/{cuenta}/pagar', [CuentaPorCobrarController::class, 'pagar'])->name('pagar');
+    Route::get('/reportes/historial-pagos', [CuentaPorCobrarController::class, 'historialPagos'])->name('historial-pagos');
+});
+
