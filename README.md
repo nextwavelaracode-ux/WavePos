@@ -1,3 +1,7 @@
+<img width="1916" height="928" alt="image" src="https://github.com/user-attachments/assets/5858c793-248d-4adc-9cc8-48858bec4b41" />
+
+
+
 # 🌊 WavePOS - Sistema de Punto de Venta y Facturación Electrónica
 
 **WavePOS** es un sistema integral de Punto de Venta (POS) moderno, escalable y listo para producción, construido sobre **Laravel 12**, **Tailwind CSS v4** y **Alpine.js** bajo una arquitectura modular estricta. Está diseñado específicamente para gestionar de forma completa el ciclo comercial: ventas en tiempo real, control de inventarios, finanzas, cuentas por cobrar/pagar y cuenta con integración nativa para la **Facturación Electrónica (DIAN)**.
