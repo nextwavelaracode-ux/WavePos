@@ -1,5 +1,32 @@
 <?php
 
+/**
+ * FacturaElectronicaController — Controlador de Facturación Electrónica DIAN
+ *
+ * Orquesta todo el flujo de negocio del módulo de facturación electrónica
+ * en WavePOS. Actúa como intermediario entre las vistas/POS y el servicio
+ * FactusService que se comunica con la API de Factus/DIAN.
+ *
+ * Rutas registradas (prefix: /facturacion, name: facturacion.*):
+ *  GET    /facturacion                  → index()       Listado paginado
+ *  GET    /facturacion/create           → create()      Formulario manual
+ *  POST   /facturacion/store            → store()       Desde POS (AJAX/JSON)
+ *  POST   /facturacion/store-manual     → storeManual() Desde formulario web
+ *  GET    /facturacion/{id}             → show()        Detalle con sync live
+ *  GET    /facturacion/{id}/pdf         → pdf()         Descarga PDF DIAN
+ *  POST   /facturacion/{id}/send-email  → sendEmail()   Envío por correo
+ *
+ * Principios de diseño aplicados:
+ *  - Single Responsibility: lógica HTTP delegada a FactusService.
+ *  - Database Transactions: store() y storeManual() usan DB::beginTransaction().
+ *  - Duplicate Prevention: verifica existencia antes de facturar.
+ *  - Standardized Responses: store() siempre retorna JSON (llamado via fetch).
+ *
+ * @package App\Http\Controllers
+ * @author  WavePOS — NextWave
+ * @version 1.0.0
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\FacturaElectronica;
@@ -13,15 +40,34 @@ use Illuminate\Support\Facades\Log;
 
 class FacturaElectronicaController extends Controller
 {
+    /** @var FactusService Servicio de comunicación con la API de Factus */
     protected FactusService $factusService;
 
+    /**
+     * Inyección de dependencia del servicio Factus mediante el Service Container de Laravel.
+     * Laravel resuelve automáticamente FactusService al instanciar este controlador.
+     *
+     * @param FactusService $factusService
+     */
     public function __construct(FactusService $factusService)
     {
         $this->factusService = $factusService;
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // MÉTODOS PÚBLICOS
+    // ─────────────────────────────────────────────────────────────────────────
+
     /**
-     * Listado de Facturas Electrónicas
+     * Muestra el listado paginado de todas las facturas electrónicas.
+     *
+     * Usa eager loading (with) para cargar la relación venta→cliente en
+     * una sola consulta SQL eficiente (evita el problema N+1).
+     *
+     * Vista: pages/facturacion/index.blade.php
+     * Ruta:  GET /facturacion  (facturacion.index)
+     *
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -31,7 +77,26 @@ class FacturaElectronicaController extends Controller
     }
 
     /**
-     * Muestra el formulario para crear una factura manual.
+     * Muestra el formulario para crear una factura electrónica manualmente.
+     *
+     * Prepara los datos de clientes, productos y ventas sin facturar para
+     * ser usados por Alpine.js en el frontend. Serializa los datos como JSON
+     * para inyectarlos de forma segura en el componente reactivo sin que Blade
+     * interprete las llaves de JavaScript como directivas Blade.
+     *
+     * Parámetro opcional: ?venta_id={id} — pre-carga una venta existente
+     * en el formulario (flujo desde historial de ventas → facturar).
+     *
+     * Vista: pages/facturacion/create.blade.php
+     * Ruta:  GET /facturacion/create  (facturacion.create)
+     *
+     * Variables enviadas a la vista:
+     *  - $clientes, $productos, $ventas       → Colecciones Eloquent
+     *  - $productosJs, $clientesJs, $ventasJs → JSON para Alpine.js
+     *  - $ventaPreload, $ventaPreloadJs        → Venta pre-cargada (nullable)
+     *
+     * @param  Request $request
+     * @return \Illuminate\View\View
      */
     public function create(Request $request)
     {
@@ -109,7 +174,26 @@ class FacturaElectronicaController extends Controller
     }
 
     /**
-     * Procesa el formulario manual y envía a Factus/DIAN.
+     * Procesa el formulario manual y envía la factura a Factus para validación DIAN.
+     *
+     * Flujo completo:
+     *  1. Valida los campos del Request (cliente, método de pago, items JSON).
+     *  2. Deserializa los items enviados desde Alpine.js (items_json).
+     *  3. Valida que cada item tenga precio >= $1 COP (requisito Factus).
+     *  4. Mapea los datos del cliente según tipo (natural, jurídico, extranjero).
+     *  5. Construye el payload $invoiceData conforme a la especificación de Factus.
+     *  6. Llama a FactusService::validateBill() dentro de una DB Transaction.
+     *  7. Si la DIAN aprueba → guarda FacturaElectronica y hace commit.
+     *  8. Si falla → rollback y retorna al formulario con los errores.
+     *
+     * Nota sobre reference_code: Se genera con timestamp 'MAN-YmdHis' para
+     * garantizar unicidad y evitar el error de colisión de referencia en Factus.
+     *
+     * Vista de retorno: facturacion.show (éxito) | facturacion.create (error)
+     * Ruta: POST /facturacion/store-manual  (facturacion.storeManual)
+     *
+     * @param  Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function storeManual(Request $request)
     {
@@ -265,8 +349,32 @@ class FacturaElectronicaController extends Controller
     }
 
     /**
-     * Convierte una venta en Factura Electrónica DIAN via Factus.
-     * Siempre retorna JSON (llamado via fetch() desde el POS).
+     * Convierte una venta existente del POS en Factura Electrónica DIAN.
+     *
+     * Este método es llamado exclusivamente via AJAX (fetch) desde el
+     * punto de venta. Siempre retorna JSON — nunca hace redirect.
+     *
+     * Validaciones de negocio antes de procesar:
+     *  - La venta debe existir en la tabla ventas.
+     *  - La venta NO debe tener ya una factura electrónica (HTTP 409).
+     *  - La venta DEBE tener un cliente con datos completos (HTTP 422).
+     *
+     * Construcción del payload:
+     *  - Itera los detalles de la venta para construir los items.
+     *  - Determina el número de documento según tipo_cliente.
+     *  - Usa reference_code = 'POS-{venta_id}-{timestamp}' para unicidad.
+     *  - Lee la configuración del establecimiento desde config/factus.php.
+     *
+     * Respuestas JSON:
+     *  - Éxito (200):  {success:true, factura_id, numero, cufe}
+     *  - Duplicado (409): {success:false, message}
+     *  - Error DIAN (422): {success:false, message, details}
+     *  - Error interno (500): {success:false, message}
+     *
+     * Ruta: POST /facturacion/store  (facturacion.store)
+     *
+     * @param  Request $request  Requiere: venta_id (integer, exists:ventas,id)
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -436,8 +544,24 @@ class FacturaElectronicaController extends Controller
     }
 
     /**
-     * Muestra el detalle de una factura electronica.
-     * Consulta el endpoint de Factus en vivo (showBill) para previsualizar los datos actualizados.
+     * Muestra el detalle completo de una factura electrónica con sincronización en vivo.
+     *
+     * Al cargar la vista de detalle, siempre consulta la API de Factus
+     * (FactusService::showBill) para obtener el estado más reciente desde
+     * la DIAN. Si la respuesta es exitosa, actualiza en BD:
+     *  - status        → 'Validado' o 'Pendiente'
+     *  - cufe          → Código fiscal actualizado
+     *  - qr            → URL del QR DIAN
+     *  - json_response → Data fresca completa (para renderizado en vista)
+     *
+     * Si la API de Factus falla (timeout, error), registra un warning en Log
+     * pero NO interrumpe la carga de la vista (muestra los datos en BD).
+     *
+     * Vista: pages/facturacion/show.blade.php
+     * Ruta:  GET /facturacion/{id}  (facturacion.show)
+     *
+     * @param  int $id  ID local de la FacturaElectronica.
+     * @return \Illuminate\View\View
      */
     public function show($id)
     {
@@ -470,7 +594,23 @@ class FacturaElectronicaController extends Controller
     }
 
     /**
-     * Descarga el PDF de la representación gráfica desde Factus.
+     * Descarga el PDF de representación gráfica de la factura desde Factus.
+     *
+     * Factus retorna el archivo PDF como string codificado en Base64.
+     * Este método lo decodifica y lo sirve directamente al navegador con
+     * los headers correctos para visualización inline (no fuerza descarga).
+     *
+     * Formato de respuesta:
+     *  Content-Type: application/pdf
+     *  Content-Disposition: inline; filename="{nombre_archivo}.pdf"
+     *
+     * Requisito: la factura debe tener un número DIAN válido (no 'N/A').
+     * Si no tiene número, redirige atrás con mensaje de error.
+     *
+     * Ruta: GET /facturacion/{id}/pdf  (facturacion.pdf)
+     *
+     * @param  int $id  ID local de la FacturaElectronica.
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function pdf($id)
     {
@@ -503,7 +643,28 @@ class FacturaElectronicaController extends Controller
     }
 
     /**
-     * Envía la factura por correo electrónico a través de Factus.
+     * Solicita a Factus el envío de la factura por correo electrónico al cliente.
+     *
+     * Factus gestiona el envío completo — incluyendo el PDF de representación
+     * gráfica y el XML del documento electrónico — directamente desde su
+     * plataforma al email indicado.
+     *
+     * Validaciones:
+     *  - El campo email debe ser un email válido (RFC 5322).
+     *  - La factura debe tener número DIAN válido (estado != 'N/A').
+     *
+     * Los resultados se comunican al usuario mediante SweetAlert2 (sweet_alert
+     * session flash) para una experiencia de usuario más limpia que un simple
+     * mensaje de texto.
+     *
+     * Nota sandbox: En el entorno de pruebas de Factus, el envío puede
+     * comportarse diferente o rechazar ciertos dominios de correo.
+     *
+     * Ruta: POST /facturacion/{id}/send-email  (facturacion.sendEmail)
+     *
+     * @param  Request $request  Requiere: email (string|email|max:255)
+     * @param  int     $id       ID local de la FacturaElectronica.
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function sendEmail(Request $request, $id)
     {
