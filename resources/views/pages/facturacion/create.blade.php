@@ -60,7 +60,7 @@
     <!-- Alpine.js Component for reactive form -->
     <div x-data="facturaForm()" x-init="init()" class="grid grid-cols-1 gap-9">
         <div class="flex flex-col gap-9 col-span-1">
-            
+
             <!-- Contenedor Principal Estilo Sistema -->
             <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900 p-6 lg:p-8">
 
@@ -95,7 +95,7 @@
                     {{-- ────── 2. Datos del Cliente ────── --}}
                     <div class="mb-6">
                         <h3 class="font-medium text-black dark:text-white mb-4">2. Receptor <span class="text-meta-1">*</span></h3>
-                        
+
                         <div class="mb-4 w-full xl:w-1/2">
                             <select x-model="clienteId" @change="actualizarInfoCliente" required
                                 class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90">
@@ -152,9 +152,9 @@
                     {{-- ────── 3. Parámetros Generales ────── --}}
                     <div class="mb-6">
                         <h3 class="font-medium text-black dark:text-white mb-4">3. Parámetros de Emisión</h3>
-                        
+
                         <div class="mb-4.5 grid grid-cols-1 md:grid-cols-3 gap-6">
-                            
+
                             <div>
                                 <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">
                                     Forma de Pago <span class="text-meta-1">*</span>
@@ -239,111 +239,188 @@
                     <div class="border-b border-stroke dark:border-strokedark my-6"></div>
 
                     {{-- ────── 4. Ítems de la Factura ────── --}}
-                    <div class="mb-6">
+                    <div class="mb-6" x-data="{ addingItem: false }">
+
+                        {{-- Cabecera de sección --}}
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-medium text-black dark:text-white">4. Detalle de Productos</h3>
-                            <span class="rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary" x-text="items.length + ' conceptos'"></span>
+                            <div class="flex items-center gap-3">
+                                <h3 class="font-medium text-black dark:text-white">4. Productos Facturados</h3>
+                                <span x-show="items.length > 0"
+                                      class="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary"
+                                      x-text="items.length + (items.length === 1 ? ' ítem' : ' ítems')">
+                                </span>
+                            </div>
+                            {{-- Botón compacto para abrir el panel de agregar --}}
+                            <button type="button" @click="addingItem = !addingItem"
+                                    class="inline-flex items-center gap-1.5 rounded-xl border border-dashed border-primary/40 px-3 py-1.5 text-xs font-semibold text-primary transition hover:border-primary hover:bg-primary/5">
+                                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"
+                                     :class="addingItem ? 'rotate-45' : ''" style="transition: transform 0.2s;">
+                                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                                <span x-text="addingItem ? 'Cancelar' : 'Agregar producto'"></span>
+                            </button>
                         </div>
 
-                        <!-- Add product form bg-gray-50 estilo compras -->
-                        <div class="mb-6 p-5 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
-                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                        {{-- Panel de entrada — se expande al hacer click en "Agregar producto" --}}
+                        <div x-show="addingItem" x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+                             class="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40 p-4">
+
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+
+                                {{-- Catálogo --}}
                                 <div class="md:col-span-3">
-                                    <label class="mb-1 block text-sm font-medium text-gray-600 dark:text-white/90">Catálogo</label>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Catálogo</label>
                                     <select x-model="tempProdId" @change="updateTempProduct"
-                                        class="w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-800 focus:border-brand-500 dark:border-gray-700 dark:text-white/90">
-                                        <option value="">Seleccione...</option>
+                                            class="w-full rounded-lg border border-gray-300 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-800 dark:text-white/90 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition">
+                                        <option value="">— Seleccionar —</option>
                                         <template x-for="p in PRODUCTOS_DATA" :key="p.id">
-                                            <option :value="p.id" x-text="`${p.nombre}`"></option>
+                                            <option :value="p.id" x-text="p.nombre"></option>
                                         </template>
                                     </select>
                                 </div>
+
+                                {{-- Descripción --}}
                                 <div class="md:col-span-3">
-                                    <label class="mb-1 block text-sm font-medium text-gray-600 dark:text-white/90">Descripción <span class="text-meta-1">*</span></label>
-                                    <input type="text" x-model="tempNombre" placeholder="Nombre completo"
-                                        class="w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:text-white/90">
+                                    <label class="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                                        Descripción <span class="text-red-400">*</span>
+                                    </label>
+                                    <input type="text" x-model="tempNombre" placeholder="Nombre del producto / servicio"
+                                           class="w-full rounded-lg border border-gray-300 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-800 dark:text-white/90 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition">
                                 </div>
+
+                                {{-- Cantidad --}}
                                 <div class="md:col-span-1">
-                                    <label class="mb-1 block text-sm font-medium text-gray-600 dark:text-white/90">Cant.</label>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Cant.</label>
                                     <input type="number" x-model="tempCantidad" min="1"
-                                        class="w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:text-white/90">
+                                           class="w-full rounded-lg border border-gray-300 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-800 dark:text-white/90 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition">
                                 </div>
+
+                                {{-- Precio --}}
                                 <div class="md:col-span-2">
-                                    <label class="mb-1 block text-sm font-medium text-gray-600 dark:text-white/90">P. Venta</label>
-                                    <input type="number" step="0.01" x-model="tempPrecio" min="0" placeholder="0.00"
-                                        class="w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:text-white/90">
+                                    <label class="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Precio Un.</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium">$</span>
+                                        <input type="number" step="0.01" x-model="tempPrecio" min="0" placeholder="0.00"
+                                               class="w-full rounded-lg border border-gray-300 bg-white dark:bg-gray-900 pl-6 pr-3 py-2 text-sm text-gray-800 dark:text-white/90 dark:border-gray-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition">
+                                    </div>
                                 </div>
+
+                                {{-- IVA --}}
                                 <div class="md:col-span-1">
-                                    <label class="mb-1 block text-sm font-medium text-gray-600 dark:text-white/90">IVA %</label>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">IVA %</label>
                                     <select x-model="tempTax"
-                                        class="w-full rounded-xl border border-gray-300 bg-transparent px-2 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:text-white/90">
-                                        <option value="0.00">0</option>
-                                        <option value="5.00">5</option>
-                                        <option value="19.00" selected>19</option>
+                                            class="w-full rounded-lg border border-gray-300 bg-white dark:bg-gray-900 px-2 py-2 text-sm text-gray-800 dark:text-white/90 dark:border-gray-700 focus:border-primary outline-none transition">
+                                        <option value="0.00">0%</option>
+                                        <option value="5.00">5%</option>
+                                        <option value="19.00" selected>19%</option>
                                     </select>
                                 </div>
+
+                                {{-- Descuento --}}
                                 <div class="md:col-span-1">
-                                    <label class="mb-1 block text-sm font-medium text-gray-600 dark:text-white/90">Desc %</label>
+                                    <label class="mb-1 block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Dto %</label>
                                     <input type="number" step="0.01" x-model="tempDesc" min="0" max="100" placeholder="0"
-                                        class="w-full rounded-xl border border-gray-300 bg-transparent px-2 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:text-white/90">
+                                           class="w-full rounded-lg border border-gray-300 bg-white dark:bg-gray-900 px-2 py-2 text-sm text-gray-800 dark:text-white/90 dark:border-gray-700 focus:border-primary outline-none transition">
                                 </div>
+
+                                {{-- Botón agregar --}}
                                 <div class="md:col-span-1">
-                                    <button type="button" @click="addItem"
-                                        class="w-full rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors">
-                                        + 
+                                    <button type="button" @click="addItem(); addingItem = false"
+                                            class="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-dark shadow-sm hover:bg-opacity-90 transition">
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                                        </svg>
+                                        Añadir
                                     </button>
                                 </div>
                             </div>
+
+                            {{-- Preview del subtotal mientras rellena --}}
+                            <div x-show="tempNombre && parseFloat(tempPrecio) > 0"
+                                 class="mt-3 flex items-center justify-end gap-2 text-xs text-gray-500 dark:text-gray-400" x-cloak>
+                                <span>Subtotal estimado:</span>
+                                <span class="font-bold text-black dark:text-white"
+                                      x-text="'$' + (parseFloat(tempCantidad || 1) * parseFloat(tempPrecio || 0) * (1 - parseFloat(tempDesc || 0)/100)).toFixed(2)">
+                                </span>
+                                <span class="text-emerald-500 font-medium"
+                                      x-text="'+ IVA $' + (parseFloat(tempCantidad||1) * parseFloat(tempPrecio||0) * (1 - parseFloat(tempDesc||0)/100) * parseFloat(tempTax||0)/100).toFixed(2)">
+                                </span>
+                            </div>
                         </div>
 
-                        <!-- Table -->
-                        <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700 mb-6">
+                        {{-- Tabla de ítems --}}
+                        <div class="overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-700">
                             <table class="w-full text-sm">
                                 <thead>
-                                    <tr class="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
-                                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Concepto</th>
-                                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Cant.</th>
-                                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">V. Un.</th>
-                                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Desc %</th>
-                                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">IVA</th>
-                                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Concepto</th>
-                                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Acc.</th>
+                                    <tr class="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-white/[0.03]">
+                                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">Concepto</th>
+                                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-400">Cant.</th>
+                                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-400">Precio Un.</th>
+                                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-400">Dto</th>
+                                        <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-gray-400">IVA</th>
+                                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-400">Total</th>
+                                        <th class="px-4 py-3 w-12"></th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                                <tbody class="divide-y divide-gray-100 dark:divide-gray-700/60">
                                     <template x-for="(item, index) in items" :key="index">
-                                        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
-                                            <td class="px-4 py-4 font-medium text-gray-800 dark:text-white/90">
-                                                <input type="hidden" :name="`items[${index}][producto_id]`" :value="item.producto_id">
-                                                <input type="hidden" :name="`items[${index}][nombre]`" :value="item.nombre">
-                                                <input type="hidden" :name="`items[${index}][codigo]`" :value="item.codigo">
-                                                <input type="hidden" :name="`items[${index}][cantidad]`" :value="item.cantidad">
-                                                <input type="hidden" :name="`items[${index}][precio]`" :value="item.precio">
-                                                <input type="hidden" :name="`items[${index}][tax_rate]`" :value="item.tax_rate">
+                                        <tr class="group hover:bg-gray-50/80 dark:hover:bg-white/[0.02] transition-colors">
+                                            <td class="px-4 py-3">
+                                                {{-- Campos hidden --}}
+                                                <input type="hidden" :name="`items[${index}][producto_id]`"  :value="item.producto_id">
+                                                <input type="hidden" :name="`items[${index}][nombre]`"       :value="item.nombre">
+                                                <input type="hidden" :name="`items[${index}][codigo]`"       :value="item.codigo">
+                                                <input type="hidden" :name="`items[${index}][cantidad]`"     :value="item.cantidad">
+                                                <input type="hidden" :name="`items[${index}][precio]`"       :value="item.precio">
+                                                <input type="hidden" :name="`items[${index}][tax_rate]`"     :value="item.tax_rate">
                                                 <input type="hidden" :name="`items[${index}][discount_rate]`" :value="item.discount_rate">
-                                                <span x-text="item.nombre"></span>
-                                                <div class="text-[11px] text-gray-400 font-mono mt-0.5" x-text="item.codigo"></div>
+                                                <p class="font-medium text-gray-800 dark:text-white/90" x-text="item.nombre"></p>
+                                                <p class="text-[11px] text-gray-400 font-mono mt-0.5" x-text="item.codigo"></p>
                                             </td>
-                                            <td class="px-4 py-4 text-center text-gray-800 dark:text-white/90" x-text="item.cantidad"></td>
-                                            <td class="px-4 py-4 text-right text-gray-600 dark:text-gray-400" x-text="'$' + parseFloat(item.precio).toFixed(2)"></td>
-                                            <td class="px-4 py-4 text-center">
-                                                <span class="rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 text-xs font-bold px-2 py-0.5" x-text="(item.discount_rate || 0) + '%'"></span>
+                                            <td class="px-4 py-3 text-center font-medium text-gray-700 dark:text-gray-300"
+                                                x-text="item.cantidad"></td>
+                                            <td class="px-4 py-3 text-right text-gray-600 dark:text-gray-400 tabular-nums"
+                                                x-text="'$' + parseFloat(item.precio).toLocaleString('es-CO', {minimumFractionDigits:2})"></td>
+                                            <td class="px-4 py-3 text-center">
+                                                <span x-show="item.discount_rate > 0"
+                                                      class="inline-block rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-[11px] font-bold px-2 py-0.5"
+                                                      x-text="item.discount_rate + '%'"></span>
+                                                <span x-show="!item.discount_rate || item.discount_rate == 0" class="text-gray-300 text-xs">—</span>
                                             </td>
-                                            <td class="px-4 py-4 text-center">
-                                                <span class="rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold px-2 py-0.5" x-text="item.tax_rate + '%'"></span>
+                                            <td class="px-4 py-3 text-center">
+                                                <span class="inline-block rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[11px] font-bold px-2 py-0.5"
+                                                      x-text="item.tax_rate + '%'"></span>
                                             </td>
-                                            <td class="px-4 py-4 text-right font-bold text-gray-800 dark:text-white/90" x-text="'$' + ((item.cantidad * item.precio) * (1 - (item.discount_rate/100))).toFixed(2)"></td>
-                                            <td class="px-4 py-4 text-center">
+                                            <td class="px-4 py-3 text-right font-bold tabular-nums text-gray-900 dark:text-white"
+                                                x-text="'$' + ((item.cantidad * item.precio) * (1 - (item.discount_rate/100))).toLocaleString('es-CO', {minimumFractionDigits:2})">
+                                            </td>
+                                            <td class="px-4 py-3 text-center">
                                                 <button type="button" @click="removeItem(index)"
-                                                    class="inline-flex items-center justify-center rounded-lg border border-red-200 bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:border-red-800/30 dark:bg-red-500/10 dark:text-red-400 transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                        class="inline-flex items-center justify-center h-7 w-7 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100">
+                                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
                                                 </button>
                                             </td>
                                         </tr>
                                     </template>
+
+                                    {{-- Estado vacío --}}
                                     <tr x-show="items.length === 0">
-                                        <td colspan="7" class="px-6 py-8 text-center text-gray-400 dark:text-gray-500">
-                                            No se han agregado productos a la factura.
+                                        <td colspan="7" class="px-6 py-12 text-center">
+                                            <div class="flex flex-col items-center gap-3">
+                                                <div class="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                                                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" class="text-gray-400">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/>
+                                                    </svg>
+                                                </div>
+                                                <p class="text-sm text-gray-400 dark:text-gray-500">Sin productos agregados</p>
+                                                <button type="button" @click="addingItem = true"
+                                                        class="text-xs font-semibold text-primary hover:underline">
+                                                    + Agregar el primer producto
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -480,7 +557,7 @@
 
                 </form>
             </div>
-            
+
         </div>
     </div>
 
