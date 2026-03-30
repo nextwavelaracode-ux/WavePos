@@ -261,9 +261,7 @@
                             </button>
                         </div>
 
-                        {{-- Panel de entrada — se expande al hacer click en "Agregar producto" --}}
-                        <div x-show="addingItem" x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+                        <div x-show="addingItem" x-cloak
                              class="mb-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40 p-4">
 
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
