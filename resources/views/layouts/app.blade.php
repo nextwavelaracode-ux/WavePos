@@ -117,7 +117,7 @@
 
         {{-- Main area: shifts when sidebar is open, full-width when hidden --}}
         <div
-            class="flex flex-col min-h-screen transition-all duration-300 ease-in-out"
+            class="flex flex-col min-h-screen transition-all duration-300 ease-in-out lg:ml-[260px]"
             :class="{
                 'lg:ml-[260px]': $store.sidebar.isExpanded,
                 'lg:ml-0'      : !$store.sidebar.isExpanded

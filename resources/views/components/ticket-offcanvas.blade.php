@@ -14,7 +14,7 @@
          @click="openTicket = false; setTimeout(() => ticketUrl = '', 300); window.dispatchEvent(new CustomEvent('ticket-cerrado'))"></div>
          
     <!-- Offcanvas Panel -->
-    <div class="fixed top-0 right-0 h-full w-[400px] max-w-full bg-white dark:bg-neutral-900 shadow-2xl z-[10000] transform transition-transform duration-300 flex flex-col"
+    <div class="fixed top-0 right-0 h-full w-[400px] max-w-full bg-white dark:bg-neutral-900 shadow-2xl z-[10000] transform transition-transform duration-300 flex flex-col translate-x-full"
          :class="openTicket ? 'translate-x-0' : 'translate-x-full'">
         
         <!-- Header -->

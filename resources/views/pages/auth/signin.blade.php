@@ -631,7 +631,99 @@
             gap: 18px;
             margin-bottom: 18px;
         }
+        /* ===================== SPLASH SCREEN ===================== */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.5s ease;
+        }
+
+        #splash-screen.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #splash-video-wrap {
+            position: relative;
+            width: 85vw;
+            height: 85vh;
+            overflow: hidden;
+        }
+
+        #splash-video {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+        #splash-skip {
+            position: absolute;
+            bottom: 36px;
+            right: 36px;
+            z-index: 20;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(8px);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 100px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: background 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #splash-skip:hover {
+            background: rgba(255,255,255,0.25);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        #splash-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00c2ff, #7c3aed);
+            width: 0%;
+            transition: width linear;
+            z-index: 20;
+        }
+
     </style>
+
+    {{-- ================================================================ --}}
+    {{-- SPLASH SCREEN (video intro, solo primera vez por sesión)          --}}
+    {{-- ================================================================ --}}
+    <div id="splash-screen">
+        <div id="splash-video-wrap">
+            <video id="splash-video" autoplay muted playsinline preload="auto">
+                <source src="/images/video/69db2db3722274791y4S2hz4LL1175.mp4" type="video/mp4">
+            </video>
+            <div id="splash-progress"></div>
+        </div>
+        <button id="splash-skip">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+            </svg>
+            Saltar intro
+        </button>
+    </div>
 
     <div class="login-root">
 
@@ -857,3 +949,48 @@
 
     </div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const splash    = document.getElementById('splash-screen');
+    const video     = document.getElementById('splash-video');
+    const skipBtn   = document.getElementById('splash-skip');
+    const progress  = document.getElementById('splash-progress');
+
+    // Solo mostrar una vez por sesión del navegador
+    const alreadySeen = sessionStorage.getItem('wavepos_splash_seen');
+
+    function dismissSplash() {
+        sessionStorage.setItem('wavepos_splash_seen', '1');
+        splash.classList.add('fade-out');
+        // Cuando termina la transición, eliminarlo del DOM para no bloquear nada
+        setTimeout(() => splash.remove(), 900);
+    }
+
+    if (alreadySeen) {
+        // Ya lo vio: ocultar inmediatamente sin animación
+        splash.style.display = 'none';
+        return;
+    }
+
+    // Animar la barra de progreso al mismo tiempo que el video
+    video.addEventListener('loadedmetadata', function () {
+        const dur = video.duration * 1000; // en ms
+        progress.style.transitionDuration = dur + 'ms';
+        // Forzar reflow para que la transición arranque correctamente
+        progress.getBoundingClientRect();
+        progress.style.width = '100%';
+    });
+
+    // Cuando termina el video → dismiss automático
+    video.addEventListener('ended', dismissSplash);
+
+    // Botón skip
+    skipBtn.addEventListener('click', dismissSplash);
+
+    // Fallback: si el video no carga en 15s, dismissear igualmente
+    setTimeout(dismissSplash, 15000);
+})();
+</script>
+@endpush
