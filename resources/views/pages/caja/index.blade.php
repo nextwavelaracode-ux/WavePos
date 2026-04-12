@@ -12,7 +12,7 @@
         
         <div class="flex flex-wrap gap-2">
             @if($cajaAbierta)
-                <a href="{{ route('caja.pos') }}" class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                <a href="{{ route('caja.pos') }}" class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700 transition">
                     POS
                 </a>
                 <button @click="modalCerrar = true" class="inline-flex items-center gap-2 rounded-lg bg-red-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-600 transition">
@@ -42,56 +42,61 @@
     @if($cajaAbierta)
     {{-- === CAJA ABIERTA === --}}
     
-    {{-- 4 Cards --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h4 class="text-title-md font-bold text-gray-800 dark:text-white">${{ number_format($montoEsperado, 2) }}</h4>
-                    <span class="text-sm font-medium text-gray-500">Efectivo en Caja</span>
-                </div>
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400">
-                    <svg width="24" height="24" fill="none" class="stroke-current" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                </div>
-            </div>
-        </div>
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h4 class="text-title-md font-bold text-gray-800 dark:text-white">${{ number_format($totalTarjeta, 2) }}</h4>
-                    <span class="text-sm font-medium text-gray-500">Ventas con Tarjeta</span>
-                </div>
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
-                     <svg width="24" height="24" fill="none" class="stroke-current" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+    {{-- 4 Cards KPI --}}
+    <div class="mb-6 grid md:grid-cols-4 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-2xs rounded-xl overflow-hidden">
+
+        {{-- Efectivo en Caja --}}
+        <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700 first:before:hidden">
+            <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                <div class="grow">
+                    <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Efectivo en Caja</p>
+                    <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-500">${{ number_format($montoEsperado, 2) }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Turno activo</p>
                 </div>
             </div>
         </div>
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h4 class="text-title-md font-bold text-gray-800 dark:text-white">${{ number_format($totalTransferencia, 2) }}</h4>
-                    <span class="text-sm font-medium text-gray-500">Transferencias</span>
-                </div>
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50 text-purple-500 dark:bg-purple-500/10 dark:text-purple-400">
-                    <svg width="24" height="24" fill="none" class="stroke-current" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
-                </div>
-            </div>
-        </div>
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h4 class="text-title-md font-bold text-brand-600 dark:text-brand-400">${{ number_format($totalVentas, 2) }}</h4>
-                    <span class="text-sm font-medium text-gray-500">Total Ventas</span>
-                </div>
-                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-500/10 dark:text-brand-400">
-                    <svg width="24" height="24" fill="none" class="stroke-current" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+
+        {{-- Ventas con Tarjeta --}}
+        <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700">
+            <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                <div class="grow">
+                    <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Ventas con Tarjeta</p>
+                    <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-500">${{ number_format($totalTarjeta, 2) }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Este turno</p>
                 </div>
             </div>
         </div>
+
+        {{-- Transferencias --}}
+        <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700">
+            <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                <div class="grow">
+                    <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Transferencias</p>
+                    <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-500">${{ number_format($totalTransferencia, 2) }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Este turno</p>
+                </div>
+            </div>
+        </div>
+
+        {{-- Total Ventas --}}
+        <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700">
+            <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div class="grow">
+                    <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Total Ventas</p>
+                    <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-500">${{ number_format($totalVentas, 2) }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Este turno</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     {{-- Tabs Navbar --}}
-    <div class="mb-6 flex flex-wrap gap-3 border-b border-gray-200 pb-3 dark:border-gray-800">
+    <div class="mb-6 flex flex-wrap gap-3 border-b border-gray-200 pb-3 dark:border-neutral-800">
         <button @click="tab = 'movimientos'" :class="tab === 'movimientos' ? 'bg-brand-50 text-brand-500 dark:bg-brand-500/10 dark:text-brand-400 font-semibold' : 'bg-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'" class="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm transition">
             Movimientos del Turno
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
@@ -109,10 +114,10 @@
     {{-- Content Sections --}}
     
     <!-- MOVIMIENTOS -->
-    <div x-show="tab === 'movimientos'" class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-sm overflow-hidden" x-cloak>
+    <div x-show="tab === 'movimientos'" class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 shadow-sm overflow-hidden" x-cloak>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800">
+                <thead class="bg-gray-50 dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-800">
                     <tr>
                         <th class="px-4 py-3 text-left font-medium text-gray-500">Hora</th>
                         <th class="px-4 py-3 text-left font-medium text-gray-500">Concepto</th>
@@ -121,9 +126,9 @@
                         <th class="px-4 py-3 text-right font-medium text-gray-500">Monto</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                <tbody class="divide-y divide-gray-100 dark:divide-neutral-800">
                     <!-- Fondo inicial -->
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800">
                         <td class="px-4 py-3 text-gray-500">{{ $cajaAbierta->fecha_apertura->format('H:i') }}</td>
                         <td class="px-4 py-3 text-gray-800 dark:text-gray-200 font-medium">Fondo Inicial Apertura</td>
                         <td class="px-4 py-3 text-gray-500">Efectivo</td>
@@ -132,7 +137,7 @@
                     </tr>
                     <!-- Ventas -->
                     @forelse($movimientosTurno as $venta)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800">
                         <td class="px-4 py-3 text-gray-500">{{ $venta->created_at->format('H:i') }}</td>
                         <td class="px-4 py-3 text-gray-800 dark:text-gray-200">Venta <span class="text-xs text-gray-400">#{{ $venta->numero }}</span></td>
                         <td class="px-4 py-3 text-gray-500">
@@ -154,27 +159,27 @@
     <div x-show="tab === 'arqueo'" class="grid gap-6 xl:grid-cols-3" x-cloak 
          x-data="arqueoData({{ $montoEsperado }})">
         <!-- Calculadora Izquierda -->
-        <div class="xl:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
+        <div class="xl:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm">
             <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Conteo Físico</h3>
             <div class="grid gap-x-6 gap-y-4 sm:grid-cols-2">
                 <!-- Monedas -->
                 <div>
-                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 dark:border-gray-800 pb-2">Monedas (PAB / USD)</h4>
+                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 dark:border-neutral-800 pb-2">Monedas (PAB / USD)</h4>
                     <template x-for="(moneda, key) in monedas" :key="key">
                         <div class="flex items-center justify-between mb-2">
                             <label class="text-sm text-gray-600 dark:text-gray-300 w-24 whitespace-nowrap" x-text="moneda.label"></label>
-                            <input type="number" min="0" x-model.number="moneda.qty" @input="calcular()" class="h-9 w-24 rounded-lg border border-gray-300 bg-white px-2 py-1 text-right text-sm focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white" placeholder="0">
+                            <input type="number" min="0" x-model.number="moneda.qty" @input="calcular()" class="h-9 w-24 rounded-lg border border-gray-300 bg-white px-2 py-1 text-right text-sm focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white" placeholder="0">
                             <span class="w-16 text-right font-mono text-sm font-semibold text-gray-800 dark:text-gray-200" x-text="'$' + (moneda.qty * moneda.val).toFixed(2)"></span>
                         </div>
                     </template>
                 </div>
                 <!-- Billetes -->
                 <div>
-                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 dark:border-gray-800 pb-2">Billetes (USD)</h4>
+                    <h4 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 dark:border-neutral-800 pb-2">Billetes (USD)</h4>
                     <template x-for="(billete, key) in billetes" :key="key">
                         <div class="flex items-center justify-between mb-2">
                             <label class="text-sm text-gray-600 dark:text-gray-300 w-24 whitespace-nowrap" x-text="'Billete $' + billete.val"></label>
-                            <input type="number" min="0" x-model.number="billete.qty" @input="calcular()" class="h-9 w-24 rounded-lg border border-gray-300 bg-white px-2 py-1 text-right text-sm focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white" placeholder="0">
+                            <input type="number" min="0" x-model.number="billete.qty" @input="calcular()" class="h-9 w-24 rounded-lg border border-gray-300 bg-white px-2 py-1 text-right text-sm focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white" placeholder="0">
                             <span class="w-16 text-right font-mono text-sm font-semibold text-gray-800 dark:text-gray-200" x-text="'$' + (billete.qty * billete.val).toFixed(2)"></span>
                         </div>
                     </template>
@@ -186,11 +191,11 @@
         </div>
 
         <!-- Resumen Derecha -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900 shadow-sm flex flex-col">
+        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm flex flex-col">
             <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Resumen de Arqueo</h3>
             
             <div class="space-y-4 flex-grow">
-                <div class="flex justify-between items-center rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                <div class="flex justify-between items-center rounded-lg bg-gray-50 p-3 dark:bg-neutral-800">
                     <span class="text-sm text-gray-500">Efectivo Esperado</span>
                     <span class="font-bold text-gray-800 dark:text-white text-lg">${{ number_format($montoEsperado, 2) }}</span>
                 </div>
@@ -222,10 +227,10 @@
     </div>
 
     <!-- HISTORIAL TURNOS -->
-    <div x-show="tab === 'turnos'" class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-sm overflow-hidden" x-cloak>
+    <div x-show="tab === 'turnos'" class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 shadow-sm overflow-hidden" x-cloak>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800">
+                <thead class="bg-gray-50 dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-800">
                     <tr>
                         <th class="px-4 py-3 text-left font-medium text-gray-500">Fecha</th>
                         <th class="px-4 py-3 text-left font-medium text-gray-500">Cajero</th>
@@ -236,9 +241,9 @@
                         <th class="px-4 py-3 text-right font-medium text-gray-500">Diferencia</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                <tbody class="divide-y divide-gray-100 dark:divide-neutral-800">
                     @forelse($historialCajas as $c)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800">
                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $c->fecha_apertura->format('d/m/Y') }}</td>
                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $c->usuario->name ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $c->fecha_apertura->format('H:i') }}</td>
@@ -265,8 +270,8 @@
     @else
 
     {{-- === CAJA CERRADA === --}}
-    <div class="flex min-h-[50vh] flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-8 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
-        <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-gray-800">
+    <div class="flex min-h-[50vh] flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-8 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm">
+        <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 text-gray-400 dark:bg-neutral-800">
             <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
         </div>
         <h3 class="mb-2 text-2xl font-bold text-gray-800 dark:text-white">La caja está cerrada</h3>
@@ -277,13 +282,13 @@
     </div>
 
     <!-- HISTORIAL TURNOS (Cuando está cerrada también podemos verlo) -->
-    <div class="mt-8 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 shadow-sm overflow-hidden">
-        <div class="p-5 border-b border-gray-200 dark:border-gray-800">
+    <div class="mt-8 rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-gray-200 dark:border-neutral-800">
             <h3 class="text-lg font-bold text-gray-800 dark:text-white">Últimos Turnos</h3>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-800">
+                <thead class="bg-gray-50 dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-800">
                     <tr>
                         <th class="px-4 py-3 text-left font-medium text-gray-500">Fecha</th>
                         <th class="px-4 py-3 text-left font-medium text-gray-500">Cajero</th>
@@ -294,9 +299,9 @@
                         <th class="px-4 py-3 text-right font-medium text-gray-500">Diferencia</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                <tbody class="divide-y divide-gray-100 dark:divide-neutral-800">
                     @forelse($historialCajas as $c)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800">
                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $c->fecha_apertura->format('d/m/Y') }}</td>
                         <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $c->usuario->name ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $c->fecha_apertura->format('H:i') }}</td>
@@ -324,13 +329,13 @@
 
     {{-- MODAL ABRIR CAJA --}}
     <div x-show="modalAbrir" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-sm" x-cloak>
-        <div @click.outside="modalAbrir = false" class="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-gray-900 shadow-2xl">
+        <div @click.outside="modalAbrir = false" class="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-neutral-900 shadow-2xl">
             <h3 class="mb-4 text-xl font-bold text-gray-800 dark:text-white">Apertura de Turno</h3>
             <form action="{{ route('caja.abrir') }}" method="POST">
                 @csrf
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Sucursal *</label>
-                    <select name="sucursal_id" required class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                    <select name="sucursal_id" required class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                         <option value="">Seleccionar...</option>
                         @foreach($sucursales as $sucursal)
                             <option value="{{ $sucursal->id }}">{{ $sucursal->nombre }}</option>
@@ -339,10 +344,10 @@
                 </div>
                 <div class="mb-6">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Fondo Inicial ($) *</label>
-                    <input type="number" name="monto_inicial" step="0.01" min="0" required value="0.00" class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                    <input type="number" name="monto_inicial" step="0.01" min="0" required value="0.00" class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                 </div>
                 <div class="flex gap-3 justify-end">
-                    <button type="button" @click="modalAbrir = false" class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+                    <button type="button" @click="modalAbrir = false" class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-800">Cancelar</button>
                     <button type="submit" class="rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600">Abrir Caja</button>
                 </div>
             </form>
@@ -352,11 +357,11 @@
     {{-- MODAL CERRAR CAJA --}}
     @if($cajaAbierta)
     <div x-show="modalCerrar" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-sm" x-cloak>
-        <div @click.outside="modalCerrar = false" class="w-full max-w-lg rounded-2xl bg-white p-6 dark:bg-gray-900 shadow-2xl">
+        <div @click.outside="modalCerrar = false" class="w-full max-w-lg rounded-2xl bg-white p-6 dark:bg-neutral-900 shadow-2xl">
             <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Cerrar Caja</h3>
             <p class="text-sm text-gray-500 mb-6">Confirma el cierre de caja para finalizar turno. Asegúrate de verificar el efectivo contabilizado.</p>
             
-            <div class="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+            <div class="mb-6 rounded-lg bg-gray-50 p-4 dark:bg-neutral-800">
                 <div class="grid grid-cols-2 gap-y-2 text-sm">
                     <div class="text-gray-500">Monto Inicial:</div>
                     <div class="text-right font-medium text-gray-800 dark:text-white">${{ number_format($cajaAbierta->monto_inicial, 2) }}</div>
@@ -374,15 +379,15 @@
                 <input type="hidden" name="caja_id" value="{{ $cajaAbierta->id }}">
                 <div class="mb-4">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Efectivo Físico Contado ($) *</label>
-                    <input type="number" name="monto_real_cierre" step="0.01" min="0" required class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm font-bold text-emerald-600 focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-emerald-400" placeholder="0.00">
+                    <input type="number" name="monto_real_cierre" step="0.01" min="0" required class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm font-bold text-emerald-600 focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-emerald-400" placeholder="0.00">
                 </div>
                 <div class="mb-6">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Observaciones (Opcional)</label>
-                    <input type="text" name="observaciones" class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white" placeholder="Faltantes o anomalías...">
+                    <input type="text" name="observaciones" class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white" placeholder="Faltantes o anomalías...">
                 </div>
                 
                 <div class="flex gap-3 justify-end">
-                    <button type="button" @click="modalCerrar = false" class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">Cancelar</button>
+                    <button type="button" @click="modalCerrar = false" class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-800">Cancelar</button>
                     <button type="submit" class="rounded-lg bg-red-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-600">Confirmar Cierre</button>
                 </div>
             </form>

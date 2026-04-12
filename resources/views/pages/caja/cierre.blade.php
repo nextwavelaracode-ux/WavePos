@@ -14,7 +14,7 @@
         <div class="lg:col-span-2 space-y-5">
 
             {{-- Totales por método --}}
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 p-5">
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 p-5">
                 <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Desglose de Ingresos</h3>
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     @foreach([
@@ -24,7 +24,7 @@
                         ['label'=>'Yappy','val'=>$caja->total_yappy,'color'=>'amber'],
                         ['label'=>'Crédito','val'=>$caja->total_credito,'color'=>'red'],
                     ] as $m)
-                    <div class="rounded-xl border border-gray-100 dark:border-gray-800 p-3">
+                    <div class="rounded-xl border border-gray-100 dark:border-neutral-800 p-3">
                         <p class="text-xs text-gray-400">{{ $m['label'] }}</p>
                         <p class="mt-1 text-lg font-bold text-gray-800 dark:text-white">${{ number_format($m['val'], 2) }}</p>
                     </div>
@@ -33,22 +33,22 @@
             </div>
 
             {{-- Cuadre de caja --}}
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 p-5">
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 p-5">
                 <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Cuadre de Caja</h3>
                 <dl class="space-y-3 text-sm">
-                    <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
+                    <div class="flex justify-between border-b border-gray-100 dark:border-neutral-800 pb-2">
                         <dt class="text-gray-500">Monto Inicial</dt>
                         <dd class="font-semibold text-gray-800 dark:text-white">${{ number_format($caja->monto_inicial, 2) }}</dd>
                     </div>
-                    <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
+                    <div class="flex justify-between border-b border-gray-100 dark:border-neutral-800 pb-2">
                         <dt class="text-gray-500">+ Efectivo Recibido</dt>
                         <dd class="font-semibold text-emerald-600">${{ number_format($caja->total_efectivo, 2) }}</dd>
                     </div>
-                    <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
+                    <div class="flex justify-between border-b border-gray-100 dark:border-neutral-800 pb-2">
                         <dt class="text-gray-500">= Monto Esperado</dt>
                         <dd class="font-bold text-gray-800 dark:text-white">${{ number_format($caja->monto_inicial + $caja->total_efectivo, 2) }}</dd>
                     </div>
-                    <div class="flex justify-between border-b border-gray-100 dark:border-gray-800 pb-2">
+                    <div class="flex justify-between border-b border-gray-100 dark:border-neutral-800 pb-2">
                         <dt class="text-gray-500">Monto Real (contado)</dt>
                         <dd class="font-semibold text-gray-800 dark:text-white">${{ number_format($caja->monto_real_cierre, 2) }}</dd>
                     </div>
@@ -65,7 +65,7 @@
             </div>
 
             @if($caja->observaciones)
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 p-5">
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 p-5">
                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Observaciones</h4>
                 <p class="text-sm text-gray-600 dark:text-gray-400">{{ $caja->observaciones }}</p>
             </div>
@@ -74,7 +74,7 @@
 
         {{-- Sidebar info --}}
         <div class="space-y-4">
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 p-5">
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 p-5">
                 <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Resumen</h3>
                 <dl class="space-y-3 text-sm">
                     <div class="flex justify-between">
@@ -95,7 +95,7 @@
                     </div>
                 </dl>
             </div>
-            <a href="{{ route('caja.index') }}" class="flex w-full items-center justify-center rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 transition">
+            <a href="{{ route('caja.index') }}" class="flex w-full items-center justify-center rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-800 transition">
                 ← Volver a Caja
             </a>
         </div>

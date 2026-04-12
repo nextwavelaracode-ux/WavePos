@@ -5,7 +5,7 @@
 
     {{-- Header --}}
     <div class="mb-6 flex items-center gap-4">
-        <a href="{{ route('caja.ventas.historial') }}" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
+        <a href="{{ route('caja.ventas.historial') }}" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </a>
         <div>
@@ -13,9 +13,9 @@
             <p class="text-sm text-gray-500">{{ $venta->fecha->format('d/m/Y') }} · {{ $venta->sucursal?->nombre }}</p>
         </div>
         <span class="ml-auto inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold
-            @if($venta->estado === 'completada') bg-emerald-100 text-emerald-700
-            @elseif($venta->estado === 'anulada') bg-red-100 text-red-700
-            @else bg-amber-100 text-amber-700 @endif">
+            @if($venta->estado === 'completada') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
+            @elseif($venta->estado === 'anulada') bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400
+            @else bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 @endif">
             {{ ucfirst($venta->estado) }}
         </span>
     </div>
@@ -24,12 +24,12 @@
 
         {{-- Left: Products --}}
         <div class="lg:col-span-2 space-y-4">
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
-                <div class="p-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 overflow-hidden">
+                <div class="p-4 border-b border-gray-100 dark:border-neutral-800">
                     <h3 class="font-semibold text-gray-800 dark:text-white">Productos Vendidos</h3>
                 </div>
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-800">
+                    <thead class="bg-gray-50 dark:bg-neutral-800">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">Producto</th>
                             <th class="px-4 py-3 text-center text-xs font-medium uppercase text-gray-500">Cant.</th>
@@ -38,7 +38,7 @@
                             <th class="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">Total</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <tbody class="divide-y divide-gray-100 dark:divide-neutral-800">
                         @foreach($venta->detalles as $detalle)
                         <tr>
                             <td class="px-4 py-3 font-medium text-gray-800 dark:text-white">{{ $detalle->producto?->nombre ?? 'N/A' }}</td>
@@ -49,7 +49,7 @@
                         </tr>
                         @endforeach
                     </tbody>
-                    <tfoot class="bg-gray-50 dark:bg-gray-800">
+                    <tfoot class="bg-gray-50 dark:bg-neutral-800">
                         <tr>
                             <td colspan="4" class="px-4 py-2 text-right text-xs text-gray-500">Subtotal</td>
                             <td class="px-4 py-2 text-right text-sm font-semibold text-gray-700 dark:text-white">${{ number_format($venta->subtotal, 2) }}</td>
@@ -67,18 +67,18 @@
             </div>
 
             {{-- Pagos --}}
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 p-5">
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 p-5">
                 <h3 class="font-semibold text-gray-800 dark:text-white mb-3">Pagos Recibidos</h3>
                 <div class="space-y-2">
                     @foreach($venta->pagos as $pago)
-                    <div class="flex items-center justify-between rounded-xl border border-gray-100 dark:border-gray-800 p-3">
+                    <div class="flex items-center justify-between rounded-xl border border-gray-100 dark:border-neutral-800 p-3">
                         <div class="flex items-center gap-2">
                             <span class="text-xs rounded-full px-2.5 py-1 font-semibold
-                                @if($pago->metodo === 'efectivo') bg-emerald-100 text-emerald-700
-                                @elseif($pago->metodo === 'tarjeta') bg-blue-100 text-blue-700
-                                @elseif($pago->metodo === 'transferencia') bg-purple-100 text-purple-700
-                                @elseif($pago->metodo === 'yappy') bg-amber-100 text-amber-700
-                                @else bg-gray-100 text-gray-700 @endif">
+                                @if($pago->metodo === 'efectivo') bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400
+                                @elseif($pago->metodo === 'tarjeta') bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400
+                                @elseif($pago->metodo === 'transferencia') bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400
+                                @elseif($pago->metodo === 'yappy') bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400
+                                @else bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-gray-300 @endif">
                                 {{ $pago->metodo_label }}
                             </span>
                             @if($pago->referencia)
@@ -104,7 +104,7 @@
 
         {{-- Right: Info + Actions --}}
         <div class="space-y-4">
-            <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 p-5">
+            <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 p-5">
                 <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Información</h3>
                 <dl class="space-y-3 text-sm">
                     <div class="flex justify-between">
@@ -144,7 +144,7 @@
                     Imprimir Ticket 80mm
                 </button>
                 <a href="{{ route('caja.ventas.historial') }}"
-                   class="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 transition mt-4">
+                   class="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-gray-400 dark:hover:bg-neutral-800 transition mt-4">
                     Volver al Historial
                 </a>
             </div>

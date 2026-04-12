@@ -7,7 +7,7 @@
                     <input type="checkbox" id="checkboxLabelOne" class="sr-only"
                         @change="checkboxToggle = !checkboxToggle" />
                     <div :class="checkboxToggle ? 'border-brand-500 bg-brand-500' :
-                        'bg-transparent border-gray-300 dark:border-gray-700'"
+                        'bg-transparent border-gray-300 dark:border-neutral-700'"
                         class="f hover:border-brand-500 dark:hover:border-brand-500 mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]">
                         <span :class="checkboxToggle ? '' : 'opacity-0'">
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
@@ -29,7 +29,7 @@
                     <input type="checkbox" id="checkboxLabelTwo" class="sr-only"
                         @change="checkboxToggle = !checkboxToggle" />
                     <div :class="checkboxToggle ? 'border-brand-500 bg-brand-500' :
-                        'bg-transparent border-gray-300 dark:border-gray-700'"
+                        'bg-transparent border-gray-300 dark:border-neutral-700'"
                         class="hover:border-brand-500 dark:hover:border-brand-500 mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]">
                         <span :class="checkboxToggle ? '' : 'opacity-0'">
                             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
@@ -50,7 +50,7 @@
                 <div class="relative">
                     <input type="checkbox" id="checkboxLabelThree" class="peer sr-only"
                         @change="checkboxToggle = !checkboxToggle" disabled />
-                    <div :class="checkboxToggle ? 'bg-transparent border-gray-200 dark:border-gray-800' :
+                    <div :class="checkboxToggle ? 'bg-transparent border-gray-200 dark:border-neutral-800' :
                         'border-brand-500 bg-brand-500'"
                         class="mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]">
                         <span :class="checkboxToggle ? '' : 'opacity-0'">

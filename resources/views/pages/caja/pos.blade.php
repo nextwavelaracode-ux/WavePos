@@ -19,10 +19,10 @@
 @endif
 
     {{-- Full-height POS layout --}}
-    <div class="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-gray-100 dark:bg-gray-950{{ ($posSettings['pos_modo_tactil'] ?? '0') == '1' ? ' pos-tactil' : '' }}" x-data="posApp()">
+    <div class="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-gray-100 dark:bg-neutral-950{{ ($posSettings['pos_modo_tactil'] ?? '0') == '1' ? ' pos-tactil' : '' }}" x-data="posApp()">
 
         {{-- ── MOBILE TAB BAR (visible only on small screens) ── --}}
-        <div class="flex lg:hidden border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div class="flex lg:hidden border-b border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
             <button @click="mobileTab = 'productos'"
                 :class="mobileTab === 'productos' ? 'border-b-2 border-brand-500 text-brand-600 font-semibold' : 'text-gray-500'"
                 class="flex-1 py-3 text-sm transition">
@@ -47,19 +47,40 @@
                  :class="{ 'hidden lg:flex': mobileTab !== 'productos' }">
 
                 {{-- Search & Filters Bar --}}
-                <div class="p-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex flex-wrap gap-2 items-center">
+                                <div class="p-3 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 flex flex-wrap gap-2 items-center">
+                    <!-- Mode Switcher -->
+                    <div class="relative flex gap-1 bg-zinc-100 dark:bg-zinc-800/50 p-1 border border-zinc-200 dark:border-white/10 rounded-lg hidden sm:flex shrink-0">
+                        <div class="absolute top-1 left-1 bottom-1 w-8 rounded-md bg-white dark:bg-zinc-700 shadow-sm transition-transform duration-300 ease-out"
+                            :class="{'translate-x-0': viewMode === 'cards', 'translate-x-[36px]': viewMode === 'stack'}"></div>
+                        <button @click="viewMode = 'cards'" class="relative z-10 flex h-7 w-8 items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors" :class="viewMode === 'cards' ? '!text-brand-600 dark:!text-brand-400' : ''" title="Vista Cuadrícula">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                        </button>
+                        <button @click="viewMode = 'stack'" class="relative z-10 flex h-7 w-8 items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors" :class="viewMode === 'stack' ? '!text-brand-600 dark:!text-brand-400' : ''" title="Vista Lista">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                        </button>
+                    </div>
                     <div class="relative flex-1 min-w-[160px]">
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <input x-model="busqueda" id="busqueda-input" type="text" placeholder="Buscar producto o código..."
-                            class="w-full h-9 rounded-lg border border-gray-300 bg-white pl-9 pr-4 text-sm focus:border-brand-500 focus:ring-0 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        <input x-model="busqueda" id="busqueda-input" x-ref="buscadorPos" type="text"
+                            placeholder="Buscar o escanear código..."
+                            autocomplete="off"
+                            class="w-full h-9 rounded-l-lg border border-gray-300 border-r-0 bg-white pl-9 pr-4 text-sm focus:border-brand-500 focus:ring-0 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                             @keyup.enter="buscarPorCodigo()">
                     </div>
+                    {{-- Botón Cámara POS --}}
+                    <button type="button"
+                        onclick="abrirScannerPOS()"
+                        title="Escanear con cámara"
+                        class="h-9 inline-flex items-center gap-1.5 rounded-r-lg border border-gray-300 border-l-0 bg-brand-50 px-3 text-brand-600 hover:bg-brand-100 dark:border-neutral-700 dark:bg-brand-500/10 dark:text-brand-400 transition-colors shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-xs font-semibold hidden sm:inline">Cámara</span>
+                    </button>
                     <select x-model="categoriaFiltro"
-                        class="h-9 rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                        class="h-9 rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                         <option value="">Todas las categorías</option>
                         @foreach ($categorias as $cat)
                             <option value="{{ $cat->id }}">{{ $cat->nombre }}</option>
@@ -80,7 +101,7 @@
                     @endif
 
                     <button @click="verEspera()"
-                        class="relative inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        class="relative inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -91,34 +112,47 @@
 
                 {{-- Product Grid --}}
                 <div class="flex-1 overflow-y-auto p-3">
-                    <div class="pos-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+                    <div class="pos-grid grid gap-3" :class="viewMode === 'cards' ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5' : 'grid-cols-1 md:grid-cols-2'">
                         @foreach ($productos as $producto)
                             <div x-show="productoVisible({{ $producto->id }}, {{ $producto->categoria_id ?? 'null' }})"
                                 @click="agregarProductoMobile({{ $producto->id }})"
-                                class="pos-product-card group cursor-pointer rounded-xl border border-gray-200 bg-white hover:border-brand-400 hover:shadow-md transition-all duration-200 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-brand-500 overflow-hidden"
+                                class="group cursor-pointer rounded-xl border border-gray-200 bg-white hover:border-brand-400 hover:shadow-md transition-all duration-200 dark:border-neutral-800/80 dark:bg-[#1e1e1e] dark:hover:border-brand-500/50 overflow-hidden"
+                                :class="viewMode === 'cards' ? 'pos-product-card flex flex-col' : 'flex flex-row items-center p-3 gap-4 hover:bg-brand-50/20 dark:hover:bg-neutral-800/10'"
                                 data-id="{{ $producto->id }}" data-nombre="{{ $producto->nombre }}"
                                 data-precio="{{ $producto->precio_venta }}" data-impuesto="{{ $producto->impuesto }}"
                                 data-stock="{{ $producto->stock }}" data-codigo="{{ $producto->codigo_barras }}"
                                 data-categoria="{{ $producto->categoria_id }}">
-                                @if ($producto->imagen_url)
-                                    <img src="{{ $producto->imagen_url }}" alt="{{ $producto->nombre }}"
-                                        class="pos-product-placeholder h-24 w-full object-cover group-hover:opacity-90 transition">
-                                @else
-                                    <div
-                                        class="pos-product-placeholder h-24 w-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
-                                        <svg class="h-8 w-8 text-gray-300 dark:text-gray-600" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                        </svg>
+                                
+                                <div :class="viewMode === 'cards' ? 'pos-product-placeholder h-24 w-full bg-gray-100 dark:bg-neutral-800' : 'h-14 w-14 flex-shrink-0 rounded-lg bg-gray-100 dark:bg-neutral-800 overflow-hidden'">
+                                    @if ($producto->imagen_url)
+                                        <img src="{{ $producto->imagen_url }}" alt="{{ $producto->nombre }}"
+                                            class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                    @else
+                                        <div class="h-full w-full flex items-center justify-center">
+                                            <svg class="w-1/2 h-1/2 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                            </svg>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div :class="viewMode === 'cards' ? 'p-2' : 'flex-1 min-w-0 flex items-center justify-between'">
+                                    <div :class="viewMode === 'cards' ? '' : 'flex-1 pr-2'">
+                                        <p class="pos-product-name font-bold text-gray-800 dark:text-white/90 leading-tight truncate" :class="viewMode === 'cards' ? 'text-xs' : 'text-sm'">
+                                            {{ $producto->nombre }}
+                                        </p>
+                                        <template x-if="viewMode === 'stack'">
+                                            <div class="mt-1 flex items-center gap-2">
+                                                <span class="rounded bg-brand-50 px-2 py-0.5 text-[10px] font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-400">{{ optional($producto->categoria)->nombre ?? 'Base' }}</span>
+                                            </div>
+                                        </template>
                                     </div>
-                                @endif
-                                <div class="p-2">
-                                    <p class="pos-product-name text-xs font-semibold text-gray-800 dark:text-white leading-tight truncate">
-                                        {{ $producto->nombre }}</p>
-                                    <p class="pos-product-price mt-0.5 text-sm font-bold text-brand-600 dark:text-brand-400">
-                                        ${{ number_format($producto->precio_venta, 2) }}</p>
-                                    <p class="pos-product-stock text-xs text-gray-400">Stock: {{ $producto->stock }}</p>
+                                    
+                                    <div :class="viewMode === 'cards' ? 'mt-0.5' : 'text-right'">
+                                        <p class="pos-product-price font-bold text-brand-600 dark:text-brand-400" :class="viewMode === 'cards' ? 'text-sm' : 'text-base'">
+                                            ${{ number_format($producto->precio_venta, 2) }}
+                                        </p>
+                                        <p class="pos-product-stock text-xs text-gray-400 font-medium">Stock: {{ $producto->stock }}</p>
+                                    </div>
                                 </div>
                             </div>
                         @endforeach
@@ -127,12 +161,12 @@
             </div>
 
             {{-- RIGHT PANEL: Cart --}}
-            <div class="flex flex-col bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800
+            <div class="flex flex-col bg-white dark:bg-neutral-900 border-l border-gray-200 dark:border-neutral-800
                         w-full lg:w-96 lg:flex-shrink-0"
                  :class="{ 'hidden lg:flex': mobileTab !== 'carrito', 'flex': mobileTab === 'carrito' }">
 
                 {{-- Cart Header --}}
-                <div class="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                <div class="p-4 border-b border-gray-200 dark:border-neutral-800 flex items-center justify-between">
                     <div>
                         <h2 class="text-base font-bold text-gray-800 dark:text-white">Carrito de Venta</h2>
                         <p x-text="'N° de venta: ' + (ventaNumero || 'Pendiente')" class="text-xs text-gray-400"></p>
@@ -147,9 +181,9 @@
                 </div>
 
                 {{-- Cliente selector --}}
-                <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 space-y-1">
+                <div class="px-4 py-2 border-b border-gray-100 dark:border-neutral-800 space-y-1">
                     <select x-model="clienteId"
-                        class="h-9 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                        class="h-9 w-full rounded-lg border border-gray-300 bg-white px-3 text-xs focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                         <option value="">👤 Consumidor Final</option>
                         @foreach ($clientes as $cliente)
                             <option value="{{ $cliente->id }}">{{ $cliente->nombre_completo }}</option>
@@ -187,7 +221,7 @@
                         </div>
                     </template>
                     <template x-for="(item, index) in carrito" :key="index">
-                        <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
+                        <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
                             <div class="flex items-start justify-between gap-2">
                                 <p class="text-xs font-semibold text-gray-800 dark:text-white leading-tight flex-1"
                                     x-text="item.nombre"></p>
@@ -201,7 +235,7 @@
                             <div class="mt-2 flex items-center justify-between">
                                 <div class="flex items-center gap-1.5">
                                     <button @click="cambiarCantidad(index, -1)"
-                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-300">
                                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M20 12H4" />
@@ -210,9 +244,9 @@
                                     <input type="number" :value="item.cantidad"
                                         @change="setCantidad(index, $event.target.value)" min="1"
                                         :max="item.stock"
-                                        class="w-12 h-7 rounded-lg border border-gray-300 bg-white text-center text-xs font-medium focus:border-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                                        class="w-12 h-7 rounded-lg border border-gray-300 bg-white text-center text-xs font-medium focus:border-brand-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
                                     <button @click="cambiarCantidad(index, 1)"
-                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-300">
                                         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 4v16m8-8H4" />
@@ -236,7 +270,7 @@
                 </div>
 
                 {{-- Totals & Actions --}}
-                <div class="border-t border-gray-200 dark:border-gray-800 p-4 space-y-2">
+                <div class="border-t border-gray-200 dark:border-neutral-800 p-4 space-y-2">
                     <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>Subtotal</span>
                         <span x-text="'$' + subtotal.toFixed(2)"></span>
@@ -246,7 +280,7 @@
                         <span x-text="'$' + itbms.toFixed(2)"></span>
                     </div>
                     <div
-                        class="flex justify-between text-lg font-bold text-gray-800 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">
+                        class="flex justify-between text-lg font-bold text-gray-800 dark:text-white border-t border-gray-200 dark:border-neutral-700 pt-2">
                         <span>TOTAL</span>
                         <span x-text="'$' + total.toFixed(2)"></span>
                     </div>
@@ -275,14 +309,14 @@
 ============================================================ --}}
     <div x-data x-show="$store.posModal.open" x-cloak
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
-        <div @click.stop class="relative w-full max-w-lg rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden"
+        <div @click.stop class="relative w-full max-w-lg rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl overflow-hidden"
             x-show="$store.posModal.open" x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
 
-            <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-800">
+            <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-neutral-800">
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">Procesar Pago</h3>
                 <button @click="$store.posModal.open = false"
-                    class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    class="rounded-lg p-1 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -308,10 +342,10 @@
                     </div>
 
                     <template x-for="(pago, idx) in pagos" :key="idx">
-                        <div class="mb-3 rounded-xl border border-gray-200 dark:border-gray-700 p-3 space-y-2">
+                        <div class="mb-3 rounded-xl border border-gray-200 dark:border-neutral-700 p-3 space-y-2">
                             <div class="flex gap-2">
                                     <select x-model="pago.metodo" @change="onMetodoChange(idx)"
-                                        class="flex-1 h-9 rounded-lg border border-gray-300 bg-white px-2 text-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                        class="flex-1 h-9 rounded-lg border border-gray-300 bg-white px-2 text-xs focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                                         <template x-if="PAGO_EFECTIVO"><option value="efectivo">💵 Efectivo</option></template>
                                         <template x-if="PAGO_TARJETA"><option value="tarjeta">💳 Tarjeta</option></template>
                                         <template x-if="PAGO_TRANSFERENCIA"><option value="transferencia">🏦 Transferencia</option></template>
@@ -320,7 +354,7 @@
                                     </select>
                                 <input x-model.number="pago.monto" type="number" step="0.01" min="0"
                                     placeholder="0.00" @input="calcularCambio()"
-                                    class="w-28 h-9 rounded-lg border border-gray-300 bg-white px-2 text-xs text-right focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                    class="w-28 h-9 rounded-lg border border-gray-300 bg-white px-2 text-xs text-right focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                                 <button x-show="pagos.length > 1" @click="eliminarPago(idx)"
                                     class="text-gray-400 hover:text-red-500">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -333,27 +367,27 @@
                             <template x-if="pago.metodo !== 'efectivo' && pago.metodo !== 'credito'">
                                 <input x-model="pago.referencia" type="text"
                                     placeholder="N° Referencia / Voucher (obligatorio)"
-                                    class="w-full h-8 rounded-lg border border-orange-300 bg-white px-2 text-xs focus:border-orange-400 dark:border-orange-700 dark:bg-gray-800 dark:text-white">
+                                    class="w-full h-8 rounded-lg border border-orange-300 bg-white px-2 text-xs focus:border-orange-400 dark:border-orange-700 dark:bg-neutral-800 dark:text-white">
                             </template>
                             {{-- Fecha Vencimiento (solo para Crédito) --}}
                             <template x-if="pago.metodo === 'credito'">
                                 <div class="space-y-1">
                                     <label class="text-[10px] font-bold text-gray-400 uppercase">Fecha de Vencimiento</label>
                                     <input x-model="fechaVencimiento" type="date"
-                                        class="w-full h-8 rounded-lg border border-brand-300 bg-white px-2 text-xs focus:border-brand-500 dark:border-brand-700 dark:bg-gray-800 dark:text-white">
+                                        class="w-full h-8 rounded-lg border border-brand-300 bg-white px-2 text-xs focus:border-brand-500 dark:border-brand-700 dark:bg-neutral-800 dark:text-white">
                                 </div>
                             </template>
 
                             <template x-if="pago.metodo === 'tarjeta'">
                                 <div class="flex gap-2">
                                     <select x-model="pago.tipo_tarjeta"
-                                        class="flex-1 h-8 rounded-lg border border-gray-300 bg-white px-2 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                        class="flex-1 h-8 rounded-lg border border-gray-300 bg-white px-2 text-xs dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                                         <option value="">Tipo tarjeta</option>
                                         <option value="debito">Débito</option>
                                         <option value="credito">Crédito</option>
                                     </select>
                                     <input x-model="pago.banco" type="text" placeholder="Banco (opcional)"
-                                        class="flex-1 h-8 rounded-lg border border-gray-300 bg-white px-2 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                        class="flex-1 h-8 rounded-lg border border-gray-300 bg-white px-2 text-xs dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                                 </div>
                             </template>
                         </div>
@@ -376,7 +410,7 @@
                 </template>
 
                 {{-- Facturación Electrónica DIAN Toggle --}}
-                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-3 flex items-center justify-between">
+                <div class="rounded-xl border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800/50 p-3 flex items-center justify-between">
                     <div>
                         <p class="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" class="text-brand-500">
@@ -388,7 +422,7 @@
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" x-model="generarFacturaDian" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-brand-500"></div>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-neutral-600 peer-checked:bg-brand-500"></div>
                     </label>
                 </div>
 
@@ -396,14 +430,14 @@
                     <div class="rounded-xl border border-brand-200 dark:border-brand-900/50 bg-brand-50/50 dark:bg-brand-900/20 p-3 space-y-3 mt-2">
                         <div>
                             <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">Forma de Pago (DIAN)</label>
-                            <select x-model="formaPagoDian" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                            <select x-model="formaPagoDian" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                                 <option value="1">1 - Contado</option>
                                 <option value="2">2 - Crédito</option>
                             </select>
                         </div>
                         <div>
                             <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">Método de Pago (DIAN)</label>
-                            <select x-model="metodoPagoDian" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                            <select x-model="metodoPagoDian" class="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs focus:border-brand-500 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                                 <option value="10">10 - Efectivo</option>
                                 <option value="42">42 - Consignación bancaria</option>
                                 <option value="47">47 - Transferencia Débito Bancaria</option>
@@ -439,8 +473,8 @@
     {{-- Modal Ventas en Espera --}}
     <div x-data x-show="$store.posEspera.open" x-cloak
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
-        <div class="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden" @click.stop>
-            <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-800">
+        <div class="w-full max-w-md rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl overflow-hidden" @click.stop>
+            <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-neutral-800">
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">Ventas en Espera</h3>
                 <button @click="$store.posEspera.open = false" class="rounded-lg p-1 text-gray-400 hover:bg-gray-100">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -454,7 +488,7 @@
                 </template>
                 <template x-for="item in lista" :key="item.id">
                     <div
-                        class="mb-3 rounded-xl border border-gray-200 dark:border-gray-700 p-3 flex items-center justify-between">
+                        class="mb-3 rounded-xl border border-gray-200 dark:border-neutral-700 p-3 flex items-center justify-between">
                         <div>
                             <p class="text-sm font-semibold text-gray-800 dark:text-white" x-text="item.nombre"></p>
                             <p class="text-xs text-gray-400" x-text="item.created_at"></p>
@@ -531,6 +565,7 @@
         // ─── Main POS App ───────────────────────────────────────────────────
         function posApp() {
             return {
+                viewMode: 'cards',
                 mobileTab: 'productos',
                 busqueda: '',
                 categoriaFiltro: '',
@@ -545,6 +580,15 @@
                             if (el) el.focus();
                         });
                     }
+
+                    // Prevenir cierre accidental de pestaña si hay items en carrito
+                    window.addEventListener('beforeunload', (evento) => {
+                        if (this.carrito.length > 0) {
+                            evento.preventDefault();
+                            evento.returnValue = 'Tienes un proceso de venta a medias en el POS. Si cierras la ventana el carrito se perderá.';
+                            return evento.returnValue;
+                        }
+                    });
                 },
 
                 get subtotal() {
@@ -578,6 +622,11 @@
                     if (prod) {
                         this.agregarProducto(prod.id);
                         this.busqueda = '';
+                        // Refocus buscador para el próximo scan
+                        this.$nextTick(() => {
+                            const el = document.getElementById('busqueda-input');
+                            if (el) el.focus();
+                        });
                     }
                 },
 
@@ -594,13 +643,7 @@
                         if (existing.cantidad < prod.stock) {
                             existing.cantidad++;
                         } else {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Sin stock',
-                                text: `Stock disponible: ${prod.stock}`,
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
+                            window.Notify.warning(`Sin stock - Stock disponible: ${prod.stock}`);
                         }
                     } else {
                         this.carrito.push({
@@ -627,13 +670,7 @@
                         return;
                     }
                     if (nueva > item.stock) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Sin stock',
-                            text: `Stock disponible: ${item.stock}`,
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
+                        window.Notify.warning(`Sin stock - Stock disponible: ${item.stock}`);
                         return;
                     }
                     item.cantidad = nueva;
@@ -655,16 +692,15 @@
 
                 limpiarCarrito() {
                     if (this.carrito.length === 0) return;
-                    Swal.fire({
-                        title: '¿Limpiar carrito?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Sí, limpiar',
-                        cancelButtonText: 'Cancelar',
-                        confirmButtonColor: '#dc2626',
-                    }).then(r => {
-                        if (r.isConfirmed) this.carrito = [];
-                    });
+                    window.Confirm.show(
+                        '¿Limpiar carrito?',
+                        '¿Deseas vaciar el carrito actual?',
+                        'Sí, limpiar',
+                        'Cancelar',
+                        () => { this.carrito = []; },
+                        () => {},
+                        { okButtonBackground: '#dc2626' }
+                    );
                 },
 
                 abrirPago() {
@@ -672,11 +708,7 @@
 
                     // Check: si venta sin cliente está deshabilitada
                     if (!POS_PERMITE_SIN_CLIENTE && !this.clienteId) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Cliente requerido',
-                            text: 'La configuración del sistema requiere seleccionar un cliente antes de cobrar.',
-                        });
+                        window.Notify.warning('Cliente requerido - La configuración del sistema requiere seleccionar un cliente antes de cobrar.');
                         return;
                     }
 
@@ -691,38 +723,30 @@
 
                 pausarVenta() {
                     if (this.carrito.length === 0) return;
-                    Swal.fire({
-                        title: 'Nombre para la espera',
-                        input: 'text',
-                        inputPlaceholder: 'Ej: Mesa 3, Sr. García...',
-                        showCancelButton: true,
-                        confirmButtonText: 'Guardar',
-                        cancelButtonText: 'Cancelar',
-                    }).then(async r => {
-                        if (!r.isConfirmed) return;
-                        const resp = await fetch(ESPERA_STORE, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': CSRF_TOKEN
-                            },
-                            body: JSON.stringify({
-                                nombre: r.value || 'Venta en espera',
-                                sucursal_id: SUCURSAL_ID,
-                                carrito: this.carrito
-                            }),
-                        });
-                        const data = await resp.json();
+                    let nombre = prompt('Escribe un nombre para identificar esta orden en espera (Ej: Mesa 3, Pedro...):');
+                    if (!nombre) return;
+                    
+                    window.Loading.pulse('Guardando...');
+                    fetch(ESPERA_STORE, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': CSRF_TOKEN
+                        },
+                        body: JSON.stringify({
+                            nombre: nombre,
+                            sucursal_id: SUCURSAL_ID,
+                            carrito: this.carrito
+                        }),
+                    }).then(r => r.json()).then(data => {
+                        window.Loading.remove();
                         if (data.success) {
                             this.carrito = [];
-                            Swal.fire({
-                                icon: 'success',
-                                title: '¡Guardada!',
-                                text: data.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
+                            window.Notify.success(data.message || 'Venta guardada');
                         }
+                    }).catch(err => {
+                        window.Loading.remove();
+                        window.Notify.failure('Error al pausar la venta');
                     });
                 },
 
@@ -807,22 +831,14 @@
                     const pago = this.pagos[idx];
                     if (pago.metodo === 'credito') {
                         if (!this.$store.posData.clienteId) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Cliente requerido',
-                                text: 'Debe seleccionar un cliente antes de usar Crédito, incluso si las ventas de contado permiten omitirlo.'
-                            });
+                            window.Notify.warning('Cliente requerido - Debe seleccionar un cliente antes de usar Crédito.');
                             pago.metodo = 'efectivo';
                             return;
                         }
                         
                         const cliente = clientesData[this.$store.posData.clienteId];
                         if (!cliente || cliente.credito_disponible <= 0) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Sin crédito',
-                                text: 'El cliente no tiene crédito disponible o rebasó su límite.'
-                            });
+                            window.Notify.failure('Sin crédito - El cliente no tiene crédito disponible o rebasó su límite.');
                             pago.metodo = 'efectivo';
                             pago.monto = 0;
                             return;
@@ -846,19 +862,11 @@
                     let totalCreditoSolicitado = 0;
                     for (const pago of this.pagos) {
                         if (pago.metodo === 'tarjeta' && REF_TARJETA && !pago.referencia.trim()) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Referencia requerida',
-                                text: `La configuración exige una referencia para pagos con tarjeta.`
-                            });
+                            window.Notify.warning('Referencia requerida - La configuración exige una referencia para pagos con tarjeta.');
                             return;
                         }
                         if ((pago.metodo === 'transferencia' || pago.metodo === 'yappy') && REF_TRANSFERENCIA && !pago.referencia.trim()) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Referencia requerida',
-                                text: `La configuración exige una referencia para transferencias/Yappy.`
-                            });
+                            window.Notify.warning('Referencia requerida - La configuración exige una referencia para transferencias/Yappy.');
                             return;
                         }
 
@@ -869,39 +877,24 @@
 
                     if (totalCreditoSolicitado > 0) {
                         if (!this.$store.posData.clienteId) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Cliente requerido',
-                                text: 'Debe seleccionar un cliente para realizar una venta a crédito.'
-                            });
+                            window.Notify.failure('Cliente requerido para realizar una venta a crédito.');
                             return;
                         }
 
                         const cliente = clientesData[this.$store.posData.clienteId];
                         if (cliente && totalCreditoSolicitado > cliente.credito_disponible) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Crédito insuficiente',
-                                html: `El cliente <b>${cliente.nombre}</b> solo tiene <b>$${cliente.credito_disponible.toFixed(2)}</b> de crédito disponible.<br>Monto solicitado: $${totalCreditoSolicitado.toFixed(2)}`
-                            });
+                            window.Notify.failure(`Crédito insuficiente - Solo tiene $${cliente.credito_disponible.toFixed(2)} disponible.`);
                             return;
                         }
                     }
 
-                    const confirm = POS_CONFIRMACION
-                        ? await Swal.fire({
-                            title: '¿Confirmar venta?',
-                            text: `Total: $${this.montoTotal.toFixed(2)}`,
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonText: 'Sí, confirmar',
-                            confirmButtonColor: '#059669',
-                            cancelButtonText: 'Revisar',
-                          })
-                        : { isConfirmed: true };
-                    if (!confirm.isConfirmed) return;
+                    const isConfirmed = POS_CONFIRMACION ? await new Promise(resolve => {
+                        window.Confirm.show('¿Confirmar venta?', `Total: $${this.montoTotal.toFixed(2)}`, 'Sí, confirmar', 'Revisar', () => resolve(true), () => resolve(false), { okButtonBackground: '#059669' });
+                    }) : true;
+                    if (!isConfirmed) return;
 
                     this.cargando = true;
+                    if(typeof window.Loading !== 'undefined') window.Loading.pulse('Procesando pago y facturación...');
                     try {
                         const resp = await fetch(VENTA_STORE, {
                             method: 'POST',
@@ -931,19 +924,23 @@
                             }),
                         });
                         const data = await resp.json();
+                        
+                        if(typeof window.Loading !== 'undefined') window.Loading.remove();
                         this.cargando = false;
 
                         if (data.success) {
                             Alpine.store('posModal').open = false;
 
+                            if (data.alertas_stock && data.alertas_stock.length > 0) {
+                                let htmlStock = '<ul><li>' + data.alertas_stock.join('</li><li>') + '</li></ul>';
+                                if(typeof window.Notify !== 'undefined') {
+                                    window.Notify.warning(`¡Atención! Stock crítico alcanzado:<br><br>${htmlStock}`, { timeout: 7000, plainText: false, width: '360px' });
+                                }
+                            }
+
                             // Flujo Factura DIAN Automática
                             if (this.generarFacturaDian) {
-                                Swal.fire({
-                                    title: 'Generando Factura DIAN...',
-                                    text: 'Por favor espera mientras Factus procesa la respuesta...',
-                                    allowOutsideClick: false,
-                                    didOpen: () => Swal.showLoading()
-                                });
+                                window.Loading.pulse('Generando Factura DIAN con Factus...');
 
                                 try {
                                     const dianResp = await fetch("{{ route('facturacion.store') }}", {
@@ -957,19 +954,11 @@
                                     const dianData = await dianResp.json();
                                     
                                     if(!dianData.success) {
-                                        await Swal.fire({
-                                            icon: 'warning',
-                                            title: 'Venta completada, pero error con la DIAN',
-                                            html: `<p class="text-sm">${dianData.message || 'Error desconocido de Factus'}</p><p class="text-xs text-gray-400 mt-2">Puedes reintentarlo desde: <b>Menú → Facturación (DIAN)</b></p>`,
-                                        });
+                                        window.Loading.remove();
+                                        window.Notify.warning('Venta completada localmente, pero falló la generación DIAN. Reintenta desde el Historial.', { timeout: 8000 });
                                     } else {
-                                        await Swal.fire({
-                                            icon: 'success',
-                                            title: '¡Factura DIAN procesada!',
-                                            text: data.numero + ' enviada a la DIAN mediante Factus.',
-                                            timer: 1500,
-                                            showConfirmButton: false
-                                        });
+                                        window.Loading.remove();
+                                        window.Notify.success(`¡Factura DIAN procesada! ${data.numero} enviada a Factus.`);
                                         // Redirigir directamente a la vista detallada de la nueva factura DIAN
                                         if (dianData.factura_id) {
                                             window.location.href = `/facturacion/${dianData.factura_id}`;
@@ -978,54 +967,33 @@
                                     }
                                 } catch(e) {
                                     console.error(e);
-                                    await Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error de Red con DIAN',
-                                        text: 'La venta se registró localmente, pero no se pudo enviar a Factus en este momento. Inténtalo de nuevo desde la sección Facturación DIAN.'
-                                    });
+                                    window.Loading.remove();
+                                    window.Notify.failure('Error de Red con DIAN. La venta se registró localmente.', { timeout: 8000 });
                                 }
                             }
 
-                            await Swal.fire({
-                                icon: 'success',
-                                title: '¡Venta Registrada!',
-                                html: `<b>${data.numero}</b><br>Total: $${this.montoTotal.toFixed(2)}`,
-                                confirmButtonText: '📄 Factura interna',
-                                showDenyButton: true,
-                                denyButtonText: '🧾 Ticket 80mm',
-                                showCancelButton: true,
-                                cancelButtonText: 'Nueva Venta',
-                                confirmButtonColor: '#3b82f6',
-                                denyButtonColor: '#1d4ed8',
-                            }).then(r => {
-                                if (r.isConfirmed) {
-                                    window.open(`/caja/ventas/${data.venta_id}/pdf`, '_blank');
-                                    location.reload();
-                                } else if (r.isDenied) {
+                            window.Notify.success(`¡Venta Registrada! ${data.numero}`);
+                            window.Confirm.show(
+                                '¿Imprimir Ticket?',
+                                `Total: $${this.montoTotal.toFixed(2)}. ¿Deseas imprimir el Ticket de 80mm?`,
+                                'Imprimir Ticket',
+                                'Nueva Venta',
+                                () => {
                                     window.dispatchEvent(new CustomEvent('abrir-ticket', { detail: `/caja/ventas/${data.venta_id}/ticket` }));
                                     window.addEventListener('ticket-cerrado', function _reload() {
                                         window.removeEventListener('ticket-cerrado', _reload);
                                         location.reload();
                                     });
-                                } else {
-                                    // if cancelled, still reload to empty the cart
-                                    location.reload();
-                                }
-                            });
+                                },
+                                () => { location.reload(); }
+                            );
                         } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: data.message
-                            });
+                            window.Notify.failure(`Error - ${data.message}`);
                         }
                     } catch (e) {
                         this.cargando = false;
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error de red',
-                            text: e.message
-                        });
+                        if(typeof window.Loading !== 'undefined') window.Loading.remove();
+                        window.Notify.failure(`Error de red - ${e.message}`);
                     }
                 }
             };
@@ -1059,33 +1027,161 @@
                     const data = await r.json();
                     if (data.success) {
                         Alpine.store('posEspera').open = false;
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Venta retomada',
-                            text: 'El carrito ha sido cargado.',
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
+                        window.Notify.success('Venta retomada - El carrito ha sido cargado.');
                     }
                 },
                 async eliminar(id) {
-                    const c = await Swal.fire({
-                        icon: 'question',
-                        title: '¿Eliminar espera?',
-                        showCancelButton: true,
-                        confirmButtonText: 'Eliminar',
-                        confirmButtonColor: '#dc2626'
-                    });
-                    if (!c.isConfirmed) return;
-                    await fetch(`/caja/espera/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': CSRF_TOKEN
-                        }
-                    });
-                    await this.cargar();
+                    window.Confirm.show('¿Eliminar espera?', '¿Deseas descartar esta venta en espera?', 'Eliminar', 'Cancelar', async () => {
+                        await fetch(`/caja/espera/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': CSRF_TOKEN
+                            }
+                        });
+                        await this.cargar();
+                    }, () => {}, { okButtonBackground: '#dc2626' });
                 }
             };
         }
     </script>
+
+{{-- ══════════════════════════════════════════════════════
+     MODAL SCANNER DE CÁMARA — Módulo POS
+═══════════════════════════════════════════════════════ --}}
+<div id="modalScannerPOS"
+     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm hidden"
+     onclick="if(event.target===this) cerrarScannerPOS()">
+    <div class="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-500/10 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-gray-800 dark:text-white">Scanner POS</h3>
+                    <p class="text-[10px] text-gray-400">El producto se agrega automáticamente</p>
+                </div>
+            </div>
+            <button onclick="cerrarScannerPOS()" class="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-800 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <!-- Camera viewport -->
+        <div id="scanner-pos-viewport" class="bg-black" style="height: 280px; position: relative;">
+            <div id="scan-line-pos" style="display:none; position:absolute; left:0; right:0; height:2px; background: linear-gradient(90deg, transparent, #22c55e, transparent); z-index:10; animation: scanLinePOS 2s linear infinite;"></div>
+        </div>
+        <!-- Status -->
+        <div class="px-5 py-3 bg-gray-50 dark:bg-neutral-800/40 text-center min-h-[44px] flex items-center justify-center">
+            <p id="scanner-pos-status" class="text-xs text-gray-500 dark:text-gray-400">Apunta la cámara al código de barras del producto...</p>
+        </div>
+        <!-- Último producto escaneado -->
+        <div id="scanner-pos-result" class="hidden px-5 py-3 bg-emerald-50 dark:bg-emerald-900/20 border-t border-emerald-100 dark:border-emerald-900/30">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400" id="scanner-pos-result-name">—</p>
+                    <p class="text-[10px] text-emerald-600 dark:text-emerald-500">Agregado al carrito ✓</p>
+                </div>
+            </div>
+        </div>
+        <!-- Footer: cerrar o continuar escaneando -->
+        <div class="px-5 py-4 border-t border-gray-100 dark:border-neutral-800 flex gap-3">
+            <button onclick="cerrarScannerPOS()"
+                    class="flex-1 rounded-xl border border-gray-300 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-800 transition">
+                Cerrar
+            </button>
+            <button onclick="document.getElementById('scanner-pos-result').classList.add('hidden')"
+                    class="flex-1 rounded-xl bg-brand-600 py-2.5 text-sm font-bold text-white hover:bg-brand-700 transition flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Escanear otro
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes scanLinePOS {
+    0%   { top: 10px; opacity: 1; }
+    50%  { opacity: 0.5; }
+    100% { top: 260px; opacity: 1; }
+}
+</style>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+    let _scannerPOSInstance = null;
+    let _scannerPOSCooldown = false;
+
+    function abrirScannerPOS() {
+        document.getElementById('modalScannerPOS').classList.remove('hidden');
+        document.getElementById('scan-line-pos').style.display = 'block';
+        document.getElementById('scanner-pos-result').classList.add('hidden');
+        document.getElementById('scanner-pos-status').textContent = 'Iniciando cámara...';
+
+        if (_scannerPOSInstance) {
+            _scannerPOSInstance.clear().catch(() => {});
+        }
+
+        _scannerPOSInstance = new Html5Qrcode('scanner-pos-viewport');
+
+        const config = {
+            fps: 12,
+            qrbox: { width: 280, height: 180 },
+            aspectRatio: 1.7,
+            supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+        };
+
+        _scannerPOSInstance.start(
+            { facingMode: 'environment' },
+            config,
+            (decodedText) => {
+                if (_scannerPOSCooldown) return;
+                _scannerPOSCooldown = true;
+
+                // Buscar producto por código de barras
+                const prod = productosData.find(p => p.codigo_barras === decodedText);
+
+                if (prod) {
+                    // Agregar al carrito via Alpine
+                    const posEl = document.querySelector('[x-data]');
+                    if (posEl && posEl._x_dataStack) {
+                        posEl._x_dataStack[0].agregarProducto(prod.id);
+                    }
+                    document.getElementById('scanner-pos-result-name').textContent = prod.nombre + ' — $' + parseFloat(prod.precio_venta).toFixed(2);
+                    document.getElementById('scanner-pos-result').classList.remove('hidden');
+                    document.getElementById('scanner-pos-status').textContent = '✅ Código: ' + decodedText;
+                } else {
+                    document.getElementById('scanner-pos-status').textContent = '⚠ Código no encontrado: ' + decodedText;
+                    document.getElementById('scanner-pos-result').classList.add('hidden');
+                }
+
+                // Cooldown de 1.5s para no leer el mismo código múltiples veces
+                setTimeout(() => { _scannerPOSCooldown = false; }, 1500);
+            },
+            () => {} // Frame errors ignorados
+        ).then(() => {
+            document.getElementById('scanner-pos-status').textContent = 'Apunta al código de barras del producto...';
+        }).catch((err) => {
+            document.getElementById('scanner-pos-status').textContent = '⚠ No se pudo acceder a la cámara.';
+            console.error('POS Scanner error:', err);
+        });
+    }
+
+    function cerrarScannerPOS() {
+        document.getElementById('modalScannerPOS').classList.add('hidden');
+        document.getElementById('scan-line-pos').style.display = 'none';
+        if (_scannerPOSInstance) {
+            _scannerPOSInstance.stop().catch(() => {});
+            _scannerPOSInstance.clear().catch(() => {});
+            _scannerPOSInstance = null;
+        }
+        // Devolver el foco al input de búsqueda para scanner físico
+        const el = document.getElementById('busqueda-input');
+        if (el) el.focus();
+    }
+</script>
+
 @endsection

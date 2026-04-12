@@ -40,7 +40,7 @@
         x-transition:leave="transition ease-in duration-75"
         x-transition:leave-start="transform opacity-100 scale-100"
         x-transition:leave-end="transform opacity-0 scale-95"
-        class="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark z-50"
+        class="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-neutral-800 dark:bg-neutral-900 z-50"
         style="display: none;"
     >
         <!-- User Info -->
@@ -50,7 +50,7 @@
         </div>
 
         <!-- Menu Items -->
-        <ul class="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+        <ul class="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-neutral-800">
             @php
                 $menuItems = [
                     [
@@ -106,38 +106,18 @@
 @push('scripts')
 <script>
 function confirmarCierreSesion() {
-    if (typeof Swal !== 'undefined') {
-        Swal.fire({
-            title: '¿Seguro quieres cerrar sesión?',
-            text: "Tendrás que ingresar tus credenciales nuevamente.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Sí, cerrar sesión',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Espere...',
-                    text: 'Cerrando sesión',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-                
-                setTimeout(() => {
-                    document.getElementById('logout-form').submit();
-                }, 10000);
-            }
-        });
-    } else {
-        if(confirm('¿Seguro quieres cerrar sesión?')) {
-            document.getElementById('logout-form').submit();
-        }
-    }
+    window.Confirm.show(
+        '¿Cerrar sesión?',
+        'Tendrás que ingresar tus credenciales nuevamente.',
+        'Sí, cerrar sesión',
+        'Cancelar',
+        () => {
+            window.Loading.hourglass('Cerrando sesión...');
+            setTimeout(() => document.getElementById('logout-form').submit(), 300);
+        },
+        () => {},
+        { okButtonBackground: '#ef4444' }
+    );
 }
 </script>
 @endpush

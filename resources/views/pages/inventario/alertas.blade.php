@@ -12,7 +12,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('inventario.stock') }}"
-                    class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 transition-colors">
+                    class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                     Volver al Stock
                 </a>
@@ -33,11 +33,11 @@
         @endif
 
         {{-- ===== TABLA DE ALERTAS ===== --}}
-        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
+        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900">
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead>
-                        <tr class="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
+                        <tr class="border-b border-gray-100 dark:border-neutral-800/80 bg-gray-50 dark:bg-neutral-800/20">
                             <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Producto</th>
                             <th class="px-5 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Stock Actual</th>
                             <th class="px-5 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Stock Mínimo</th>
@@ -47,12 +47,12 @@
                             <th class="px-5 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Acción</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                    <tbody class="divide-y divide-gray-100 dark:divide-neutral-800/80">
                         @forelse ($alertas as $producto)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                                 <td class="px-5 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                                        <div class="h-9 w-9 flex-shrink-0 rounded-lg bg-gray-100 dark:bg-neutral-800 overflow-hidden flex items-center justify-center border border-gray-200 dark:border-neutral-700">
                                             @if($producto->imagen_url)
                                                 <img src="{{ $producto->imagen_url }}" alt="{{ $producto->nombre }}" class="h-full w-full object-cover">
                                             @else

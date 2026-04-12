@@ -21,6 +21,7 @@ use App\Http\Controllers\CuentaPorCobrarController;
 use App\Http\Controllers\GastoController;
 use App\Http\Controllers\CategoriaGastoController;
 use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 // authentication pages
@@ -29,7 +30,7 @@ Route::get('/signin', function () {
     return redirect()->route('login');
 })->name('signin')->middleware('guest');
 
-Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
+Route::post('/login', [AuthController::class, 'login'])->middleware(['guest', 'throttle:5,1']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::get('/signup', function () {
@@ -38,12 +39,10 @@ Route::get('/signup', function () {
 
 
 // TODAS LAS RUTAS PROTEGIDAS DEL SISTEMA POS
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'active_user'])->group(function () {
 
     // dashboard pages
-    Route::get('/', function () {
-        return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
-    })->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 
     // ============================================================
@@ -118,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/productos/exportar/{formato}', [ProductoController::class, 'exportar'])->name('productos.exportar')->middleware('permission:productos.ver');
         Route::post('/productos/importar', [ProductoController::class, 'importar'])->name('productos.importar')->middleware('permission:productos.crear');
         Route::get('/productos/plantilla', [ProductoController::class, 'plantilla'])->name('productos.plantilla')->middleware('permission:productos.ver');
+        Route::get('/productos/buscar-api/{barcode}', [ProductoController::class, 'buscarApi'])->name('productos.buscar_api')->middleware('permission:productos.crear');
 
         // Control de Inventario
         Route::get('/stock', [InventarioController::class, 'index'])->name('stock')->middleware('permission:stock.ver');
@@ -134,13 +134,14 @@ Route::middleware(['auth'])->group(function () {
     // ============================================================
     Route::prefix('clientes')->name('clientes.')->group(function () {
         Route::get('/', [ClienteController::class, 'index'])->name('index')->middleware('permission:clientes.ver');
+        Route::get('/plantilla', [ClienteController::class, 'plantilla'])->name('plantilla')->middleware('permission:clientes.ver');
+        Route::get('/exportar/{formato}', [ClienteController::class, 'exportar'])->name('exportar')->middleware('permission:clientes.ver');
+        Route::post('/importar', [ClienteController::class, 'importar'])->name('importar')->middleware('permission:clientes.crear');
         Route::post('/', [ClienteController::class, 'store'])->name('store')->middleware('permission:clientes.crear');
+        Route::get('/{cliente}', [ClienteController::class, 'show'])->name('show')->middleware('permission:clientes.ver');
         Route::put('/{cliente}', [ClienteController::class, 'update'])->name('update')->middleware('permission:clientes.editar');
         Route::delete('/{cliente}', [ClienteController::class, 'destroy'])->name('destroy')->middleware('permission:clientes.eliminar');
         Route::post('/bulk-delete', [ClienteController::class, 'bulkDestroy'])->name('bulk_destroy')->middleware('permission:clientes.eliminar');
-        Route::get('/exportar/{formato}', [ClienteController::class, 'exportar'])->name('exportar')->middleware('permission:clientes.ver');
-        Route::post('/importar', [ClienteController::class, 'importar'])->name('importar')->middleware('permission:clientes.crear');
-        Route::get('/plantilla', [ClienteController::class, 'plantilla'])->name('plantilla')->middleware('permission:clientes.ver');
     });
 
     // ============================================================
@@ -240,6 +241,13 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('finanzas')->name('finanzas.')->middleware('permission:finanzas.ver')->group(function () {
         Route::get('/', [\App\Http\Controllers\FinanzasController::class, 'index'])->name('index');
         Route::get('/reportes', [\App\Http\Controllers\FinanzasController::class, 'reportes'])->name('reportes')->middleware('permission:finanzas.reportes');
+
+        // Calendario y Recordatorios
+        Route::get('/calendar-events', [\App\Http\Controllers\FinanzasController::class, 'calendarEvents'])->name('calendar-events');
+        Route::get('/recordatorios', [\App\Http\Controllers\FinanzasController::class, 'getRecordatorios'])->name('recordatorios.index');
+        Route::post('/recordatorios', [\App\Http\Controllers\FinanzasController::class, 'storeRecordatorio'])->name('recordatorios.store');
+        Route::put('/recordatorios/{id}', [\App\Http\Controllers\FinanzasController::class, 'updateRecordatorio'])->name('recordatorios.update');
+        Route::delete('/recordatorios/{id}', [\App\Http\Controllers\FinanzasController::class, 'destroyRecordatorio'])->name('recordatorios.destroy');
     });
 
     // ============================================================

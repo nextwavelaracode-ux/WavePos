@@ -2,23 +2,7 @@
 
 @section('content')
 
-    {{-- SweetAlert2 Notification --}}
-    @if (session('sweet_alert'))
-        @php $sa = session('sweet_alert'); @endphp
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        icon: '{{ $sa['type'] }}',
-                        title: '{{ $sa['title'] }}',
-                        text: '{{ $sa['message'] }}',
-                        timer: 3000,
-                        showConfirmButton: false,
-                    });
-                });
-            </script>
-        @endpush
-    @endif
+
 
 <div class="space-y-6">
     {{-- ===== HEADER ===== --}}
@@ -34,15 +18,15 @@
     </div>
 
     {{-- ===== TABLA ===== --}}
-    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
-        <div class="border-b border-gray-100 dark:border-white/[0.05] px-6 py-4">
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900">
+        <div class="border-b border-gray-100 dark:border-neutral-800/80 px-6 py-4">
             <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90">Listado de Compras Vencidas</h4>
         </div>
 
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
+                    <tr class="border-b border-gray-100 dark:border-neutral-800/80 bg-gray-50 dark:bg-neutral-800/20">
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Factura</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Proveedor</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Vencimiento</th>
@@ -74,14 +58,12 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('cuentas-por-pagar.show', $compra->id) }}" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 transition-colors" title="Ver Detalles">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        Ver
+                                    <a href="{{ route('cuentas-por-pagar.show', $compra->id) }}" class="inline-flex items-center rounded-lg border border-gray-200 bg-white p-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700 dark:border-gray-700 dark:bg-neutral-800 dark:text-gray-400 transition-colors" title="Ver Detalles">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </a>
                                     @if($compra->estado_pago !== 'pagado')
-                                        <a href="{{ route('cuentas-por-pagar.show', [$compra->id, 'action' => 'pay']) }}" class="inline-flex items-center gap-1 rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-red-700 transition-colors shadow-sm" title="Abonar a cuenta atrasada">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                                            Pagar
+                                        <a href="{{ route('cuentas-por-pagar.show', [$compra->id, 'action' => 'pay']) }}" class="inline-flex items-center rounded-lg bg-red-600 p-2 text-white hover:bg-red-700 transition-colors shadow-sm" title="Registrar pago">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                                         </a>
                                     @endif
                                 </div>
@@ -102,7 +84,7 @@
         </div>
         
         @if ($compras->hasPages())
-            <div class="border-t border-gray-100 px-6 py-4 dark:border-white/[0.05]">
+            <div class="border-t border-gray-100 px-6 py-4 dark:border-neutral-800/80">
                 {{ $compras->links() }}
             </div>
         @endif

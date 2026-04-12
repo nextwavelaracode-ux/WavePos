@@ -15,15 +15,15 @@
     </div>
 
     {{-- ===== TABLA ===== --}}
-    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
-        <div class="border-b border-gray-100 dark:border-white/[0.05] px-6 py-4">
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900">
+        <div class="border-b border-gray-100 dark:border-neutral-800/80 px-6 py-4">
             <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90">Resumen de Deudas Activas e Históricas</h4>
         </div>
 
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
+                    <tr class="border-b border-gray-100 dark:border-neutral-800/80 bg-gray-50 dark:bg-neutral-800/20">
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Proveedor</th>
                         <th class="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Cant. Compras</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Comprado (Crédito)</th>
@@ -43,7 +43,7 @@
                             $grandTotalPagado += $proveedor->total_pagado;
                             $grandTotalPendiente += $proveedor->saldo_pendiente;
                         @endphp
-                        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="font-medium text-gray-800 dark:text-white/90">{{ $proveedor->empresa }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400">RUC: {{ $proveedor->ruc }}</div>
@@ -75,7 +75,7 @@
                     @endforelse
                 </tbody>
                 @if($proveedores->count() > 0)
-                <tfoot class="border-t-2 border-gray-200 dark:border-white/[0.1] bg-gray-50 dark:bg-white/[0.03]">
+                <tfoot class="border-t-2 border-gray-200 dark:border-white/[0.1] bg-gray-50 dark:bg-neutral-800/20">
                     <tr>
                         <th class="px-6 py-4 font-bold text-gray-800 dark:text-white/90 text-right uppercase text-xs" colspan="2">TOTAL GENERAL:</th>
                         <th class="px-6 py-4 font-bold text-gray-800 dark:text-white/90 text-right">${{ number_format($grandTotalComprado, 2) }}</th>

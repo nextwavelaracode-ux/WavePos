@@ -3,29 +3,14 @@
 @section('content')
 <x-common.page-breadcrumb pageTitle="Configuración del Sistema" />
 
-@if(session('sweet_alert'))
-    @php $sa = session('sweet_alert'); @endphp
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            Swal.fire({
-                icon: '{{ $sa['type'] }}',
-                title: '{{ $sa['title'] }}',
-                text: '{{ $sa['message'] }}',
-                timer: 3000,
-                showConfirmButton: false,
-            });
-        });
-    </script>
-    @endpush
-@endif
+
 
 {{-- Shared input/select/toggle CSS classes --}}
 @php
-$inputClass = 'h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800';
-$selectClass = 'h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800';
+$inputClass = 'h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800';
+$selectClass = 'h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white/90 dark:focus:border-brand-800';
 $labelClass = 'mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400';
-$sectionCard = 'rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900';
+$sectionCard = 'rounded-2xl border border-gray-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900';
 $sectionTitle = 'mb-5 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400';
 
 function s($settings, $group, $key, $default = '') {
@@ -36,7 +21,7 @@ function s($settings, $group, $key, $default = '') {
 <div x-data="{ tab: 'general' }" class="space-y-5">
 
     {{-- Tab Navigation --}}
-    <div class="flex flex-wrap gap-1 rounded-2xl border border-gray-200 bg-white p-1 dark:border-gray-800 dark:bg-gray-900 shadow-sm">
+    <div class="flex flex-wrap gap-1 rounded-2xl border border-gray-200 bg-white p-1 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm">
         @foreach([
             ['id' => 'general',      'label' => 'General & POS',    'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z'],
             ['id' => 'facturacion',  'label' => 'Facturación',       'icon' => 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z'],
@@ -46,7 +31,7 @@ function s($settings, $group, $key, $default = '') {
             ['id' => 'reportes',     'label' => 'Reportes',          'icon' => 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
         ] as $t)
         <button @click="tab = '{{ $t['id'] }}'"
-                :class="tab === '{{ $t['id'] }}' ? 'bg-brand-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'"
+                :class="tab === '{{ $t['id'] }}' ? 'bg-brand-500 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-800'"
                 class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all">
             <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $t['icon'] }}" />
@@ -78,13 +63,13 @@ function s($settings, $group, $key, $default = '') {
                         ['key' => 'pos_venta_rapida',        'label' => 'Venta rápida (sin pasos intermedios)'],
                         ['key' => 'pos_autofocus_buscador',  'label' => 'Auto-focus en buscador de productos'],
                     ] as $toggle)
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1"
                                    class="sr-only peer"
                                    {{ ($settings['pos'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>
@@ -110,13 +95,13 @@ function s($settings, $group, $key, $default = '') {
                         ['key' => 'caja_arqueo_obligatorio',     'label' => 'Arqueo obligatorio al cerrar'],
                         ['key' => 'caja_permitir_diferencias',   'label' => 'Permitir diferencias en arqueo'],
                     ] as $toggle)
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1"
                                    class="sr-only peer"
                                    {{ ($settings['caja'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>
@@ -180,12 +165,12 @@ function s($settings, $group, $key, $default = '') {
                         ['key' => 'ventas_descuentos',         'label' => 'Permitir descuentos en ventas'],
                         ['key' => 'ventas_cliente_obligatorio','label' => 'Cliente obligatorio para vender'],
                     ] as $toggle)
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
                                    {{ ($settings['ventas'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>
@@ -210,12 +195,12 @@ function s($settings, $group, $key, $default = '') {
                                class="{{ $inputClass }}">
                     </div>
 
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Compras a crédito habilitadas</span>
                         <div class="relative">
                             <input type="checkbox" name="compras_credito" value="1" class="sr-only peer"
                                    {{ ($settings['compras']['compras_credito'] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>
@@ -245,12 +230,12 @@ function s($settings, $group, $key, $default = '') {
                         ['key' => 'inv_alertas_minimo', 'label' => 'Alertas de stock mínimo activas'],
                         ['key' => 'inv_lotes',          'label' => 'Control por lotes (avanzado)'],
                     ] as $toggle)
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
                                    {{ ($settings['inventario'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>
@@ -274,12 +259,12 @@ function s($settings, $group, $key, $default = '') {
                                class="{{ $inputClass }}" placeholder="regular,vip,mayorista">
                     </div>
 
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">RUC obligatorio para clientes</span>
                         <div class="relative">
                             <input type="checkbox" name="clientes_ruc_obligatorio" value="1" class="sr-only peer"
                                    {{ ($settings['clientes']['clientes_ruc_obligatorio'] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>
@@ -300,7 +285,7 @@ function s($settings, $group, $key, $default = '') {
                         ['key' => 'pago_transferencia',  'label' => 'Transferencia bancaria', 'icon' => 'text-purple-500', 'bg' => 'bg-purple-50 dark:bg-purple-500/10'],
                         ['key' => 'pago_yappy',          'label' => 'Yappy / Nequi', 'icon' => 'text-amber-500', 'bg' => 'bg-amber-50 dark:bg-amber-500/10'],
                     ] as $pago)
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <div class="flex items-center gap-3">
                             <div class="flex h-9 w-9 items-center justify-center rounded-lg {{ $pago['bg'] }}">
                                 <svg class="h-5 w-5 {{ $pago['icon'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,7 +297,7 @@ function s($settings, $group, $key, $default = '') {
                         <div class="relative">
                             <input type="checkbox" name="{{ $pago['key'] }}" value="1" class="sr-only peer"
                                    {{ ($settings['pagos'][$pago['key']] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>
@@ -327,12 +312,12 @@ function s($settings, $group, $key, $default = '') {
                         ['key' => 'pago_referencia_tarjeta',       'label' => 'Requerir referencia en pagos con tarjeta'],
                         ['key' => 'pago_referencia_transferencia',  'label' => 'Requerir referencia en transferencias'],
                     ] as $toggle)
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
                                    {{ ($settings['pagos'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>
@@ -365,12 +350,12 @@ function s($settings, $group, $key, $default = '') {
                         ['key' => 'seg_bloqueo_auto', 'label' => 'Bloqueo automático de cuenta tras intentos fallidos'],
                         ['key' => 'seg_auditoria',    'label' => 'Habilitar auditoría de acciones del sistema'],
                     ] as $toggle)
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
                                    {{ ($settings['seguridad'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>
@@ -398,12 +383,12 @@ function s($settings, $group, $key, $default = '') {
                         ['key' => 'rep_logo_en_pdf',    'label' => 'Mostrar logo de empresa en PDF'],
                         ['key' => 'rep_datos_fiscales', 'label' => 'Mostrar datos fiscales (RUC/DV en PDF)'],
                     ] as $toggle)
-                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                    <label class="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-neutral-800 transition">
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
                                    {{ ($settings['reportes'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
-                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-gray-700"></div>
+                            <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
                     </label>

@@ -13,8 +13,31 @@ class ClienteController extends Controller
 {
     public function index()
     {
-        $clientes = Cliente::latest()->get();
+        $clientes = Cliente::latest()->paginate(25);
         return view('pages.clientes.clientes', compact('clientes'));
+    }
+
+    public function show(Cliente $cliente)
+    {
+        // Eager-load ventas (desc) con su factura electrónica y detalles
+        $cliente->load([
+            'ventas' => function ($query) {
+                $query->with(['facturaElectronica', 'detalles', 'pagos'])
+                      ->orderBy('created_at', 'desc');
+            },
+            'cuentasCobrar.pagos',
+        ]);
+
+        $totalCompras = $cliente->ventas->count();
+        $totalGastado = $cliente->ventas->sum('total');
+        $deudaActual  = $cliente->cuentasCobrar()->where('estado', '!=', 'pagado')->sum('saldo_pendiente');
+
+        return view('pages.clientes.show', compact(
+            'cliente',
+            'totalCompras',
+            'totalGastado',
+            'deudaActual'
+        ));
     }
 
     public function exportar($formato)

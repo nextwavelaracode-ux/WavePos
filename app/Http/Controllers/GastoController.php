@@ -65,7 +65,7 @@ class GastoController extends Controller
             $query->whereDate('fecha', '<=', $request->fecha_hasta);
         }
 
-        $gastos = $query->latest('fecha')->latest('id')->paginate(20)->withQueryString();
+        $gastos = $query->latest('fecha')->latest('id')->paginate(25)->withQueryString();
 
         // ── Dashboard KPIs ──────────────────────────────────────────────
         $hoy = now()->toDateString();

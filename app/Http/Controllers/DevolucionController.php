@@ -15,7 +15,7 @@ class DevolucionController extends Controller
     {
         $devoluciones = Devolucion::with(['venta', 'producto', 'usuario'])
             ->latest()
-            ->paginate(20);
+            ->paginate(25);
 
         $ventas = Venta::where('estado', 'completada')
             ->with('detalles.producto')

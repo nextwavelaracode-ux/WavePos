@@ -9,7 +9,12 @@ use App\Models\Gasto;
 use App\Models\Sucursal;
 use App\Models\Caja;
 use App\Models\User;
+use App\Models\Producto;
+use App\Models\CuentaPorCobrar;
+use App\Models\MovimientoInventario;
+use App\Models\FinanzasRecordatorio;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class FinanzasController extends Controller
 {
@@ -17,45 +22,44 @@ class FinanzasController extends Controller
     {
         // Rango de fechas por defecto: este mes
         $fechaInicio = $request->input('fecha_inicio', Carbon::now()->startOfMonth()->toDateString());
-        $fechaFin = $request->input('fecha_fin', Carbon::now()->endOfMonth()->toDateString());
-        $sucursalId = $request->input('sucursal_id', 'todas');
+        $fechaFin    = $request->input('fecha_fin', Carbon::now()->endOfMonth()->toDateString());
+        $sucursalId  = $request->input('sucursal_id', 'todas');
 
         // Query Base Ventas (Solo ventas completadas)
-        $ventasQuery = Venta::where('ventas.estado', 'completada')
-            ->whereBetween('ventas.fecha', [$fechaInicio, $fechaFin]);
+        $ventasQuery = Venta::where('estado', 'completada')
+            ->whereBetween('fecha', [$fechaInicio, $fechaFin]);
 
-        // Query Base Compras (Solo compras completadas)
-        $comprasQuery = Compra::where('compras.estado', 'completada')
-            ->whereBetween('compras.fecha_compra', [$fechaInicio, $fechaFin]);
+        // Query Base Compras (Solo compras completadas/registradas)
+        $comprasQuery = Compra::where('estado', 'registrada')
+            ->whereBetween('fecha_compra', [$fechaInicio, $fechaFin]);
 
         // Query Base Gastos (Solo activos)
-        $gastosQuery = Gasto::where('gastos.estado', 'activo')
-            ->whereBetween('gastos.fecha', [$fechaInicio, $fechaFin]);
+        $gastosQuery = Gasto::where('estado', 'activo')
+            ->whereBetween('fecha', [$fechaInicio, $fechaFin]);
 
-        // Filtrar por sucursal si aplica
         if ($sucursalId !== 'todas') {
-            $ventasQuery->where('ventas.sucursal_id', $sucursalId);
-            $comprasQuery->where('compras.sucursal_id', $sucursalId);
-            $gastosQuery->where('gastos.sucursal_id', $sucursalId);
+            $ventasQuery->where('sucursal_id', $sucursalId);
+            $comprasQuery->where('sucursal_id', $sucursalId);
+            $gastosQuery->where('sucursal_id', $sucursalId);
         }
 
-        // Totales básicos
-        $totalVentas = $ventasQuery->sum('total');
-        $totalCompras = $comprasQuery->sum('total');
-        $totalGastos = $gastosQuery->sum('monto');
-
-        $utilidadBruta = $totalVentas - $totalCompras;
-        $utilidadNeta = $utilidadBruta - $totalGastos;
+        // Totales básicos KPI
+        $totalVentas  = $ventasQuery->sum('total');
+        $totalGastos  = $gastosQuery->sum('monto');
+        $totalCompras = $comprasQuery->sum('total'); // no es KPI principal pero sirve de referencia
         
-        $margenGanancia = 0;
-        if ($totalVentas > 0) {
-            $margenGanancia = ($utilidadNeta / $totalVentas) * 100;
-        }
-
-        // --- DATOS PARA GRÁFICAS ---
+        $cuentasCobrar = CuentaPorCobrar::whereIn('estado', ['pendiente', 'parcial', 'vencido'])->sum('saldo_pendiente');
+        $cuentasPagar  = Compra::where('tipo_compra', 'credito')->whereIn('estado_pago', ['pendiente', 'parcial', 'vencido'])->sum('saldo_pendiente');
         
-        // 1. Gráfica de Periodos (Evolución de Ingresos vs Egresos por día)
-        // Obtenemos un array de fechas en el rango
+        $totalProductos = Producto::count();
+        $stockTotal     = Producto::sum('stock');
+
+        // Utilidad y margen (para referencias si se necesitan en otro lado)
+        $utilidadBruta  = $totalVentas - $totalCompras;
+        $utilidadNeta   = $utilidadBruta - $totalGastos;
+        $margenGanancia = $totalVentas > 0 ? ($utilidadNeta / $totalVentas) * 100 : 0;
+
+        // ── Gráfica de Periodos (Evolución de Ingresos vs Egresos por día) ──
         $fechas = [];
         $inicio = Carbon::parse($fechaInicio);
         $fin = Carbon::parse($fechaFin);
@@ -64,19 +68,16 @@ class FinanzasController extends Controller
             $inicio->addDay();
         }
 
-        // Agrupar ventas diarias
         $ventasDiarias = $ventasQuery->clone()
             ->selectRaw('DATE(fecha) as date, SUM(total) as sum')
             ->groupBy('date')
             ->pluck('sum', 'date')->toArray();
 
-        // Agrupar gastos diarios
         $gastosDiarios = $gastosQuery->clone()
             ->selectRaw('DATE(fecha) as date, SUM(monto) as sum')
             ->groupBy('date')
             ->pluck('sum', 'date')->toArray();
 
-        // Agrupar compras diarias
         $comprasDiarias = $comprasQuery->clone()
             ->selectRaw('DATE(fecha_compra) as date, SUM(total) as sum')
             ->groupBy('date')
@@ -99,155 +100,249 @@ class FinanzasController extends Controller
 
         $graficaPeriodos = [
             'categorias' => $categoriasGrafica,
-            'ingresos' => $serieIngresos,
-            'egresos' => $serieEgresos,
+            'ingresos'   => $serieIngresos,
+            'egresos'    => $serieEgresos,
         ];
 
-        // 2. Gastos por Categoría (Donut Chart)
-        $gastosPorCategoria = $gastosQuery->clone()
-            ->join('categorias_gasto', 'gastos.categoria_gasto_id', '=', 'categorias_gasto.id')
-            ->selectRaw('categorias_gasto.nombre as categoria, SUM(gastos.monto) as total')
-            ->groupBy('categorias_gasto.nombre')
-            ->orderByDesc('total')
-            ->get();
-
-        // 3. Top Productos Rentables
-        // Se asume que detalle_ventas existe y tiene producto_id, cantidad, precio_unitario, y precio_compra si lo almacena, 
-        // o sino tomamos el precio_compra actual del producto (esto puede variar según modelo exacto, usare precio_compra del producto con join)
-        $topProductos = \DB::table('detalle_ventas')
-            ->join('ventas', 'detalle_ventas.venta_id', '=', 'ventas.id')
-            ->join('productos', 'detalle_ventas.producto_id', '=', 'productos.id')
-            ->where('ventas.estado', 'completada')
-            ->whereBetween('ventas.fecha', [$fechaInicio, $fechaFin]);
-        
-        if ($sucursalId !== 'todas') {
-            $topProductos->where('ventas.sucursal_id', $sucursalId);
-        }
-
-        $topProductos = $topProductos->selectRaw('
-                productos.nombre, 
-                SUM(detalle_ventas.cantidad) as cant_vendida,
-                MAX(productos.precio_venta) as precio_v,
-                MAX(productos.precio_compra) as precio_c,
-                SUM(detalle_ventas.subtotal) as total_ingreso,
-                SUM(detalle_ventas.cantidad * productos.precio_compra) as total_costo
-            ')
-            ->groupBy('productos.id', 'productos.nombre')
+        // ── Movimientos de Inventario (Últimos 10) ──
+        $ultimosMovimientos = MovimientoInventario::with('producto')
+            ->latest('fecha')
+            ->take(10)
             ->get()
-            ->map(function ($item) {
-                $utilidad = $item->total_ingreso - $item->total_costo;
-                $margen = $item->total_ingreso > 0 ? ($utilidad / $item->total_ingreso) * 100 : 0;
+            ->map(function($m) {
                 return [
-                    'nombre' => $item->nombre,
-                    'ventas' => $item->cant_vendida,
-                    'precio_compra' => round($item->precio_c, 2),
-                    'precio_venta' => round($item->precio_v, 2),
-                    'ganancia_unitaria' => round($item->precio_v - $item->precio_c, 2),
-                    'ingreso' => round($item->total_ingreso, 2),
-                    'utilidad' => round($utilidad, 2),
-                    'margen' => round($margen, 2)
-                ];
-            })
-            ->sortByDesc('utilidad')
-            ->take(5)
-            ->values();
-
-        // Extraer series para grafica Top Productos
-        $topProductosNombres = $topProductos->pluck('nombre')->toArray();
-        $topProductosVentas = $topProductos->pluck('ventas')->toArray();
-        $topProductosUtilidad = $topProductos->pluck('utilidad')->toArray();
-
-        // 4. Rentabilidad por Sucursal
-        $sucursalesKpis = Sucursal::where('estado', true)->get()->map(function($suc) use ($fechaInicio, $fechaFin) {
-            $v = Venta::where('sucursal_id', $suc->id)->where('estado', 'completada')->whereBetween('fecha', [$fechaInicio, $fechaFin])->sum('total');
-            $c = Compra::where('sucursal_id', $suc->id)->where('estado', 'completada')->whereBetween('fecha_compra', [$fechaInicio, $fechaFin])->sum('total');
-            $g = Gasto::where('sucursal_id', $suc->id)->where('estado', 'activo')->whereBetween('fecha', [$fechaInicio, $fechaFin])->sum('monto');
-            $u = $v - $c - $g;
-            return [
-                'nombre' => $suc->nombre,
-                'ventas' => round($v, 2),
-                'costos' => round($c + $g, 2),
-                'utilidad' => round($u, 2)
-            ];
-        })->sortByDesc('utilidad')->values();
-
-        // Últimos Movimientos (Flujo Combinado)
-        $entradas = $ventasQuery->clone()->orderByDesc('created_at')->take(10)->get()
-            ->map(fn($v) => ['tipo' => 'ingreso', 'categoria' => 'Venta', 'referencia' => $v->numero_comprobante, 'monto' => $v->total, 'fecha' => $v->fecha]);
-        $salidasGastos = $gastosQuery->clone()->with('categoria')->orderByDesc('created_at')->take(10)->get()
-            ->map(fn($g) => ['tipo' => 'egreso', 'categoria' => 'Gasto / ' . ($g->categoria->nombre ?? ''), 'referencia' => $g->descripcion, 'monto' => $g->monto, 'fecha' => $g->fecha]);
-        $salidasCompras = $comprasQuery->clone()->orderByDesc('created_at')->take(10)->get()
-            ->map(fn($c) => ['tipo' => 'egreso', 'categoria' => 'Compra', 'referencia' => $c->comprobante, 'monto' => $c->total, 'fecha' => $c->fecha_compra]);
-
-        
-        $flujoReciente = collect([])->merge($entradas)->merge($salidasGastos)->merge($salidasCompras)
-            ->sortByDesc('fecha')->take(10)->values();
-
-        // 5. Top Vendedores (usuarios que más han vendido)
-        $topSellersQuery = Venta::where('estado', 'completada')
-            ->whereBetween('fecha', [$fechaInicio, $fechaFin]);
-        if ($sucursalId !== 'todas') {
-            $topSellersQuery->where('sucursal_id', $sucursalId);
-        }
-        $topSellers = $topSellersQuery
-            ->selectRaw('user_id, SUM(total) as total_ventas, COUNT(*) as num_transacciones')
-            ->groupBy('user_id')
-            ->orderByDesc('total_ventas')
-            ->take(5)
-            ->get()
-            ->map(function($item) {
-                $user = User::find($item->user_id);
-                return [
-                    'nombre' => $user ? $user->name : 'Usuario #' . $item->user_id,
-                    'total_ventas' => round($item->total_ventas, 2),
-                    'transacciones' => $item->num_transacciones,
+                    'producto'    => $m->producto->nombre ?? 'Producto Eliminado',
+                    'tipo'        => $m->tipo,
+                    'motivo'      => $m->motivo_label,
+                    'cantidad'    => $m->cantidad,
+                    'stock_nuevo' => $m->stock_nuevo,
+                    'fecha'       => Carbon::parse($m->fecha)->format('d M Y'),
                 ];
             });
 
-        // 6. Historial de Turnos (cajas)
-        $turnosQuery = Caja::whereBetween('fecha_apertura', [$fechaInicio . ' 00:00:00', $fechaFin . ' 23:59:59']);
-        if ($sucursalId !== 'todas') {
-            $turnosQuery->where('sucursal_id', $sucursalId);
-        }
-        $historialTurnos = $turnosQuery->with(['usuario', 'sucursal'])
-            ->orderByDesc('fecha_apertura')
+        // ── Cuentas Resumen (Panel derecho) ──
+        $cuentasCobrarLista = CuentaPorCobrar::with('cliente')
+            ->whereIn('estado', ['pendiente', 'parcial', 'vencido'])
+            ->orderBy('fecha_vencimiento', 'asc')
             ->take(10)
-            ->get();
+            ->get()
+            ->map(function($c) {
+                return [
+                    'cliente'     => $c->cliente->nombre_completo ?? 'Desconocido',
+                    'vencimiento' => $c->fecha_vencimiento ? Carbon::parse($c->fecha_vencimiento)->format('d M Y') : '—',
+                    'saldo'       => $c->saldo_pendiente,
+                    'estado'      => $c->estado,
+                ];
+            });
+
+        $cuentasPagarLista = Compra::with('proveedor')
+            ->where('tipo_compra', 'credito')
+            ->whereIn('estado_pago', ['pendiente', 'parcial', 'vencido'])
+            ->orderBy('fecha_vencimiento', 'asc')
+            ->take(10)
+            ->get()
+            ->map(function($c) {
+                return [
+                    'proveedor'   => $c->proveedor->empresa ?? 'Desconocido',
+                    'numero'      => $c->numero_factura ?? 'S/N',
+                    'vencimiento' => $c->fecha_vencimiento ? Carbon::parse($c->fecha_vencimiento)->format('d M Y') : '—',
+                    'saldo'       => $c->saldo_pendiente,
+                    'estado_pago' => $c->estado_pago,
+                ];
+            });
 
         // Sucursales activas para el select de filtro
         $sucursales = Sucursal::where('estado', true)->get();
 
         return view('pages.finanzas.index', compact(
-            'fechaInicio',
-            'fechaFin',
-            'sucursalId',
-            'totalVentas',
-            'totalCompras',
-            'totalGastos',
-            'utilidadBruta',
-            'utilidadNeta',
-            'margenGanancia',
-            'sucursales',
-            'graficaPeriodos',
-            'topProductos',
-            'topProductosNombres',
-            'topProductosVentas',
-            'topProductosUtilidad',
-            'gastosPorCategoria',
-            'sucursalesKpis',
-            'flujoReciente',
-            'topSellers',
-            'historialTurnos'
+            'fechaInicio', 'fechaFin', 'sucursalId', 'sucursales',
+            'totalVentas', 'totalGastos', 'cuentasCobrar', 'cuentasPagar',
+            'totalProductos', 'stockTotal', 'graficaPeriodos', 
+            'ultimosMovimientos', 'cuentasCobrarLista', 'cuentasPagarLista',
+            'utilidadBruta', 'utilidadNeta', 'margenGanancia', 'totalCompras'
         ));
     }
 
     public function reportes(Request $request)
     {
-        // Futura implementación de exportación PDF / Excel
         return back()->with('sweet_alert', [
             'type' => 'info',
             'title' => 'En desarrollo',
             'message' => 'El módulo de exportación de reportes financieros estará disponible próximamente.'
         ]);
+    }
+
+    // =========================================================================
+    // API ENDPOINTS PARA CALENDARIOS
+    // =========================================================================
+
+    /**
+     * Calendario automático: Vencimientos (Cuentas por Pagar y por Cobrar)
+     */
+    public function calendarEvents(Request $request)
+    {
+        $start = $request->input('start');
+        $end   = $request->input('end');
+
+        // 1. Cuentas por Pagar (Compras a Crédito)
+        $comprasQuery = Compra::with('proveedor')
+            ->where('tipo_compra', 'credito')
+            ->whereNotNull('fecha_vencimiento')
+            ->whereIn('estado_pago', ['pendiente', 'parcial', 'vencido']);
+
+        if ($start && $end) {
+            $startDate = \Carbon\Carbon::parse($start)->startOfDay()->toDateTimeString();
+            $endDate   = \Carbon\Carbon::parse($end)->endOfDay()->toDateTimeString();
+            $comprasQuery->whereBetween('fecha_vencimiento', [$startDate, $endDate]);
+        }
+        
+        $compras = $comprasQuery->get();
+
+        // 2. Cuentas por Cobrar
+        $cobrarQuery = CuentaPorCobrar::with('cliente')
+            ->whereNotNull('fecha_vencimiento')
+            ->whereIn('estado', ['pendiente', 'parcial', 'vencido']);
+
+        if ($start && $end) {
+            $startDate = \Carbon\Carbon::parse($start)->startOfDay()->toDateTimeString();
+            $endDate   = \Carbon\Carbon::parse($end)->endOfDay()->toDateTimeString();
+            $cobrarQuery->whereBetween('fecha_vencimiento', [$startDate, $endDate]);
+        }
+        
+        $cobros = $cobrarQuery->get();
+
+        // Agrupamos por fecha para mostrar un solo evento por día con un modal
+        $eventosPorDia = [];
+
+        foreach ($compras as $c) {
+            $fecha = Carbon::parse($c->fecha_vencimiento)->format('Y-m-d');
+            if (!isset($eventosPorDia[$fecha])) {
+                $eventosPorDia[$fecha] = ['pagar' => 0, 'cobrar' => 0, 'items' => []];
+            }
+            $eventosPorDia[$fecha]['pagar']++;
+            $eventosPorDia[$fecha]['items'][] = [
+                'tipo'        => 'pagar',
+                'referencia'  => 'Fac: ' . ($c->numero_factura ?? 'S/N') . ' - ' . ($c->proveedor->empresa ?? 'Proveedor'),
+                'descripcion' => 'Compra ' . $c->id,
+                'monto'       => (float) $c->saldo_pendiente,
+                'estado_pago' => ucfirst($c->estado_pago),
+            ];
+        }
+
+        foreach ($cobros as $c) {
+            $fecha = Carbon::parse($c->fecha_vencimiento)->format('Y-m-d');
+            if (!isset($eventosPorDia[$fecha])) {
+                $eventosPorDia[$fecha] = ['pagar' => 0, 'cobrar' => 0, 'items' => []];
+            }
+            $eventosPorDia[$fecha]['cobrar']++;
+            $eventosPorDia[$fecha]['items'][] = [
+                'tipo'        => 'cobrar',
+                'referencia'  => 'Venta: #' . $c->venta_id . ' - ' . ($c->cliente->nombre_completo ?? 'Cliente'),
+                'descripcion' => 'Cuenta ' . $c->id,
+                'monto'       => (float) $c->saldo_pendiente,
+                'estado_pago' => ucfirst($c->estado),
+            ];
+        }
+
+        $formatedEvents = [];
+        foreach ($eventosPorDia as $fecha => $data) {
+            $titulo = [];
+            if ($data['pagar'] > 0) $titulo[]  = $data['pagar'] . ' Por pagar';
+            if ($data['cobrar'] > 0) $titulo[] = $data['cobrar'] . ' Por cobrar';
+            
+            // Color based on majority or logic:
+            $color = $data['pagar'] > 0 ? '#f59e0b' : '#3b82f6'; // amber if any payables, else blue
+
+            $formatedEvents[] = [
+                'id'              => 'vencimiento-' . $fecha,
+                'title'           => implode(' | ', $titulo),
+                'start'           => $fecha,
+                'allDay'          => true,
+                'backgroundColor' => $color,
+                'borderColor'     => $color,
+                'textColor'       => '#ffffff',
+                'extendedProps'   => [
+                    'grupo' => $data['items']
+                ]
+            ];
+        }
+
+        return response()->json($formatedEvents);
+    }
+
+    /**
+     * API: Listar recordatorios de base de datos
+     */
+    public function getRecordatorios(Request $request)
+    {
+        $start = $request->input('start');
+        $end   = $request->input('end');
+
+        $query = FinanzasRecordatorio::where('user_id', auth()->id());
+        if ($start && $end) {
+            $query->whereBetween('fecha', [$start, $end]);
+        }
+
+        $recordatorios = $query->get()->map(function($r) {
+            return [
+                'id'              => $r->id,
+                'title'           => $r->titulo,
+                'start'           => $r->fecha->format('Y-m-d'),
+                'allDay'          => true,
+                'backgroundColor' => $r->color ?? '#3b82f6',
+                'borderColor'     => $r->color ?? '#3b82f6',
+                'extendedProps'   => [
+                    'descripcion' => $r->descripcion,
+                ]
+            ];
+        });
+
+        return response()->json($recordatorios);
+    }
+
+    /**
+     * API: Crear recordatorio
+     */
+    public function storeRecordatorio(Request $request)
+    {
+        $validated = $request->validate([
+            'fecha'       => 'required|date',
+            'titulo'      => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'color'       => 'nullable|string|max:20',
+        ]);
+
+        $validated['user_id'] = auth()->id();
+
+        $recordatorio = FinanzasRecordatorio::create($validated);
+        return response()->json(['success' => true, 'data' => $recordatorio]);
+    }
+
+    /**
+     * API: Actualizar recordatorio
+     */
+    public function updateRecordatorio(Request $request, $id)
+    {
+        $recordatorio = FinanzasRecordatorio::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+        
+        $validated = $request->validate([
+            'fecha'       => 'required|date',
+            'titulo'      => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'color'       => 'nullable|string|max:20',
+        ]);
+
+        $recordatorio->update($validated);
+        return response()->json(['success' => true, 'data' => $recordatorio]);
+    }
+
+    /**
+     * API: Eliminar recordatorio
+     */
+    public function destroyRecordatorio($id)
+    {
+        $recordatorio = FinanzasRecordatorio::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+        $recordatorio->delete();
+        return response()->json(['success' => true]);
     }
 }

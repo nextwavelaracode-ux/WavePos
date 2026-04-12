@@ -1,9 +1,9 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
     <div
-      class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
+      class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-800/20 md:p-6"
     >
       <div
-        class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800"
+        class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-neutral-800"
       >
         <svg
           class="fill-gray-800 dark:fill-white/90"
@@ -53,10 +53,10 @@
     </div>
 
     <div
-      class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6"
+      class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-800/20 md:p-6"
     >
       <div
-        class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800"
+        class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-neutral-800"
       >
         <svg
           class="fill-gray-800 dark:fill-white/90"

@@ -2,23 +2,7 @@
 
 @section('content')
 
-    {{-- SweetAlert2 Notification --}}
-    @if (session('sweet_alert'))
-        @php $sa = session('sweet_alert'); @endphp
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        icon: '{{ $sa['type'] }}',
-                        title: '{{ $sa['title'] }}',
-                        text: '{{ $sa['message'] }}',
-                        timer: 3000,
-                        showConfirmButton: false,
-                    });
-                });
-            </script>
-        @endpush
-    @endif
+
 
 <div class="space-y-6">
     {{-- ===== HEADER ===== --}}
@@ -28,7 +12,7 @@
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Gestiona las deudas por compras a crédito</p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
-            <a href="{{ route('cuentas-por-pagar.historial') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200 transition-colors dark:bg-white/[0.03] dark:text-gray-300 dark:hover:bg-white/[0.05]">
+            <a href="{{ route('cuentas-por-pagar.historial') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200 transition-colors dark:bg-neutral-800/20 dark:text-gray-300 dark:hover:bg-white/[0.05]">
                 Historial de Pagos
             </a>
             <a href="{{ route('cuentas-por-pagar.vencidas') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-red-100 px-5 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-200 transition-colors dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20">
@@ -41,61 +25,65 @@
     </div>
 
     {{-- ===== METRICAS ===== --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
+    <div class="mb-6 grid md:grid-cols-4 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-2xs rounded-xl overflow-hidden">
         <!-- Pendiente -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 transition-all hover:border-red-300 dark:hover:border-red-500/30">
-            <div class="flex items-center justify-center w-12 h-12 bg-red-50 rounded-xl dark:bg-red-500/10 mb-4">
-                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Pendiente</span>
-                <h4 class="mt-1 font-bold text-gray-800 text-2xl dark:text-white/90">${{ number_format($totalPendiente, 2) }}</h4>
+        <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700 first:before:hidden">
+            <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div class="grow">
+                    <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Total Pendiente</p>
+                    <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-500">${{ number_format($totalPendiente, 2) }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Total adeudado</p>
+                </div>
             </div>
         </div>
 
         <!-- Pagado -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 transition-all hover:border-emerald-300 dark:hover:border-emerald-500/30">
-            <div class="flex items-center justify-center w-12 h-12 bg-emerald-50 rounded-xl dark:bg-emerald-500/10 mb-4">
-                <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7" /></svg>
-            </div>
-            <div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Pagado</span>
-                <h4 class="mt-1 font-bold text-gray-800 text-2xl dark:text-white/90">${{ number_format($totalPagado, 2) }}</h4>
+        <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700">
+            <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                <div class="grow">
+                    <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Total Pagado</p>
+                    <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-500">${{ number_format($totalPagado, 2) }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Abonos realizados</p>
+                </div>
             </div>
         </div>
 
         <!-- Vencidas -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 transition-all hover:border-orange-300 dark:hover:border-orange-500/30">
-            <div class="flex items-center justify-center w-12 h-12 bg-orange-50 rounded-xl dark:bg-orange-500/10 mb-4">
-                <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-            </div>
-            <div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Cuentas Vencidas</span>
-                <h4 class="mt-1 font-bold text-gray-800 text-2xl dark:text-white/90">{{ $comprasVencidas }}</h4>
+        <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700">
+            <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <div class="grow">
+                    <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Cuentas Vencidas</p>
+                    <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-500">{{ $comprasVencidas }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Plazo superado</p>
+                </div>
             </div>
         </div>
 
         <!-- Del mes -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 transition-all hover:border-brand-300 dark:hover:border-brand-500/30">
-            <div class="flex items-center justify-center w-12 h-12 bg-brand-50 rounded-xl dark:bg-brand-500/10 mb-4">
-                <svg class="w-6 h-6 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-            </div>
-            <div>
-                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Créditos del Mes</span>
-                <h4 class="mt-1 font-bold text-gray-800 text-2xl dark:text-white/90">{{ $comprasMes }}</h4>
+        <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700">
+            <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                <div class="grow">
+                    <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Créditos del Mes</p>
+                    <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-500">{{ $comprasMes }}</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Generados este mes</p>
+                </div>
             </div>
         </div>
     </div>
 
     {{-- ===== TABLA ===== --}}
-    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
-        <div class="border-b border-gray-100 dark:border-white/[0.05] px-6 py-4">
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900">
+        <div class="border-b border-gray-100 dark:border-neutral-800/80 px-6 py-4">
             <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90">Listado de Compras a Crédito</h4>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
+                    <tr class="border-b border-gray-100 dark:border-neutral-800/80 bg-gray-50 dark:bg-neutral-800/20">
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Factura</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Proveedor</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total Compra</th>
@@ -107,7 +95,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                     @forelse($compras as $compra)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                             <td class="px-6 py-4 font-medium text-gray-800 dark:text-white/90">
                                 #{{ $compra->numero_factura }}
                             </td>
@@ -140,14 +128,12 @@
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('cuentas-por-pagar.show', $compra->id) }}" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 transition-colors" title="Ver Detalles">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        Ver
+                                    <a href="{{ route('cuentas-por-pagar.show', $compra->id) }}" class="inline-flex items-center rounded-lg border border-gray-200 bg-white p-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700 dark:border-gray-700 dark:bg-neutral-800 dark:text-gray-400 transition-colors" title="Ver Detalles">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </a>
                                     @if($compra->estado_pago !== 'pagado')
-                                        <a href="{{ route('cuentas-por-pagar.show', [$compra->id, 'action' => 'pay']) }}" class="inline-flex items-center gap-1 rounded-lg bg-brand-500 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-brand-600 transition-colors shadow-sm" title="Abonar / Pagar">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                                            Pagar
+                                        <a href="{{ route('cuentas-por-pagar.show', [$compra->id, 'action' => 'pay']) }}" class="inline-flex items-center rounded-lg bg-emerald-600 p-2 text-white hover:bg-emerald-700 transition-colors shadow-sm" title="Abonar / Pagar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                                         </a>
                                     @endif
                                 </div>
@@ -168,7 +154,7 @@
         </div>
         
         @if ($compras->hasPages())
-            <div class="border-t border-gray-100 px-6 py-4 dark:border-white/[0.05]">
+            <div class="border-t border-gray-100 px-6 py-4 dark:border-neutral-800/80">
                 {{ $compras->links() }}
             </div>
         @endif

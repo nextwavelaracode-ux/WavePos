@@ -15,7 +15,7 @@ class CategoriaController extends Controller
 {
     public function index()
     {
-        $categorias = Categoria::with('parent')->orderBy('orden_visualizacion')->get();
+        $categorias = Categoria::with('parent')->orderBy('orden_visualizacion')->paginate(25);
         // Categorias that can act as parents (we can restrict to those without parents themselves if we want, but generally all are fine)
         $padres = Categoria::where('estado', true)->orderBy('nombre')->get();
         

@@ -14,22 +14,22 @@
          @click="openTicket = false; setTimeout(() => ticketUrl = '', 300); window.dispatchEvent(new CustomEvent('ticket-cerrado'))"></div>
          
     <!-- Offcanvas Panel -->
-    <div class="fixed top-0 right-0 h-full w-[400px] max-w-full bg-white dark:bg-gray-900 shadow-2xl z-[10000] transform transition-transform duration-300 flex flex-col"
+    <div class="fixed top-0 right-0 h-full w-[400px] max-w-full bg-white dark:bg-neutral-900 shadow-2xl z-[10000] transform transition-transform duration-300 flex flex-col"
          :class="openTicket ? 'translate-x-0' : 'translate-x-full'">
         
         <!-- Header -->
-        <div class="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+        <div class="p-4 border-b border-gray-200 dark:border-neutral-800 flex justify-between items-center bg-gray-50 dark:bg-neutral-800/50">
             <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 Vista de Ticket
             </h3>
-            <button @click="openTicket = false; setTimeout(() => ticketUrl = '', 300); window.dispatchEvent(new CustomEvent('ticket-cerrado'))" class="rounded-full p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition">
+            <button @click="openTicket = false; setTimeout(() => ticketUrl = '', 300); window.dispatchEvent(new CustomEvent('ticket-cerrado'))" class="rounded-full p-1.5 text-gray-500 hover:bg-gray-200 hover:text-gray-700 dark:hover:bg-neutral-700 dark:hover:text-gray-300 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
         
         <!-- Content iframe -->
-        <div class="flex-1 overflow-hidden bg-gray-200 dark:bg-gray-950 flex justify-center relative">
+        <div class="flex-1 overflow-hidden bg-gray-200 dark:bg-neutral-950 flex justify-center relative">
             <template x-if="ticketUrl">
                 <iframe :src="ticketUrl" class="w-full h-full border-0 absolute inset-0 z-10" id="ticketFrame"></iframe>
             </template>
@@ -48,8 +48,8 @@
         </div>
         
         <!-- Footer actions -->
-        <div class="p-4 border-t border-gray-200 dark:border-gray-800 gap-3 flex bg-white dark:bg-gray-900 drop-shadow-md">
-            <button @click="openTicket = false; setTimeout(() => ticketUrl = '', 300); window.dispatchEvent(new CustomEvent('ticket-cerrado'))" class="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 transition">
+        <div class="p-4 border-t border-gray-200 dark:border-neutral-800 gap-3 flex bg-white dark:bg-neutral-900 drop-shadow-md">
+            <button @click="openTicket = false; setTimeout(() => ticketUrl = '', 300); window.dispatchEvent(new CustomEvent('ticket-cerrado'))" class="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 dark:border-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-800 transition">
                 Cerrar
             </button>
             <button @click="document.getElementById('ticketFrame').contentWindow.print()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition flex items-center justify-center gap-2 shadow-sm shadow-emerald-600/20">

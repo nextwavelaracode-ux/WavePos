@@ -11,8 +11,8 @@
     cargando: false,
     
     async confirmarPago() {
-        if (this.monto <= 0 || this.monto > (this.saldoMax + 0.01)) { // Allow tiny margin for floating point
-            Swal.fire('Monto inválido', `El monto debe ser entre $0.01 y $${this.saldoMax}`, 'warning');
+        if (this.monto <= 0 || this.monto > (this.saldoMax + 0.01)) {
+            window.Notify.warning(`El monto debe ser entre $0.01 y $${this.saldoMax}`);
             return;
         }
         
@@ -38,20 +38,14 @@
             
             if (data.success) {
                 this.open = false;
-                await Swal.fire({
-                    icon: 'success',
-                    title: '¡Pago registrado!',
-                    text: data.message,
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-                window.location.reload();
+                window.Notify.success(data.message, { timeout: 2000 });
+                setTimeout(() => window.location.reload(), 2000);
             } else {
-                Swal.fire('Error', data.message, 'error');
+                window.Notify.failure(data.message);
             }
         } catch (e) {
             this.cargando = false;
-            Swal.fire('Error de red', e.message, 'error');
+            window.Notify.failure('Error de red: ' + e.message);
         }
     }
 }" 
@@ -59,8 +53,8 @@
 x-show="open" x-cloak
 class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
     
-    <div @click.outside="open = false" class="relative w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 shadow-2xl overflow-hidden shadow-emerald-500/10 border border-gray-100 dark:border-white/[0.05]">
-        <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-white/[0.05]">
+    <div @click.outside="open = false" class="relative w-full max-w-md rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl overflow-hidden shadow-emerald-500/10 border border-gray-100 dark:border-neutral-800/80">
+        <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-neutral-800/80">
             <h3 class="text-lg font-bold text-gray-800 dark:text-white">Registrar Cobro</h3>
             <button @click="open = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -83,7 +77,7 @@ class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">$</span>
                         <input type="number" x-model.number="monto" step="0.01" :max="saldoMax" 
-                            class="w-full h-12 rounded-xl border-2 border-gray-100 bg-gray-50 pl-8 pr-4 text-lg font-black text-gray-800 focus:border-brand-500 focus:bg-white focus:ring-0 dark:border-white/[0.05] dark:bg-white/[0.02] dark:text-white transition-all">
+                            class="w-full h-12 rounded-xl border-2 border-gray-100 bg-gray-50 pl-8 pr-4 text-lg font-black text-gray-800 focus:border-brand-500 focus:bg-white focus:ring-0 dark:border-neutral-800/80 dark:bg-neutral-800/10 dark:text-white transition-all">
                     </div>
                 </div>
 
@@ -91,7 +85,7 @@ class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 
                     <div class="col-span-2">
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Método de Cobro</label>
                         <select x-model="metodo"
-                            class="w-full h-11 rounded-xl border border-gray-100 bg-white px-4 text-sm font-semibold focus:border-brand-500 focus:ring-0 dark:border-white/[0.05] dark:bg-gray-800 dark:text-white">
+                            class="w-full h-11 rounded-xl border border-gray-100 bg-white px-4 text-sm font-semibold focus:border-brand-500 focus:ring-0 dark:border-neutral-800/80 dark:bg-neutral-800 dark:text-white">
                             <option value="efectivo">💵 Efectivo</option>
                             <option value="tarjeta">💳 Tarjeta</option>
                             <option value="transferencia">🏦 Transferencia</option>
@@ -103,14 +97,14 @@ class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 
                         <div class="col-span-2">
                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">N° Referencia / Voucher</label>
                             <input type="text" x-model="referencia" placeholder="Obligatorio para electrónicos"
-                                class="w-full h-11 rounded-xl border border-gray-100 bg-white px-4 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.05] dark:bg-gray-800 dark:text-white">
+                                class="w-full h-11 rounded-xl border border-gray-100 bg-white px-4 text-sm focus:border-brand-500 focus:ring-0 dark:border-neutral-800/80 dark:bg-neutral-800 dark:text-white">
                         </div>
                     </template>
 
                     <div class="col-span-2">
                         <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Observaciones</label>
                         <textarea x-model="observaciones" rows="2" placeholder="Opcional..."
-                            class="w-full rounded-xl border border-gray-100 bg-white px-4 py-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.05] dark:bg-gray-800 dark:text-white"></textarea>
+                            class="w-full rounded-xl border border-gray-100 bg-white px-4 py-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-neutral-800/80 dark:bg-neutral-800 dark:text-white"></textarea>
                     </div>
                 </div>
             </div>

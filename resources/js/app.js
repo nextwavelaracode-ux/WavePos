@@ -1,4 +1,6 @@
 import './bootstrap';
+import './notiflix.config.js';
+
 import Alpine from 'alpinejs';
 import ApexCharts from 'apexcharts';
 
@@ -7,8 +9,8 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 // FullCalendar
 import { Calendar } from '@fullcalendar/core';
-import Swal from 'sweetalert2';
-window.Swal = Swal;
+// Migración a Notiflix completada — window.Notify, window.Confirm y window.Loading
+// disponibles globalmente desde notiflix.config.js
 
 
 window.Alpine = Alpine;
@@ -48,5 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Calendar init
     if (document.querySelector('#calendar')) {
         import('./components/calendar-init').then(module => module.calendarInit());
+    }
+    // Finanzas init
+    if (document.querySelector('#finanzasIngresosChart') || document.querySelector('#calendarioRecordatorios')) {
+        import('./components/finanzas-init').then(module => module.initFinanzas());
     }
 });

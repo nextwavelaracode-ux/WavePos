@@ -1,0 +1,9 @@
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:16: <body class="bg-white text-gray-800 p-8 font-sans">
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:39: <p class="font-bold text-gray-800 text-lg">{{ $compra->proveedor->empresa }}</p>
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:52: <p class="text-sm text-gray-600 block mb-1">Nº Factura Proveedor: <span class="font-semibold text-gr
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:53: <p class="text-sm text-gray-600 block mb-1">Tipo de Compra: <span class="font-semibold text-gray-800
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:55: <p class="text-sm text-gray-600 block mb-1">Vencimiento: <span class="font-semibold text-gray-800">{
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:57: <p class="text-sm text-gray-600 block mb-1">Registrado por: <span class="font-semibold text-gray-800
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:77: <td class="py-3 px-4 text-sm text-gray-800 font-medium">
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:83: <td class="py-3 px-4 text-sm text-gray-800 font-bold text-right">${{ number_format($detalle->subtota
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:94: <span class="font-bold text-gray-800 text-lg">TOTAL:</span>

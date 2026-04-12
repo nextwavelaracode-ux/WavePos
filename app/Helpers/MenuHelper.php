@@ -32,12 +32,7 @@ class MenuHelper
                 'path' => '/caja',
                 'permission' => 'caja.ver'
             ],
-            [
-                'icon' => 'pos',
-                'name' => 'Punto de Venta',
-                'path' => '/caja/pos',
-                'permission' => 'pos.ver'
-            ],
+
             [
                 'icon' => 'historial-ventas',
                 'name' => 'Historial de Ventas',

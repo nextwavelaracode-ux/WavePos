@@ -12,13 +12,13 @@
     <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="showModal = false"></div>
 
     {{-- Modal Panel --}}
-    <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
+    <div class="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl dark:bg-neutral-900"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100">
 
         {{-- Header --}}
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-white/[0.05]">
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-neutral-800/80">
             <div class="flex items-center gap-3">
                 <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +51,7 @@
                         Categoría de Gasto <span class="text-red-500">*</span>
                     </label>
                     <select name="categoria_gasto_id" x-model="categoria_gasto_id" required
-                            class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white">
+                            class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white">
                         <option value="">— Seleccionar categoría —</option>
                         @foreach($categorias as $cat)
                             <option value="{{ $cat->id }}">{{ $cat->nombre }}</option>
@@ -66,7 +66,7 @@
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium text-sm">$</span>
                         <input type="number" name="monto" x-model="monto" min="0.01" step="0.01" required
                                placeholder="0.00"
-                               class="w-full h-11 rounded-xl border border-gray-200 bg-white pl-8 pr-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white">
+                               class="w-full h-11 rounded-xl border border-gray-200 bg-white pl-8 pr-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white">
                     </div>
                 </div>
             </div>
@@ -78,7 +78,7 @@
                         Método de Pago <span class="text-red-500">*</span>
                     </label>
                     <select name="metodo_pago" x-model="metodo_pago" required
-                            class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white">
+                            class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white">
                         <option value="efectivo">💵 Efectivo</option>
                         <option value="transferencia">🏦 Transferencia</option>
                         <option value="tarjeta">💳 Tarjeta</option>
@@ -95,7 +95,7 @@
                     </label>
                     <input type="text" name="referencia" x-model="referencia" :required="requiereReferencia"
                            placeholder="Ej: TXN-001234"
-                           class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white">
+                           class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white">
                 </div>
             </div>
 
@@ -106,14 +106,14 @@
                         Fecha <span class="text-red-500">*</span>
                     </label>
                     <input type="date" name="fecha" x-model="fecha" required
-                           class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white">
+                           class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Sucursal <span class="text-red-500">*</span>
                     </label>
                     <select name="sucursal_id" x-model="sucursal_id" required
-                            class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white">
+                            class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white">
                         <option value="">— Seleccionar sucursal —</option>
                         @foreach($sucursales as $suc)
                             <option value="{{ $suc->id }}">{{ $suc->nombre }}</option>
@@ -126,7 +126,7 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Descripción</label>
                 <textarea name="descripcion" x-model="descripcion" rows="2" placeholder="Detalle del gasto..."
-                          class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white resize-none"></textarea>
+                          class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white resize-none"></textarea>
             </div>
 
             {{-- Comprobante --}}
@@ -138,18 +138,18 @@
             </div>
 
             {{-- Gasto Recurrente --}}
-            <div class="rounded-xl border border-gray-100 p-4 dark:border-white/[0.05]">
+            <div class="rounded-xl border border-gray-100 p-4 dark:border-neutral-800/80">
                 <label class="flex items-center gap-3 cursor-pointer">
                     <div class="relative">
                         <input type="checkbox" name="es_recurrente" x-model="es_recurrente" value="1" class="sr-only peer">
-                        <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-brand-500"></div>
+                        <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-neutral-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-neutral-600 peer-checked:bg-brand-500"></div>
                     </div>
                     <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Gasto recurrente</span>
                 </label>
                 <div x-show="es_recurrente" x-transition class="mt-3">
                     <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Frecuencia</label>
                     <select name="frecuencia" x-model="frecuencia"
-                            class="h-9 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white">
+                            class="h-9 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white">
                         <option value="">— Seleccionar —</option>
                         <option value="diario">Diario</option>
                         <option value="semanal">Semanal</option>
@@ -161,7 +161,7 @@
             </div>
 
             {{-- Footer --}}
-            <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-white/[0.05]">
+            <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-neutral-800/80">
                 <button type="button" @click="showModal = false"
                         class="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-white/[0.1] dark:text-gray-300 dark:hover:bg-white/[0.03]">
                     Cancelar

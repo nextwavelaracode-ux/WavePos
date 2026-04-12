@@ -12,7 +12,7 @@ class UsuarioController extends Controller
 {
     public function index()
     {
-        $usuarios  = User::with(['roles', 'sucursal'])->latest()->get();
+        $usuarios  = User::with(['roles', 'sucursal'])->latest()->paginate(25);
         $roles     = Role::orderBy('name')->get();
         $sucursales = Sucursal::where('estado', true)->orderBy('nombre')->get();
 

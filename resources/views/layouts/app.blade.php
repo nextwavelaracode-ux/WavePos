@@ -111,86 +111,104 @@
     <x-common.preloader/>
     {{-- preloader end --}}
 
-    <div class="min-h-screen xl:flex">
-        @include('layouts.backdrop')
+    <div class="min-h-screen bg-neutral-100 dark:bg-neutral-950">
+
         @include('layouts.sidebar')
 
-        <div class="flex-1 transition-all duration-300 ease-in-out"
+        {{-- Main area: shifts when sidebar is open, full-width when hidden --}}
+        <div
+            class="flex flex-col min-h-screen transition-all duration-300 ease-in-out"
             :class="{
-                'xl:ml-[260px]': $store.sidebar.isExpanded || $store.sidebar.isHovered,
-                'xl:ml-[90px]': !$store.sidebar.isExpanded && !$store.sidebar.isHovered,
-                'ml-0': $store.sidebar.isMobileOpen
-            }">
-            <!-- app header start -->
+                'lg:ml-[260px]': $store.sidebar.isExpanded,
+                'lg:ml-0'      : !$store.sidebar.isExpanded
+            }"
+        >
             @include('layouts.app-header')
-            <!-- app header end -->
-            <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+
+            <main class="flex-1 p-4 md:p-6 max-w-screen-2xl w-full mx-auto">
                 @yield('content')
-            </div>
+            </main>
         </div>
 
     </div>
 
     <x-ticket-offcanvas />
 
-    @if(session('success'))
+    {{-- Notiflix Global Notification System --}}
     <script type="module">
-        if (typeof window.Swal !== 'undefined') {
-            window.Swal.fire({
-                icon: 'success',
-                title: '{{ session('success') }}',
-                timer: 3000,
-                showConfirmButton: false,
-                toast: true,
-                position: 'bottom-end'
-            });
-        }
-    </script>
-    @endif
+        if (typeof window.Notify !== 'undefined') {
+            
+            // 1. Manejo nativo de notificaciones Notify() desde PHP
+            @if(session('notiflix'))
+                @php $n = session('notiflix'); @endphp
+                const type = '{{ $n['type'] === 'error' ? 'failure' : $n['type'] }}';
+                window.Notify[type]('{{ $n['title'] }} {{ $n['message'] ? " - " . $n['message'] : "" }}');
+            @endif
 
-    @if($errors->any())
-    <script type="module">
-        if (typeof window.Swal !== 'undefined') {
-            window.Swal.fire({
-                icon: 'error',
-                title: 'Error de Validación',
-                html: "{!! implode('<br>', $errors->all()) !!}",
-                timer: 5000,
-                showConfirmButton: true,
-            });
-        }
-    </script>
-    @endif
+            // 2. Errores de Validación (Request Validation)
+            @if($errors->any())
+                const validationErrors = @json($errors->all());
+                validationErrors.forEach(err => {
+                    window.Notify.failure(err);
+                });
+            @endif
 
-    @if(session('error'))
-    <script type="module">
-        if (typeof window.Swal !== 'undefined') {
-            window.Swal.fire({
-                icon: 'error',
-                title: '{{ session('error') }}',
-                timer: 4000,
-                showConfirmButton: false,
-                toast: true,
-                position: 'bottom-end'
-            });
-        }
-    </script>
-    @endif
+            // 3. Fallbacks para redirects antiguos
+            @if(session('success'))
+                window.Notify.success('{{ session('success') }}');
+            @endif
 
-    @if(session('sweet_alert'))
-    <script type="module">
-        if (typeof window.Swal !== 'undefined') {
-            const sa = @json(session('sweet_alert'));
-            window.Swal.fire({
-                icon: sa.type || 'success',
-                title: sa.title || '',
-                text: sa.message || '',
-                timer: sa.timer || 3000,
-                showConfirmButton: sa.showConfirmButton || false,
-            });
+            @if(session('error'))
+                window.Notify.failure('{{ session('error') }}');
+            @endif
+
+            // 4. Fallback del antiguo sweet_alert
+            @if(session('sweet_alert'))
+                @php $sa = session('sweet_alert'); @endphp
+                const saType = '{{ strtolower($sa['type'] ?? 'success') }}' === 'error' ? 'failure' : '{{ strtolower($sa['type'] ?? 'success') }}';
+                window.Notify[saType]('{{ $sa['title'] ?? '' }} {{ $sa['message'] ?? '' }}');
+            @endif
         }
     </script>
-    @endif
+
+    {{-- Guardián de Sesión por Expirar --}}
+    <script type="module">
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof window.Confirm === 'undefined') return;
+            
+            // Sesión aproximada (asumiendo 120min). Alertamos a los 115min.
+            const LIMITE_MINUTOS = 115; 
+            let warningTime = LIMITE_MINUTOS * 60 * 1000;
+            let inactivityTimer;
+
+            function startInactivityTimer() {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = setTimeout(() => {
+                    window.Confirm.show(
+                        'Sesión a punto de Expirar',
+                        'Por seguridad del sistema y privacidad, tu sesión se cerrará en 5 minutos por inactividad.',
+                        'Extender Sesión',
+                        'Dejar que expire',
+                        () => {
+                            fetch('/sanctum/csrf-cookie').then(() => {
+                                window.Notify.success('Sesión prolongada con éxito. Ya puedes seguir facturando.');
+                                startInactivityTimer(); 
+                            });
+                        },
+                        () => {
+                            window.location.href = '/logout';
+                        },
+                        { okButtonBackground: '#3b82f6' }
+                    );
+                }, warningTime);
+            }
+
+            window.addEventListener('load', startInactivityTimer);
+            window.addEventListener('mousemove', startInactivityTimer);
+            window.addEventListener('click', startInactivityTimer);
+            window.addEventListener('keypress', startInactivityTimer);
+        });
+    </script>
 </body>
 
 @stack('scripts')

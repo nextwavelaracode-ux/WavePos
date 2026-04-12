@@ -60,7 +60,7 @@
 @endphp
 
 <div
-    class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6"
+    class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pb-3 pt-4 dark:border-neutral-800 dark:bg-neutral-800/20 sm:px-6"
 >
     <div class="flex justify-between gap-2 mb-4 sm:items-center">
         <div>
@@ -74,7 +74,7 @@
         <table class="min-w-full">
             <!-- table header start -->
             <thead>
-                <tr class="border-gray-100 border-y dark:border-gray-800">
+                <tr class="border-gray-100 border-y dark:border-neutral-800">
                     <th class="py-3 font-normal">
                         <div class="flex items-center">
                             <p class="text-gray-500 text-theme-sm dark:text-gray-400">Creator</p>
@@ -95,7 +95,7 @@
             <!-- table header end -->
 
             <!-- table body start -->
-            <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+            <tbody class="divide-y divide-gray-100 dark:divide-neutral-800">
                 @foreach ($campaigns as $campaign)
                     <tr>
                         <td class="py-3">

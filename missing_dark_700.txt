@@ -1,0 +1,40 @@
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\caja\detalle.blade.php:81: @else bg-gray-100 text-gray-700 @endif">
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\caja\devoluciones.blade.php:67: <button onclick="document.getElementById('modalDevolucion').classList.add('hidden')" class="text-gra
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\caja\historial.blade.php:196: @else bg-gray-100 text-gray-700 @endif">
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\caja\historial.blade.php:249: <button type="button" onclick="cerrarModalAnular()" class="rounded-lg border border-gray-300 px-4 py
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\clientes\clientes.blade.php:205: <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $badgeColors
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\clientes\clientes.blade.php:353: <button @click="showCreate = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-20
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\clientes\clientes.blade.php:387: <button @click="showEdit = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\clientes\clientes.blade.php:434: <button @click="showView = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\clientes\clientes.blade.php:513: <button @click="showImport = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-20
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\index.blade.php:108: <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold uppercase {{ $t
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:27: <h2 class="text-xl font-bold text-gray-700">COMPRA #{{ str_pad($compra->id, 5, '0', STR_PAD_LEFT) }}
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:28: <div class="inline-block mt-2 px-3 py-1 rounded bg-gray-100 text-sm font-semibold text-gray-600 uppe
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:31: <p class="text-sm text-gray-500 mt-4">Fecha: <span class="font-semibold text-gray-700">{{ $compra->f
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:41: <p class="text-sm text-gray-600">RUC: {{ $compra->proveedor->ruc }}</p>
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:44: <p class="text-sm text-gray-600">Contacto: {{ $compra->proveedor->contacto }}</p>
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:47: <p class="text-sm text-gray-600">Email: {{ $compra->proveedor->email }}</p>
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:52: <p class="text-sm text-gray-600 block mb-1">Nº Factura Proveedor: <span class="font-semibold text-gr
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:53: <p class="text-sm text-gray-600 block mb-1">Tipo de Compra: <span class="font-semibold text-gray-800
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:55: <p class="text-sm text-gray-600 block mb-1">Vencimiento: <span class="font-semibold text-gray-800">{
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:57: <p class="text-sm text-gray-600 block mb-1">Registrado por: <span class="font-semibold text-gray-800
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:76: <td class="py-3 px-4 text-sm text-gray-600">{{ $index + 1 }}</td>
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:81: <td class="py-3 px-4 text-sm text-gray-600 text-center">{{ $detalle->cantidad }}</td>
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:82: <td class="py-3 px-4 text-sm text-gray-600 text-right">${{ number_format($detalle->precio_compra, 2)
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\compras\pdf.blade.php:104: <p class="text-sm text-gray-600 whitespace-pre-wrap">{{ $compra->observaciones }}</p>
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\cuentas\_modal-pago.blade.php:65: <button @click="open = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\categorias.blade.php:351: class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\categorias.blade.php:517: class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\categorias.blade.php:683: class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\categorias.blade.php:805: class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\inventario.blade.php:302: <button @click="showEntrada = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-2
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\inventario.blade.php:391: <button @click="showSalida = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-20
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\inventario.blade.php:469: <button @click="showAjuste = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-20
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\movimientos.blade.php:82: <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $badgeColors
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\productos.blade.php:617: <button @click="showCreate = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-20
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\productos.blade.php:651: <button @click="showEdit = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\productos.blade.php:698: <button @click="showView = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\productos.blade.php:779: <button @click="showImport = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-20
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\proveedores.blade.php:281: <button @click="showCreate = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-20
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\proveedores.blade.php:404: <button @click="showEdit = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 
+c:\Users\jjdia\Downloads\NextWave\WavePos\resources\views\pages\inventario\proveedores.blade.php:530: <button @click="showImport = false" class="text-gray-400 hover:text-gray-700 dark:hover:text-gray-20

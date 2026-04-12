@@ -3,22 +3,7 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="Roles y Permisos" />
 
-    @if (session('sweet_alert'))
-        @php $sa = session('sweet_alert'); @endphp
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        icon: '{{ $sa['type'] }}',
-                        title: '{{ $sa['title'] }}',
-                        text: '{{ $sa['message'] }}',
-                        timer: 3000,
-                        showConfirmButton: false,
-                    });
-                });
-            </script>
-        @endpush
-    @endif
+
 
     <div x-data="{
         showCreate: false,
@@ -50,11 +35,11 @@
         </div>
 
         {{-- Tabla --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-800/20">
             <div class="overflow-x-auto">
                 <table class="min-w-full">
                     <thead>
-                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                        <tr class="border-b border-gray-200 dark:border-neutral-700">
                             <th
                                 class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                                 #</th>
@@ -72,9 +57,9 @@
                                 Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <tbody class="divide-y divide-gray-100 dark:divide-neutral-800">
                         @forelse($roles as $i => $rol)
-                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-neutral-800/10 transition-colors">
                                 <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $i + 1 }}</td>
                                 <td class="px-6 py-4">
                                     @php
@@ -104,7 +89,7 @@
                                     <div class="flex flex-wrap gap-1">
                                         @foreach ($rol->permissions->take(4) as $perm)
                                             <span
-                                                class="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                                                class="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-neutral-700 dark:text-gray-300">
                                                 {{ $perm->name }}
                                             </span>
                                         @endforeach
@@ -133,23 +118,21 @@
                                         name: "{{ addslashes($rol->name) }}",
                                         permissions: @json($rol->permissions->pluck("name")->toArray())
                                     })'
-                                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.05] transition-colors">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            class="inline-flex items-center rounded-lg border border-blue-200 bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:border-blue-800/30 dark:bg-blue-500/10 dark:text-blue-400 transition-colors" title="Editar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
-                                            Editar
                                         </button>
                                         <button
                                             onclick="confirmarEliminar({{ $rol->id }}, '{{ addslashes($rol->name) }}')"
-                                            class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-800/30 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                                            class="inline-flex items-center rounded-lg border border-red-200 bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:border-red-800/30 dark:bg-red-500/10 dark:text-red-400 transition-colors" title="Eliminar">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                            Eliminar
                                         </button>
                                     </div>
                                 </td>
@@ -171,6 +154,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="p-4 border-t border-gray-100 dark:border-white/5">
+                {{ $roles->links() }}
+            </div>
         </div>
 
         {{-- ===== MODAL CREAR ===== --}}
@@ -181,10 +167,10 @@
             @keydown.escape.window="showCreate = false" style="display:none">
 
             <div @click.outside="showCreate = false"
-                class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-10 mx-4 max-h-[90vh]">
+                class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-neutral-900 lg:p-10 mx-4 max-h-[90vh]">
 
                 <button @click="showCreate = false" type="button"
-                    class="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
+                    class="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -203,7 +189,7 @@
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre del Rol
                                 <span class="text-red-500">*</span></label>
                             <input id="create-rol-name" type="text" name="name"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                                 placeholder="Ej: supervisor" required>
                         </div>
 
@@ -211,7 +197,7 @@
                             <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-400">Permisos de Acceso</p>
                             <div class="space-y-4">
                                 @foreach ($permisos as $modulo => $permisosGrupo)
-                                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                                    <div class="rounded-xl border border-gray-200 dark:border-neutral-700 p-4">
                                         <div class="flex items-center justify-between mb-3">
                                             <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300 capitalize">
                                                 {{ $modulo }}</h5>
@@ -224,7 +210,7 @@
                                                 <label class="flex items-center gap-2.5 cursor-pointer">
                                                     <input type="checkbox" name="permissions[]"
                                                         value="{{ $permiso->name }}"
-                                                        class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 create-perm-{{ $modulo }}">
+                                                        class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-neutral-600 dark:bg-neutral-800 create-perm-{{ $modulo }}">
                                                     <span
                                                         class="text-sm text-gray-600 dark:text-gray-400">{{ $permiso->name }}</span>
                                                 </label>
@@ -237,7 +223,7 @@
                     </div>
                     <div class="flex items-center gap-3 mt-6 lg:justify-end">
                         <button @click="showCreate = false" type="button"
-                            class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                            class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
                             Cancelar
                         </button>
                         <button type="submit"
@@ -257,10 +243,10 @@
             @keydown.escape.window="showEdit = false" style="display:none">
 
             <div @click.outside="showEdit = false"
-                class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-10 mx-4 max-h-[90vh]">
+                class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-neutral-900 lg:p-10 mx-4 max-h-[90vh]">
 
                 <button @click="showEdit = false" type="button"
-                    class="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700">
+                    class="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -280,7 +266,7 @@
                             <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Nombre del Rol
                                 <span class="text-red-500">*</span></label>
                             <input type="text" name="name" :value="editData.name"
-                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                                class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                                 placeholder="Nombre del rol" required>
                         </div>
 
@@ -288,7 +274,7 @@
                             <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-400">Permisos de Acceso</p>
                             <div class="space-y-4">
                                 @foreach ($permisos as $modulo => $permisosGrupo)
-                                    <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                                    <div class="rounded-xl border border-gray-200 dark:border-neutral-700 p-4">
                                         <div class="flex items-center justify-between mb-3">
                                             <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300 capitalize">
                                                 {{ $modulo }}</h5>
@@ -303,7 +289,7 @@
                                                         value="{{ $permiso->name }}"
                                                         :checked="editData.permissions && editData.permissions.includes(
                                                             '{{ $permiso->name }}')"
-                                                        class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 edit-perm-{{ $modulo }}">
+                                                        class="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-neutral-600 dark:bg-neutral-800 edit-perm-{{ $modulo }}">
                                                     <span
                                                         class="text-sm text-gray-600 dark:text-gray-400">{{ $permiso->name }}</span>
                                                 </label>
@@ -316,7 +302,7 @@
                     </div>
                     <div class="flex items-center gap-3 mt-6 lg:justify-end">
                         <button @click="showEdit = false" type="button"
-                            class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                            class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
                             Cancelar
                         </button>
                         <button type="submit"
@@ -339,22 +325,19 @@
 @push('scripts')
     <script>
         function confirmarEliminar(id, nombre) {
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: `Eliminarás el rol "${nombre}". Los usuarios con este rol perderán sus permisos.`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-            }).then((result) => {
-                if (result.isConfirmed) {
+            window.Confirm.show(
+                '¿Eliminar rol?',
+                `Eliminarás el rol "${nombre}". Los usuarios con este rol perderán sus permisos.`,
+                'Sí, eliminar',
+                'Cancelar',
+                () => {
                     const form = document.getElementById('delete-form');
                     form.action = `/configuracion/roles/${id}`;
                     form.submit();
-                }
-            });
+                },
+                () => {},
+                { okButtonBackground: '#ef4444' }
+            );
         }
 
         function toggleGrupo(btn, prefix) {

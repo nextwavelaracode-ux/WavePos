@@ -87,23 +87,9 @@ class VentaController extends Controller
     /**
      * Confirmar y guardar venta (transacción atómica).
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\StoreVentaRequest $request, \App\Services\VentaService $ventaService)
     {
-        $request->validate([
-            'sucursal_id'           => 'required|exists:sucursales,id',
-            'cliente_id'            => 'nullable|exists:clientes,id',
-            'items'                 => 'required|array|min:1',
-            'items.*.producto_id'   => 'required|exists:productos,id',
-            'items.*.cantidad'      => 'required|integer|min:1',
-            'items.*.precio_unitario'=> 'required|numeric|min:0',
-            'items.*.impuesto'      => 'required|numeric|min:0',
-            'pagos'                 => 'required|array|min:1',
-            'pagos.*.metodo'        => 'required|in:efectivo,tarjeta,transferencia,yappy,credito',
-            'pagos.*.monto'         => 'required|numeric|min:0.01',
-            'fecha_vencimiento'     => 'nullable|date',
-            'forma_pago_dian'       => 'nullable|string',
-            'metodo_pago_dian_id'   => 'nullable|integer',
-        ]);
+        $validated = $request->validated();
 
         // Validate referencía required for electronic payments
         // AND validate credit requires a real client
@@ -146,149 +132,38 @@ class VentaController extends Controller
             }
         }
 
+        $caja = Caja::where('estado', 'abierta')->latest()->first();
+
+        if (!$caja) {
+            return response()->json([
+                'success' => false,
+                'message' => '¡Error! No se puede registrar la venta. Debe abrir un turno de caja primero.'
+            ], 422);
+        }
+
         try {
-            DB::beginTransaction();
+            // Toda la lógica de creación centralizada en el Service
+            $venta = $ventaService->procesarVenta($request->all(), $caja, auth()->id() ?? 1);
 
-            // Get open caja
-            $caja = Caja::where('estado', 'abierta')->latest()->first();
-
-            if (!$caja) {
-                DB::rollBack();
-                return response()->json([
-                    'success' => false,
-                    'message' => '¡Error! No se puede registrar la venta. Debe abrir un turno de caja primero.'
-                ], 422);
-            }
-
-            // Calculate totals
-            $subtotal = 0;
-            $itbms    = 0;
-
-            foreach ($request->items as $item) {
-                $producto = Producto::lockForUpdate()->findOrFail($item['producto_id']);
-
-                // Stock validation
-                if ($producto->stock < $item['cantidad']) {
-                    DB::rollBack();
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Stock insuficiente para '{$producto->nombre}'. Disponible: {$producto->stock}"
-                    ], 422);
-                }
-
-                $lineaSub   = round($item['precio_unitario'] * $item['cantidad'], 2);
-                $lineaItbms = round($lineaSub * ($item['impuesto'] / 100), 2);
-                $subtotal  += $lineaSub;
-                $itbms     += $lineaItbms;
-            }
-
-            $total = round($subtotal + $itbms, 2);
-
-            // Validate payment total
-            $totalPagado = collect($request->pagos)->sum('monto');
-            if (round($totalPagado, 2) < $total) {
-                DB::rollBack();
-                return response()->json([
-                    'success' => false,
-                    'message' => "El monto pagado ({$totalPagado}) es menor al total ({$total})."
-                ], 422);
-            }
-
-            // Create Venta
-            $venta = Venta::create([
-                'numero'       => Venta::generateNumero(),
-                'caja_id'      => $caja?->id,
-                'sucursal_id'  => $request->sucursal_id,
-                'cliente_id'   => $request->cliente_id,
-                'user_id'      => auth()->id() ?? 1,
-                'subtotal'     => $subtotal,
-                'itbms'        => $itbms,
-                'total'        => $total,
-                'estado'       => 'completada',
-                'fecha'        => now()->toDateString(),
-                'forma_pago_dian'=> $request->forma_pago_dian,
-                'metodo_pago_dian_id'=> $request->metodo_pago_dian_id,
-            ]);
-
-            // Create Detalle + Descuento stock + Kardex
-            foreach ($request->items as $item) {
-                $producto   = Producto::lockForUpdate()->findOrFail($item['producto_id']);
-                $lineaSub   = round($item['precio_unitario'] * $item['cantidad'], 2);
-                $lineaItbms = round($lineaSub * ($item['impuesto'] / 100), 2);
-
-                DetalleVenta::create([
-                    'venta_id'       => $venta->id,
-                    'producto_id'    => $item['producto_id'],
-                    'cantidad'       => $item['cantidad'],
-                    'precio_unitario'=> $item['precio_unitario'],
-                    'impuesto'       => $item['impuesto'],
-                    'subtotal'       => $lineaSub,
-                    'total'          => round($lineaSub + $lineaItbms, 2),
-                ]);
-
-                // Decrement stock
-                $stockAnterior = $producto->stock;
-                $producto->decrement('stock', $item['cantidad']);
-                $stockNuevo = $producto->fresh()->stock;
-
-                // Kardex movement
-                MovimientoInventario::create([
-                    'producto_id'    => $item['producto_id'],
-                    'tipo'           => 'salida',
-                    'motivo'         => 'venta',
-                    'cantidad'       => $item['cantidad'],
-                    'stock_anterior' => $stockAnterior,
-                    'stock_nuevo'    => $stockNuevo,
-                    'numero_factura' => $venta->numero,
-                    'observaciones'  => "Venta #{$venta->numero}",
-                    'usuario_id'     => auth()->id() ?? 1,
-                    'fecha'          => now()->toDateString(),
-                ]);
-            }
-
-            // Create Pagos
-            $totalCredito = 0;
-            foreach ($request->pagos as $pago) {
-                PagoVenta::create([
-                    'venta_id'    => $venta->id,
-                    'metodo'      => $pago['metodo'],
-                    'monto'       => $pago['monto'],
-                    'referencia'  => $pago['referencia'] ?? null,
-                    'tipo_tarjeta'=> $pago['tipo_tarjeta'] ?? null,
-                    'banco'       => $pago['banco'] ?? null,
-                    'observaciones'=> $pago['observaciones'] ?? null,
-                ]);
-
-                if ($pago['metodo'] === 'credito') {
-                    $totalCredito += $pago['monto'];
+            $alertasStock = [];
+            if (!empty($request->items)) {
+                foreach ($request->items as $item) {
+                    $productoFresco = Producto::find($item['producto_id']);
+                    if ($productoFresco && $productoFresco->stock <= 5) {
+                        $alertasStock[] = "{$productoFresco->nombre} (Quedan: {$productoFresco->stock})";
+                    }
                 }
             }
-
-            // Create Cuenta por Cobrar if there's credit
-            if ($totalCredito > 0) {
-                \App\Models\CuentaPorCobrar::create([
-                    'venta_id'          => $venta->id,
-                    'cliente_id'        => $venta->cliente_id,
-                    'sucursal_id'       => $venta->sucursal_id,
-                    'total'             => $totalCredito,
-                    'total_pagado'      => 0,
-                    'saldo_pendiente'   => $totalCredito,
-                    'fecha_vencimiento' => $request->fecha_vencimiento ?? now()->addDays(30),
-                    'estado'            => 'pendiente',
-                ]);
-            }
-
-            DB::commit();
 
             return response()->json([
-                'success'  => true,
-                'message'  => "Venta {$venta->numero} registrada correctamente.",
-                'venta_id' => $venta->id,
-                'numero'   => $venta->numero,
+                'success'       => true,
+                'message'       => "Venta {$venta->numero} registrada correctamente.",
+                'venta_id'      => $venta->id,
+                'numero'        => $venta->numero,
+                'alertas_stock' => $alertasStock,
             ]);
 
         } catch (\Throwable $e) {
-            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Error al registrar venta: ' . $e->getMessage()
@@ -326,7 +201,7 @@ class VentaController extends Controller
             $query->whereDate('fecha', '<=', $request->fecha_hasta);
         }
 
-        $ventas = $query->paginate(20)->withQueryString();
+        $ventas = $query->paginate(25)->withQueryString();
 
         // --- DASHBOARD KPI ---
         $today = now()->toDateString();
@@ -403,6 +278,13 @@ class VentaController extends Controller
         $request->validate([
             'motivo_anulacion' => 'required|string|min:5|max:300',
         ]);
+
+        if (!\Illuminate\Support\Facades\Gate::allows('anular', $venta)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Acción denegada: Sólo puedes anular tickets de tu sucursal emitidos el día de hoy.'
+            ], 403);
+        }
 
         if ($venta->estado === 'anulada') {
             return response()->json(['success' => false, 'message' => 'La venta ya fue anulada.'], 422);

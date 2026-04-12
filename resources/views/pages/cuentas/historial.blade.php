@@ -3,8 +3,8 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="Historial de Cobros AR" />
 
-    <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900 overflow-hidden">
-        <div class="p-5 border-b border-gray-100 dark:border-white/[0.05] flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900 overflow-hidden">
+        <div class="p-5 border-b border-gray-100 dark:border-neutral-800/80 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h4 class="text-lg font-bold text-gray-800 dark:text-white">Registro de Cobros</h4>
                 <p class="text-xs text-gray-400">Listado histórico de todos los abonos realizados a cuentas por cobrar</p>
@@ -18,7 +18,7 @@
                         </svg>
                     </span>
                     <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar cliente o recibo..."
-                        class="w-full h-10 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-white">
+                        class="w-full h-10 rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800/20 dark:text-white">
                 </div>
             </form>
         </div>
@@ -26,7 +26,7 @@
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="border-b border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-white/[0.03]">
+                    <tr class="border-b border-gray-100 bg-gray-50 dark:border-neutral-800/80 dark:bg-neutral-800/20">
                         <th class="px-6 py-4 text-left font-semibold text-gray-500 dark:text-gray-400">Fecha / Hora</th>
                         <th class="px-6 py-4 text-left font-semibold text-gray-500 dark:text-gray-400">Cliente</th>
                         <th class="px-6 py-4 text-left font-semibold text-gray-500 dark:text-gray-400">Venta Ref.</th>
@@ -36,10 +36,10 @@
                         <th class="px-6 py-4 text-right font-semibold text-gray-500 dark:text-gray-400">Acciones</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                <tbody class="divide-y divide-gray-100 dark:divide-neutral-800/80">
                     @if(count($pagos) > 0)
                         @foreach($pagos as $pago)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                                 <td class="px-6 py-4">
                                     <span class="font-medium text-gray-700 dark:text-gray-300">{{ $pago->created_at->format('d/m/Y') }}</span>
                                     <p class="text-[10px] text-gray-400">{{ $pago->created_at->format('H:i') }}</p>
@@ -90,7 +90,7 @@
         </div>
 
         @if($pagos->hasPages())
-            <div class="p-5 border-t border-gray-100 dark:border-white/[0.05]">
+            <div class="p-5 border-t border-gray-100 dark:border-neutral-800/80">
                 {{ $pagos->links() }}
             </div>
         @endif

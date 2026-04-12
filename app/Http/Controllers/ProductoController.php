@@ -15,7 +15,7 @@ class ProductoController extends Controller
 {
     public function index()
     {
-        $productos = Producto::with(['categoria', 'subcategoria'])->latest()->get();
+        $productos = Producto::with(['categoria', 'subcategoria'])->latest()->paginate(25);
         // Categorias base (sin padre) para el select principal
         $categorias = Categoria::whereNull('parent_id')->where('estado', true)->orderBy('nombre')->get();
         // Todas las categorías para subcategorías y filtros
@@ -24,33 +24,9 @@ class ProductoController extends Controller
         return view('pages.inventario.productos', compact('productos', 'categorias', 'todasCategorias'));
     }
 
-    public function store(Request $request)
+    public function store(\App\Http\Requests\StoreProductoRequest $request)
     {
-        $validated = $request->validate([
-            'nombre'          => 'required|string|max:150',
-            'descripcion'     => 'nullable|string',
-            'categoria_id'    => 'required|exists:categorias,id',
-            'subcategoria_id' => 'nullable|exists:categorias,id',
-            'sku'             => 'nullable|string|max:50',
-            'codigo_barras'   => 'nullable|string|max:50',
-            'precio_compra'   => 'required|numeric|min:0',
-            'precio_venta'    => 'required|numeric|min:0',
-            'precio_minimo'   => 'nullable|numeric|min:0',
-            'margen'          => 'nullable|numeric',
-            'impuesto'        => 'required|in:0,7,10,15',
-            'stock'           => 'required|integer|min:0',
-            'stock_minimo'    => 'nullable|integer|min:0',
-            'stock_maximo'    => 'nullable|integer|min:0',
-            'unidad_medida'   => 'required|string|max:50',
-            'ubicacion'       => 'nullable|string|max:255',
-            'pasillo'         => 'nullable|string|max:50',
-            'estante'         => 'nullable|string|max:50',
-            'imagen'          => 'nullable|image|mimes:jpg,jpeg,png,gif,svg|max:2048',
-            'estado'          => 'nullable',
-            'tasa_impuesto'   => 'nullable|numeric|min:0',
-            'is_excluded'     => 'nullable',
-            'unidad_medida_dian_id' => 'nullable|integer',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('imagen')) {
             $validated['imagen'] = $request->file('imagen')->store('productos', 'public');
@@ -91,33 +67,9 @@ class ProductoController extends Controller
             ]);
     }
 
-    public function update(Request $request, Producto $producto)
+    public function update(\App\Http\Requests\UpdateProductoRequest $request, Producto $producto)
     {
-        $validated = $request->validate([
-            'nombre'          => 'required|string|max:150',
-            'descripcion'     => 'nullable|string',
-            'categoria_id'    => 'required|exists:categorias,id',
-            'subcategoria_id' => 'nullable|exists:categorias,id',
-            'sku'             => 'nullable|string|max:50',
-            'codigo_barras'   => 'nullable|string|max:50',
-            'precio_compra'   => 'required|numeric|min:0',
-            'precio_venta'    => 'required|numeric|min:0',
-            'precio_minimo'   => 'nullable|numeric|min:0',
-            'margen'          => 'nullable|numeric',
-            'impuesto'        => 'required|in:0,7,10,15',
-            'stock'           => 'required|integer|min:0',
-            'stock_minimo'    => 'nullable|integer|min:0',
-            'stock_maximo'    => 'nullable|integer|min:0',
-            'unidad_medida'   => 'required|string|max:50',
-            'ubicacion'       => 'nullable|string|max:255',
-            'pasillo'         => 'nullable|string|max:50',
-            'estante'         => 'nullable|string|max:50',
-            'imagen'          => 'nullable|image|mimes:jpg,jpeg,png,gif,svg|max:2048',
-            'estado'          => 'nullable',
-            'tasa_impuesto'   => 'nullable|numeric|min:0',
-            'is_excluded'     => 'nullable',
-            'unidad_medida_dian_id' => 'nullable|integer',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('imagen')) {
             if ($producto->imagen && Storage::disk('public')->exists($producto->imagen)) {
@@ -277,6 +229,28 @@ class ProductoController extends Controller
                 'success' => false,
                 'message' => 'Ocurrió un error al intentar eliminar los registros.'
             ], 500);
+        }
+    }
+    public function buscarApi($barcode)
+    {
+        try {
+            $response = \Illuminate\Support\Facades\Http::withoutVerifying()->timeout(5)->get("https://world.openfoodfacts.org/api/v0/product/{$barcode}.json");
+            
+            if ($response->successful() && $response->json('status') === 1) {
+                $product = $response->json('product');
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'nombre' => $product['product_name'] ?? $product['product_name_es'] ?? $product['product_name_en'] ?? $product['generic_name'] ?? $product['brands'] ?? 'Producto: ' . $barcode,
+                        'marca' => $product['brands'] ?? null,
+                        'imagen_url' => $product['image_front_url'] ?? null,
+                    ]
+                ]);
+            }
+            
+            return response()->json(['success' => false, 'message' => 'Producto no encontrado en la base de datos global.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error de conexión con la API externa.']);
         }
     }
 }

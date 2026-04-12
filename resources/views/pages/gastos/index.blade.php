@@ -6,106 +6,81 @@
     <div class="space-y-6" x-data="gastosApp()">
 
         {{-- ===== DASHBOARD KPI CARDS ===== --}}
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="mb-6 grid md:grid-cols-4 bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 shadow-2xs rounded-xl overflow-hidden">
 
             {{-- Total Hoy --}}
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gastos Hoy</p>
-                        <h3 class="mt-1 text-2xl font-bold text-red-600 dark:text-red-400">${{ number_format($totalHoy, 2) }}</h3>
-                    </div>
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+            <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700 first:before:hidden">
+                <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                    <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <div class="grow">
+                        <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Gastos Hoy</p>
+                        <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-red-600 dark:text-red-500">${{ number_format($totalHoy, 2) }}</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Total diario</p>
                     </div>
                 </div>
             </div>
 
             {{-- Total Mes --}}
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gastos del Mes</p>
-                        <h3 class="mt-1 text-2xl font-bold text-orange-600 dark:text-orange-400">${{ number_format($totalMes, 2) }}</h3>
-                    </div>
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
+            <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700">
+                <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                    <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    <div class="grow">
+                        <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Gastos del Mes</p>
+                        <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-orange-600 dark:text-orange-500">${{ number_format($totalMes, 2) }}</h3>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-neutral-400">Total mensual</p>
                     </div>
                 </div>
             </div>
 
             {{-- Por Categoría --}}
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Top Categorías (mes)</p>
-                        @forelse($porCategoria as $cat)
-                            <div class="flex items-center justify-between text-xs mb-1">
-                                <span class="truncate text-gray-600 dark:text-gray-300 max-w-[100px]">{{ $cat['nombre'] }}</span>
-                                <span class="font-bold text-red-600 dark:text-red-400 ml-2">${{ number_format($cat['total'], 0) }}</span>
-                            </div>
-                        @empty
-                            <p class="text-xs text-gray-400">Sin datos</p>
-                        @endforelse
-                    </div>
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 ml-3 flex-shrink-0">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
+            <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700">
+                <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                    <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                    <div class="grow">
+                        <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Top Categorías</p>
+                        <div class="mt-2 space-y-1">
+                            @forelse($porCategoria as $cat)
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="truncate text-gray-500 dark:text-neutral-400 max-w-[100px]">{{ $cat['nombre'] }}</span>
+                                    <span class="font-semibold text-gray-800 dark:text-neutral-200">${{ number_format($cat['total'], 0) }}</span>
+                                </div>
+                            @empty
+                                <p class="text-sm text-gray-500 dark:text-neutral-400">Sin datos</p>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
             </div>
 
             {{-- Por Sucursal --}}
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Por Sucursal (mes)</p>
-                        @forelse($porSucursal as $suc)
-                            <div class="flex items-center justify-between text-xs mb-1">
-                                <span class="truncate text-gray-600 dark:text-gray-300 max-w-[100px]">{{ $suc['nombre'] }}</span>
-                                <span class="font-bold text-orange-600 dark:text-orange-400 ml-2">${{ number_format($suc['total'], 0) }}</span>
-                            </div>
-                        @empty
-                            <p class="text-xs text-gray-400">Sin datos</p>
-                        @endforelse
-                    </div>
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400 ml-3 flex-shrink-0">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
+            <div class="block p-4 md:p-5 relative bg-white dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700 transition before:absolute before:top-0 before:start-0 before:w-full before:h-px md:before:h-full before:border-s before:border-gray-200 dark:before:border-neutral-700">
+                <div class="flex flex-col lg:flex-row gap-y-3 gap-x-5">
+                    <svg class="shrink-0 size-5 text-gray-400 dark:text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                    <div class="grow">
+                        <p class="text-xs uppercase font-medium text-gray-800 dark:text-neutral-200">Por Sucursal</p>
+                        <div class="mt-2 space-y-1">
+                            @forelse($porSucursal as $suc)
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="truncate text-gray-500 dark:text-neutral-400 max-w-[100px]">{{ $suc['nombre'] }}</span>
+                                    <span class="font-semibold text-gray-800 dark:text-neutral-200">${{ number_format($suc['total'], 0) }}</span>
+                                </div>
+                            @empty
+                                <p class="text-sm text-gray-500 dark:text-neutral-400">Sin datos</p>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         {{-- ===== ALERTS ===== --}}
-        @if (session('sweet_alert'))
-            @php $sa = session('sweet_alert'); @endphp
-            @push('scripts')
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        Swal.fire({
-                            icon: '{{ $sa['type'] }}',
-                            title: '{{ $sa['title'] }}',
-                            text: '{{ $sa['message'] }}',
-                            timer: 3000,
-                            showConfirmButton: false,
-                        });
-                    });
-                </script>
-            @endpush
-        @endif
+
 
         {{-- ===== FILTROS + TABLA ===== --}}
-        <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900 overflow-hidden">
+        <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900 overflow-hidden">
 
             {{-- Toolbar --}}
-            <div class="p-5 border-b border-gray-100 dark:border-white/[0.05] flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="p-5 border-b border-gray-100 dark:border-neutral-800/80 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div class="flex items-center gap-3">
                     <h4 class="text-lg font-bold text-gray-800 dark:text-white">Listado de Gastos</h4>
                     <a href="{{ route('gastos.categorias.index') }}"
@@ -121,12 +96,12 @@
                     {{-- Filtros --}}
                     <form action="{{ route('gastos.index') }}" method="GET" class="flex flex-wrap gap-2 items-center" id="filtro-form">
                         <input type="date" name="fecha_desde" value="{{ request('fecha_desde') }}"
-                               class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-white">
+                               class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800/20 dark:text-white">
                         <input type="date" name="fecha_hasta" value="{{ request('fecha_hasta') }}"
-                               class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-white">
+                               class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800/20 dark:text-white">
 
                         <select name="categoria_id" onchange="this.form.submit()"
-                                class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-white">
+                                class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800/20 dark:text-white">
                             <option value="">Todas las categorías</option>
                             @foreach($categorias as $cat)
                                 <option value="{{ $cat->id }}" {{ request('categoria_id') == $cat->id ? 'selected' : '' }}>{{ $cat->nombre }}</option>
@@ -134,7 +109,7 @@
                         </select>
 
                         <select name="sucursal_id" onchange="this.form.submit()"
-                                class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-white">
+                                class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800/20 dark:text-white">
                             <option value="">Todas las sucursales</option>
                             @foreach($sucursales as $suc)
                                 <option value="{{ $suc->id }}" {{ request('sucursal_id') == $suc->id ? 'selected' : '' }}>{{ $suc->nombre }}</option>
@@ -142,7 +117,7 @@
                         </select>
 
                         <select name="metodo" onchange="this.form.submit()"
-                                class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-white/[0.03] dark:text-white">
+                                class="h-9 rounded-xl border border-gray-200 bg-gray-50 px-3 text-xs focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800/20 dark:text-white">
                             <option value="">Todos los métodos</option>
                             <option value="efectivo"      {{ request('metodo') === 'efectivo'      ? 'selected' : '' }}>Efectivo</option>
                             <option value="transferencia" {{ request('metodo') === 'transferencia' ? 'selected' : '' }}>Transferencia</option>
@@ -160,7 +135,7 @@
 
                     <div x-data="{ openExport: false }" class="relative">
                         <button @click="openExport = !openExport"
-                            class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 transition-colors shadow-sm">
+                            class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors shadow-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
@@ -170,7 +145,7 @@
                             </svg>
                         </button>
                         <div x-show="openExport" @click.outside="openExport = false"
-                            class="absolute right-0 mt-2 w-48 origin-top-right rounded-xl border border-gray-100 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900 z-50">
+                            class="absolute right-0 mt-2 w-48 origin-top-right rounded-xl border border-gray-100 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900 z-50">
                             <div class="p-1 text-xs">
                                 <a href="{{ route('gastos.exportar', array_merge(request()->all(), ['formato' => 'excel'])) }}" 
                                    class="flex items-center gap-2 rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/5">
@@ -202,7 +177,7 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead>
-                        <tr class="border-b border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-white/[0.03]">
+                        <tr class="border-b border-gray-100 bg-gray-50 dark:border-neutral-800/80 dark:bg-neutral-800/20">
                             <th class="px-5 py-4 text-left font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase">#</th>
                             <th class="px-5 py-4 text-left font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase">Categoría</th>
                             <th class="px-5 py-4 text-right font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase">Monto</th>
@@ -214,9 +189,9 @@
                             <th class="px-5 py-4 text-right font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                    <tbody class="divide-y divide-gray-100 dark:divide-neutral-800/80">
                         @forelse($gastos as $gasto)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                                 <td class="px-5 py-4">
                                     <span class="font-bold text-gray-800 dark:text-white">#{{ $gasto->id }}</span>
                                     @if($gasto->es_recurrente)
@@ -301,7 +276,7 @@
 
             {{-- Pagination --}}
             @if($gastos->hasPages())
-                <div class="p-5 border-t border-gray-100 dark:border-white/[0.05]">
+                <div class="p-5 border-t border-gray-100 dark:border-neutral-800/80">
                     {{ $gastos->links() }}
                 </div>
             @endif
@@ -389,22 +364,19 @@ function gastosApp() {
         },
 
         eliminarGasto(id) {
-            Swal.fire({
-                title: '¿Eliminar gasto?',
-                text: 'Esta acción anulará el gasto. Si fue pagado en efectivo, el monto se revertirá en caja.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-            }).then((result) => {
-                if (result.isConfirmed) {
+            window.Confirm.show(
+                '¿Eliminar gasto?',
+                'Esta acción anulará el gasto. Si fue pagado en efectivo, el monto se revertirá en caja.',
+                'Sí, eliminar',
+                'Cancelar',
+                () => {
                     const form = document.getElementById('form-eliminar-gasto');
                     form.action = `/gastos/${id}`;
                     form.submit();
-                }
-            });
+                },
+                () => {},
+                { okButtonBackground: '#ef4444' }
+            );
         }
     }
 }

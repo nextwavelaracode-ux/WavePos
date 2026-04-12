@@ -31,40 +31,29 @@
         selectAll: false,
         async bulkDelete(routeUrl) {
             if (this.selectedIds.length === 0) return;
-            
-            const result = await Swal.fire({
-                title: '¿Eliminar registros?',
-                html: `<p class='text-gray-500'>Estás a punto de eliminar <strong>${this.selectedIds.length}</strong> registros.<br>Esta acción no se puede deshacer.</p>`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    const response = await fetch(routeUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ ids: this.selectedIds })
-                    });
-                    const data = await response.json();
-                    if (response.ok && data.success) {
-                        window.location.reload();
-                    } else {
-                        Swal.fire('Atención', data.message || 'No se pudieron eliminar los registros. Verifique que no tengan datos dependientes.', 'warning');
+            const count = this.selectedIds.length;
+            window.Confirm.show(
+                '¿Eliminar registros?',
+                `Estás a punto de eliminar ${count} registro(s). Esta acción no se puede deshacer.`,
+                'Sí, eliminar',
+                'Cancelar',
+                async () => {
+                    try {
+                        const response = await fetch(routeUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ ids: this.selectedIds })
+                        });
+                        const data = await response.json();
+                        if (response.ok && data.success) { window.location.reload(); }
+                        else { window.Notify.warning(data.message || 'No se pudieron eliminar los registros. Verifique que no tengan datos dependientes.'); }
+                    } catch (error) {
+                        window.Notify.failure('Hubo un problema al eliminar los registros.');
                     }
-                } catch (error) {
-                    console.error('Error:', error);
-                    Swal.fire('Error', 'Hubo un problema al eliminar los registros.', 'error');
-                }
-            }
+                },
+                () => {},
+                { okButtonBackground: '#ef4444' }
+            );
         }
     }">
 
@@ -78,7 +67,7 @@
             <div class="flex flex-wrap items-center gap-2">
                 {{-- Botón Importar --}}
                 <button @click="showImport = true"
-                    class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                    class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -89,7 +78,7 @@
                 {{-- Botón Exportar (Dropdown simple o Botón directo) --}}
                 <div x-data="{ openExport: false }" class="relative">
                     <button @click="openExport = !openExport"
-                        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -102,7 +91,7 @@
                     </button>
 
                     <div x-show="openExport" @click.outside="openExport = false"
-                        class="absolute right-0 mt-2 w-48 rounded-xl border border-gray-200 bg-white py-2 shadow-lg dark:border-gray-700 dark:bg-gray-800 z-50">
+                        class="absolute right-0 mt-2 w-48 rounded-xl border border-gray-200 bg-white py-2 shadow-lg dark:border-neutral-700 dark:bg-neutral-800 z-50">
                         <a href="{{ route('inventario.categorias.exportar', 'excel') }}"
                             class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03]">
                             <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,14 +137,14 @@
         </div>
 
         {{-- Tabla --}}
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-800/20">
             <div class="overflow-x-auto">
                 <table class="min-w-full">
                     <thead>
-                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                        <tr class="border-b border-gray-200 dark:border-neutral-700">
                             <th class="px-6 py-4 w-10 text-center">
                                 <input type="checkbox" x-model="selectAll" @change="selectedIds = selectAll ? {{ $categorias->pluck('id') }} : []" 
-                                    class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:checked:bg-brand-500">
+                                    class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-neutral-600 dark:bg-neutral-800 dark:checked:bg-brand-500">
                             </th>
                             <th
                                 class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -183,22 +172,22 @@
                                 Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <tbody class="divide-y divide-gray-100 dark:divide-neutral-800">
                         @forelse($categorias as $i => $categoria)
-                            <tr class="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors" :class="selectedIds.includes({{ $categoria->id }}) ? 'bg-brand-50 dark:bg-brand-500/5' : ''">
+                            <tr class="hover:bg-gray-50/50 dark:hover:bg-neutral-800/10 transition-colors" :class="selectedIds.includes({{ $categoria->id }}) ? 'bg-brand-50 dark:bg-brand-500/5' : ''">
                                 <td class="px-6 py-4 w-10 text-center">
                                     <input type="checkbox" value="{{ $categoria->id }}" x-model="selectedIds" 
-                                        class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:checked:bg-brand-500">
+                                        class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-neutral-600 dark:bg-neutral-800 dark:checked:bg-brand-500">
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{{ $i + 1 }}</td>
                                 <td class="px-6 py-4">
                                     @if ($categoria->imagen)
                                         <img src="{{ asset('storage/' . $categoria->imagen) }}"
                                             alt="{{ $categoria->nombre }}"
-                                            class="w-12 h-12 rounded object-cover border border-gray-200 dark:border-gray-700">
+                                            class="w-12 h-12 rounded object-cover border border-gray-200 dark:border-neutral-700">
                                     @else
                                         <div
-                                            class="w-12 h-12 pl-2.5 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                                            class="w-12 h-12 pl-2.5 rounded bg-gray-100 dark:bg-neutral-800 flex items-center justify-center border border-gray-200 dark:border-neutral-700">
                                             <svg class="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none"
                                                 stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -219,7 +208,7 @@
                                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                                     @if ($categoria->parent)
                                         <span
-                                            class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+                                            class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-neutral-700">
                                             Subcategoría de: <strong>{{ $categoria->parent->nombre }}</strong>
                                         </span>
                                     @else
@@ -290,7 +279,7 @@
                                         orden_visualizacion: {{ $categoria->orden_visualizacion }},
                                         estado: {{ $categoria->estado ? 'true' : 'false' }}
                                     })'
-                                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.05] transition-colors">
+                                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-white/[0.05] transition-colors">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -300,7 +289,7 @@
                                         </button>
                                         <button type="button"
                                             onclick="confirmarEliminar({{ $categoria->id }}, '{{ addslashes($categoria->nombre) }}')"
-                                            class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-800/30 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
+                                            class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 dark:border-red-800/30 dark:bg-neutral-800 dark:text-red-400 dark:hover:bg-red-500/10 transition-colors">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -329,6 +318,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="p-4 border-t border-gray-100 dark:border-white/5">
+                {{ $categorias->links() }}
+            </div>
         </div>
 
         {{-- ===== MODAL CREAR ===== --}}
@@ -339,7 +331,7 @@
             @keydown.escape.window="showCreate = false" style="display:none">
 
             <div @click.outside="showCreate = false"
-                class="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-10 mx-4 max-h-[90vh]">
+                class="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-neutral-900 lg:p-10 mx-4 max-h-[90vh]">
 
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -365,7 +357,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Nombre de
                                 Categoría <span class="text-red-500">*</span></label>
                             <input type="text" name="nombre" id="create-nombre" required
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"
                                 placeholder="Ej. Bebidas, Ferretería...">
                         </div>
 
@@ -376,7 +368,7 @@
                                     (Subcategoría de)</label>
                             </div>
                             <select name="parent_id" id="create-parent-id"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                                 <option value="">Ninguna (Categoría Principal)</option>
                                 @foreach ($padres as $padre)
                                     <option value="{{ $padre->id }}">{{ $padre->nombre }}</option>
@@ -389,7 +381,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Impuesto
                                 Sugerido (ITBMS Panam\u00e1) <span class="text-red-500">*</span></label>
                             <select name="impuesto" required
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                                 <option value="7">7% (General)</option>
                                 <option value="10">10% (Licores)</option>
                                 <option value="15">15% (Cigarrillos)</option>
@@ -402,7 +394,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Unidad de Medida
                                 (Defecto)</label>
                             <select name="unidad_medida"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                                 <option value="">Seleccione...</option>
                                 <option value="Global (Par/Set)">Global (Par/Set) - Guantes, juegos</option>
                                 <option value="Longitud (Pie/Metro)">Longitud (Pie/Metro) - Cables, tubos</option>
@@ -420,7 +412,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Ubicación
                                 (Pasillo/Estante)</label>
                             <input type="text" name="ubicacion"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"
                                 placeholder="Ej. Pasillo 4 - Estante B">
                         </div>
 
@@ -429,7 +421,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Atributos
                                 Técnicos requeridos</label>
                             <input type="text" name="atributos_tecnicos"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"
                                 placeholder="Ej. Medida, Material, Voltaje (Separados por coma)">
                         </div>
 
@@ -438,7 +430,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Detalle
                                 Público</label>
                             <input type="text" name="detalle"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"
                                 placeholder="Ej. Productos para el hogar">
                         </div>
 
@@ -447,7 +439,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Descripción
                                 Interna</label>
                             <textarea name="descripcion" rows="3"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"
                                 placeholder="Notas internas sobre esta categoría..."></textarea>
                         </div>
 
@@ -455,7 +447,7 @@
                         <div>
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Imagen</label>
                             <input type="file" name="imagen" accept="image/*"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-brand-500/10 dark:file:text-brand-400">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-brand-500/10 dark:file:text-brand-400">
                         </div>
 
                         {{-- Orden y Estado --}}
@@ -464,14 +456,14 @@
                                 <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Orden
                                     Visual</label>
                                 <input type="number" name="orden_visualizacion" value="0" min="0" required
-                                    class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                    class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                             </div>
                             <div class="w-1/2 pt-6">
                                 <label class="flex items-center gap-3 cursor-pointer">
                                     <div class="relative">
                                         <input type="checkbox" name="estado" value="1" class="sr-only group"
                                             checked>
-                                        <div class="block h-6 w-10 rounded-full bg-gray-300 dark:bg-gray-700 transition">
+                                        <div class="block h-6 w-10 rounded-full bg-gray-300 dark:bg-neutral-700 transition">
                                         </div>
                                         <div
                                             class="dot absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition peer-checked:translate-x-full peer-checked:bg-white">
@@ -486,7 +478,7 @@
 
                     <div class="mt-8 flex justify-end gap-3">
                         <button type="button" @click="showCreate = false"
-                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
                             Cancelar
                         </button>
                         <button type="submit"
@@ -507,7 +499,7 @@
             @keydown.escape.window="showEdit = false" style="display:none">
 
             <div @click.outside="showEdit = false"
-                class="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-10 mx-4 max-h-[90vh]">
+                class="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-neutral-900 lg:p-10 mx-4 max-h-[90vh]">
 
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -532,7 +524,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Nombre de
                                 Categoría <span class="text-red-500">*</span></label>
                             <input type="text" name="nombre" x-model="editData.nombre" required
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                         </div>
 
                         {{-- Categoría Padre --}}
@@ -542,7 +534,7 @@
                                     Padre</label>
                             </div>
                             <select name="parent_id" id="edit-parent-id" x-model="editData.parent_id"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                                 <option value="">Ninguna</option>
                                 @foreach ($padres as $padre)
                                     <option value="{{ $padre->id }}">{{ $padre->nombre }}</option>
@@ -555,7 +547,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Impuesto
                                 Sugerido <span class="text-red-500">*</span></label>
                             <select name="impuesto" x-model="editData.impuesto" required
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                                 <option value="7">7% (General)</option>
                                 <option value="10">10% (Licores)</option>
                                 <option value="15">15% (Cigarrillos)</option>
@@ -568,7 +560,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Unidad de Medida
                                 (Defecto)</label>
                             <select name="unidad_medida" x-model="editData.unidad_medida"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                                 <option value="">Seleccione...</option>
                                 <option value="Global (Par/Set)">Global (Par/Set) - Guantes, juegos</option>
                                 <option value="Longitud (Pie/Metro)">Longitud (Pie/Metro) - Cables, tubos</option>
@@ -586,7 +578,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Ubicación
                                 (Pasillo/Estante)</label>
                             <input type="text" name="ubicacion" x-model="editData.ubicacion"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"
                                 placeholder="Ej. Pasillo 4 - Estante B">
                         </div>
 
@@ -595,7 +587,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Atributos
                                 Técnicos requeridos</label>
                             <input type="text" name="atributos_tecnicos" x-model="editData.atributos_tecnicos"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"
                                 placeholder="Ej. Medida, Material, Voltaje (Separados por coma)">
                         </div>
 
@@ -604,7 +596,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Detalle
                                 Público</label>
                             <input type="text" name="detalle" x-model="editData.detalle"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                         </div>
 
                         {{-- Descripción --}}
@@ -612,7 +604,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Descripción
                                 Interna</label>
                             <textarea name="descripcion" x-model="editData.descripcion" rows="3"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"></textarea>
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"></textarea>
                         </div>
 
                         {{-- Imagen --}}
@@ -620,7 +612,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Reemplazar
                                 Imagen</label>
                             <input type="file" name="imagen" accept="image/*"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-brand-500/10 dark:file:text-brand-400">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-brand-500/10 dark:file:text-brand-400">
                         </div>
 
                         {{-- Orden y Estado --}}
@@ -630,14 +622,14 @@
                                     Visual</label>
                                 <input type="number" name="orden_visualizacion" x-model="editData.orden_visualizacion"
                                     min="0" required
-                                    class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                    class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                             </div>
                             <div class="w-1/2 pt-6">
                                 <label class="flex items-center gap-3 cursor-pointer">
                                     <div class="relative">
                                         <input type="checkbox" name="estado" value="1" x-model="editData.estado"
                                             class="sr-only">
-                                        <div class="block h-6 w-10 rounded-full bg-gray-300 dark:bg-gray-700 transition"
+                                        <div class="block h-6 w-10 rounded-full bg-gray-300 dark:bg-neutral-700 transition"
                                             :class="editData.estado ? 'bg-brand-500 dark:bg-brand-500' : ''"></div>
                                         <div class="dot absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition"
                                             :class="editData.estado ? 'translate-x-[100%]' : ''"></div>
@@ -651,7 +643,7 @@
 
                     <div class="mt-8 flex justify-end gap-3">
                         <button type="button" @click="showEdit = false"
-                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
                             Cancelar
                         </button>
                         <button type="submit"
@@ -672,7 +664,7 @@
             @keydown.escape.window="showCreateSub = false" style="display:none">
 
             <div @click.outside="showCreateSub = false"
-                class="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-10 mx-4 max-h-[90vh]">
+                class="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-neutral-900 lg:p-10 mx-4 max-h-[90vh]">
 
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -699,7 +691,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Nombre de
                                 Subcategoría <span class="text-red-500">*</span></label>
                             <input type="text" name="nombre" id="sub-nombre" required
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"
                                 placeholder="Ej. Laptops, Smartphones, Herramientas manuales...">
                         </div>
 
@@ -708,7 +700,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Descripción
                                 Corta</label>
                             <input type="text" name="detalle"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500"
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500"
                                 placeholder="Ej. Equipos portátiles y accesorios">
                         </div>
 
@@ -717,7 +709,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Impuesto
                                 (ITBMS) <span class="text-red-500">*</span></label>
                             <select name="impuesto" x-model="subData.impuesto" required
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                                 <option value="7">7% (General)</option>
                                 <option value="10">10% (Licores)</option>
                                 <option value="15">15% (Cigarrillos)</option>
@@ -731,7 +723,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Orden
                                 Visual</label>
                             <input type="number" name="orden_visualizacion" value="0" min="0" required
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500">
                         </div>
 
                         {{-- Imagen --}}
@@ -739,7 +731,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-800 dark:text-white/90">Imagen /
                                 Icono</label>
                             <input type="file" name="imagen" accept="image/*" id="sub-imagen"
-                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-brand-500/10 dark:file:text-brand-400">
+                                class="w-full rounded-xl border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 focus:border-brand-500 focus:ring-brand-500 dark:border-neutral-700 dark:text-white/90 dark:focus:border-brand-500 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-brand-500/10 dark:file:text-brand-400">
                         </div>
 
                         {{-- Checkbox de mantener abierto --}}
@@ -748,7 +740,7 @@
                             <label class="flex items-start gap-3 cursor-pointer">
                                 <div class="relative pt-0.5">
                                     <input type="checkbox" x-model="keepAddingSub" class="sr-only group">
-                                    <div class="block h-5 w-9 rounded-full bg-gray-300 dark:bg-gray-700 transition"
+                                    <div class="block h-5 w-9 rounded-full bg-gray-300 dark:bg-neutral-700 transition"
                                         :class="keepAddingSub ? 'bg-brand-500 dark:bg-brand-500' : ''"></div>
                                     <div class="dot absolute left-1 top-1 h-3 w-3 rounded-full bg-white transition"
                                         :class="keepAddingSub ? 'translate-x-[100%]' : ''"></div>
@@ -765,7 +757,7 @@
 
                     <div class="mt-8 flex justify-end gap-3">
                         <button type="button" @click="showCreateSub = false"
-                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
                             Cancelar
                         </button>
                         <button type="submit" id="btn-submit-sub"
@@ -794,7 +786,7 @@
             @keydown.escape.window="showImport = false" style="display:none">
 
             <div @click.outside="showImport = false"
-                class="no-scrollbar relative w-full max-w-[500px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-8 mx-4">
+                class="no-scrollbar relative w-full max-w-[500px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-neutral-900 lg:p-8 mx-4">
 
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -815,7 +807,7 @@
                     @csrf
                     <div class="space-y-5">
                         <div
-                            class="rounded-xl border-2 border-dashed border-gray-200 p-8 text-center dark:border-gray-700">
+                            class="rounded-xl border-2 border-dashed border-gray-200 p-8 text-center dark:border-neutral-700">
                             <input type="file" name="archivo" id="archivo-import" class="hidden" accept=".xlsx,.xls,.csv"
                                 required onchange="updateFileName(this)">
                             <label for="archivo-import" class="cursor-pointer">
@@ -850,7 +842,7 @@
 
                     <div class="mt-8 flex justify-end gap-3">
                         <button type="button" @click="showImport = false"
-                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
+                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-white/[0.03] transition-colors">
                             Cancelar
                         </button>
                         <button type="submit"
@@ -877,151 +869,93 @@
                 document.getElementById('file-name').textContent = fileName;
             }
             function crearPadreRapido(selectId, isAlpine = false) {
-                Swal.fire({
-                    title: 'Nueva Categoría Principal',
-                    input: 'text',
-                    inputPlaceholder: 'Ej. Ferretería Técnica',
-                    showCancelButton: true,
-                    confirmButtonText: 'Crear Rápido',
-                    cancelButtonText: 'Cancelar',
-                    inputValidator: (value) => {
-                        if (!value) return 'El nombre es obligatorio';
+                // Usar mini modal inline ya que Notiflix no tiene input nativo
+                const nombre = prompt('¿Nombre de la nueva categoría principal?');
+                if (!nombre || !nombre.trim()) return;
+                const formData = new FormData();
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('nombre', nombre.trim());
+                formData.append('impuesto', '7');
+                formData.append('estado', '1');
+                fetch('{{ route('inventario.categorias.store') }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.querySelectorAll('select[name="parent_id"]').forEach(sel => {
+                            const option = document.createElement('option');
+                            option.value = data.categoria.id;
+                            option.text = data.categoria.nombre;
+                            sel.add(option);
+                        });
+                        const select = document.getElementById(selectId);
+                        select.value = data.categoria.id;
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        window.Notify.success('Categoría padre creada exitosamente.');
                     }
-                }).then((result) => {
-                    if (result.isConfirmed && result.value) {
-                        const formData = new FormData();
-                        formData.append('_token', '{{ csrf_token() }}');
-                        formData.append('nombre', result.value);
-                        formData.append('impuesto', '7');
-                        formData.append('estado', '1');
-
-                        fetch('{{ route('inventario.categorias.store') }}', {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'application/json',
-                                }
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.success) {
-                                    const select = document.getElementById(selectId);
-                                    const option = document.createElement('option');
-                                    option.value = data.categoria.id;
-                                    option.text = data.categoria.nombre;
-
-                                    // Añadir como opción a todos los selects de parent_id de la página
-                                    document.querySelectorAll('select[name="parent_id"]').forEach(sel => {
-                                        sel.add(option.cloneNode(true));
-                                    });
-
-                                    // Seleccionar la nueva opción
-                                    select.value = data.categoria.id;
-
-                                    // Emitir un evento input por si AlpineJS lo está escuchando (v-model/x-model)
-                                    select.dispatchEvent(new Event('change', {
-                                        bubbles: true
-                                    }));
-
-                                    Swal.fire({
-                                        toast: true,
-                                        position: 'top-end',
-                                        icon: 'success',
-                                        title: 'Categoría padre creada',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                }
-                            })
-                            .catch(err => {
-                                Swal.fire('Error', 'No se pudo crear la categoría', 'error');
-                            });
-                    }
+                })
+                .catch(err => {
+                    window.Notify.failure('No se pudo crear la categoría.');
                 });
             }
 
             function guardarSubcategoriaAjax(event, form) {
                 event.preventDefault();
-
                 const btnSubmit = document.getElementById('btn-submit-sub');
                 const spinner = document.getElementById('spinner-sub');
-
-                // UX: mostrar cargando
                 btnSubmit.disabled = true;
                 btnSubmit.classList.add('opacity-70', 'cursor-not-allowed');
                 spinner.classList.remove('hidden');
-
                 const formData = new FormData(form);
                 formData.append('_token', '{{ csrf_token() }}');
-
                 fetch('{{ route('inventario.categorias.store') }}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json',
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: 'Subcategoría agregada exitosamente',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
-
-                            // Si keepAddingSub está marcado, limpiamos pero no cerramos ni recargamos
-                            // Alpine context para keepAddingSub
-                            const alpineContext = Alpine.$data(document.querySelector('[x-data]'));
-
-                            if (alpineContext.keepAddingSub) {
-                                form.reset();
-                                // El reset borra el select también; restaurar parent_id y impuesto del padre.
-                                document.querySelector('input[name="parent_id"]').value = alpineContext.subData.parent_id;
-                                alpineContext.subData.impuesto = alpineContext.subData
-                                    .impuesto; // forzar actualización si es necesario
-
-                                document.getElementById('sub-nombre').focus();
-                            } else {
-                                window.location.reload();
-                            }
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.Notify.success('Subcategoría agregada exitosamente.');
+                        const alpineContext = Alpine.$data(document.querySelector('[x-data]'));
+                        if (alpineContext.keepAddingSub) {
+                            form.reset();
+                            document.querySelector('input[name="parent_id"]').value = alpineContext.subData.parent_id;
+                            document.getElementById('sub-nombre').focus();
                         } else {
-                            Swal.fire('Error', 'Hubo un error al guardar la subcategoría', 'error');
+                            window.location.reload();
                         }
-                    })
-                    .catch(err => {
-                        Swal.fire('Error', 'Error de conexión', 'error');
-                    })
-                    .finally(() => {
-                        btnSubmit.disabled = false;
-                        btnSubmit.classList.remove('opacity-70', 'cursor-not-allowed');
-                        spinner.classList.add('hidden');
-                    });
+                    } else {
+                        window.Notify.failure('Hubo un error al guardar la subcategoría.');
+                    }
+                })
+                .catch(err => {
+                    window.Notify.failure('Error de conexión.');
+                })
+                .finally(() => {
+                    btnSubmit.disabled = false;
+                    btnSubmit.classList.remove('opacity-70', 'cursor-not-allowed');
+                    spinner.classList.add('hidden');
+                });
             }
 
             function confirmarEliminar(id, nombre) {
-                Swal.fire({
-                    title: '¿Estás seguro?',
-                    text: "Se eliminará la categoría '" + nombre +
-                        "'. ¡Esta acción no se puede deshacer! Asegúrate que no tenga subcategorías asociadas.",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.getElementById('delete-form');
-                        form.action = '/inventario/categorias/' + id;
-                        form.submit();
-                    }
-                });
+            window.Confirm.show(
+                '¿Eliminar categoría?',
+                `Se eliminará la categoría '${nombre}'. Asegúrate que no tenga subcategorías asociadas.`,
+                'Sí, eliminar',
+                'Cancelar',
+                () => {
+                    const form = document.getElementById('delete-form');
+                    form.action = '/inventario/categorias/' + id;
+                    form.submit();
+                },
+                () => {},
+                { okButtonBackground: '#ef4444' }
+            );
             }
         </script>
 

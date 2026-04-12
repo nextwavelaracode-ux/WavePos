@@ -14,7 +14,7 @@
     </div>
 
     @if($ventasEspera->isEmpty())
-        <div class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 flex flex-col items-center justify-center py-20 text-center">
+        <div class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 flex flex-col items-center justify-center py-20 text-center">
             <svg class="h-16 w-16 text-gray-200 dark:text-gray-700 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
@@ -24,7 +24,7 @@
     @else
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @foreach($ventasEspera as $espera)
-            <div class="rounded-2xl border border-amber-200 bg-white dark:border-amber-800 dark:bg-gray-900 shadow-sm hover:shadow-md transition overflow-hidden">
+            <div class="rounded-2xl border border-amber-200 bg-white dark:border-amber-800 dark:bg-neutral-900 shadow-sm hover:shadow-md transition overflow-hidden">
                 <div class="p-4 bg-amber-50 dark:bg-amber-900/20 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40">
                         <svg class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -48,7 +48,7 @@
                         <p class="text-xs text-gray-400">+ {{ count($espera->carrito) - 3 }} más...</p>
                         @endif
                     </div>
-                    <div class="flex justify-between text-sm font-bold text-gray-800 dark:text-white border-t border-gray-100 dark:border-gray-800 pt-2 mb-3">
+                    <div class="flex justify-between text-sm font-bold text-gray-800 dark:text-white border-t border-gray-100 dark:border-neutral-800 pt-2 mb-3">
                         <span>Total estimado</span>
                         <span>${{ number_format($espera->total_carrito, 2) }}</span>
                     </div>
@@ -75,16 +75,24 @@ async function retomar(id) {
     const data = await r.json();
     if (data.success) {
         sessionStorage.setItem('carrito_retomado', JSON.stringify(data.carrito));
-        Swal.fire({ icon: 'success', title: '¡Venta retomada!', text: 'Redirigiendo al POS...', timer: 1500, showConfirmButton: false })
-            .then(() => window.location.href = '{{ route('caja.pos') }}');
+        window.Notify.success('¡Venta retomada! Redirigiendo al POS...', { timeout: 1500 });
+        setTimeout(() => window.location.href = '{{ route('caja.pos') }}', 1500);
     }
 }
-async function eliminarEspera(id) {
-    const c = await Swal.fire({ icon: 'question', title: '¿Eliminar venta en espera?', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Eliminar', cancelButtonText: 'Cancelar' });
-    if (!c.isConfirmed) return;
-    const r = await fetch(`/caja/espera/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
-    const data = await r.json();
-    if (data.success) location.reload();
+function eliminarEspera(id) {
+    window.Confirm.show(
+        '¿Eliminar venta en espera?',
+        'Esta acción no se puede deshacer.',
+        'Eliminar',
+        'Cancelar',
+        async () => {
+            const r = await fetch(`/caja/espera/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
+            const data = await r.json();
+            if (data.success) location.reload();
+        },
+        () => {},
+        { okButtonBackground: '#dc2626' }
+    );
 }
 </script>
 @endsection

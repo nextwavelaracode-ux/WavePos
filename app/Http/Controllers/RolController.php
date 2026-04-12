@@ -10,7 +10,7 @@ class RolController extends Controller
 {
     public function index()
     {
-        $roles = Role::with('permissions')->orderBy('name')->get();
+        $roles = Role::with('permissions')->orderBy('name')->paginate(25);
         $permisos = Permission::orderBy('name')->get()->groupBy(function ($p) {
             return explode('.', $p->name)[0] ?? 'general';
         });

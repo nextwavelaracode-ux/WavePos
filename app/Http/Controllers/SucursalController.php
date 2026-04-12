@@ -9,7 +9,7 @@ class SucursalController extends Controller
 {
     public function index()
     {
-        $sucursales = Sucursal::latest()->get();
+        $sucursales = Sucursal::latest()->paginate(25);
         return view('pages.configuracion.sucursales', compact('sucursales'));
     }
 

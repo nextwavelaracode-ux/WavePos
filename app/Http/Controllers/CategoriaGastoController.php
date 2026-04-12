@@ -9,7 +9,7 @@ class CategoriaGastoController extends Controller
 {
     public function index()
     {
-        $categorias = CategoriaGasto::orderBy('nombre')->get();
+        $categorias = CategoriaGasto::orderBy('nombre')->paginate(25);
         return view('pages.gastos.categorias', compact('categorias'));
     }
 

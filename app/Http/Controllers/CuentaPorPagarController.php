@@ -33,7 +33,7 @@ class CuentaPorPagarController extends Controller
             $query->whereDate('fecha_compra', '<=', $request->fecha_fin);
         }
 
-        $compras = $query->orderBy('fecha_compra', 'desc')->paginate(15);
+        $compras = $query->orderBy('fecha_compra', 'desc')->paginate(25);
 
         // Dashboard stats
         $totalPendiente = Compra::where('tipo_compra', 'credito')->sum('saldo_pendiente');
@@ -136,7 +136,7 @@ class CuentaPorPagarController extends Controller
         $pagos = PagoCompra::with(['compra.proveedor', 'usuario'])
             ->orderBy('fecha_pago', 'desc')
             ->orderBy('id', 'desc')
-            ->paginate(15);
+            ->paginate(25);
 
         return view('cuentas-por-pagar.historial', compact('pagos'));
     }
@@ -148,7 +148,7 @@ class CuentaPorPagarController extends Controller
             ->where('saldo_pendiente', '>', 0)
             ->whereDate('fecha_vencimiento', '<', now()->toDateString())
             ->orderBy('fecha_vencimiento', 'asc')
-            ->paginate(15);
+            ->paginate(25);
 
         return view('cuentas-por-pagar.vencidas', compact('compras'));
     }

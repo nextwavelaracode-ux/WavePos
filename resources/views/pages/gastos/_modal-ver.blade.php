@@ -7,13 +7,13 @@
 
     <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="showVerModal = false"></div>
 
-    <div class="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
+    <div class="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl dark:bg-neutral-900"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100">
 
         {{-- Header --}}
-        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-white/[0.05]">
+        <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-neutral-800/80">
             <div class="flex items-center gap-3">
                 <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,12 +79,12 @@
 
             <div x-show="verData.descripcion">
                 <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">Descripción</p>
-                <p class="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-white/[0.03] rounded-xl p-3" x-text="verData.descripcion"></p>
+                <p class="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-neutral-800/20 rounded-xl p-3" x-text="verData.descripcion"></p>
             </div>
         </div>
 
         {{-- Footer --}}
-        <div class="flex justify-end border-t border-gray-100 px-6 py-4 dark:border-white/[0.05]">
+        <div class="flex justify-end border-t border-gray-100 px-6 py-4 dark:border-neutral-800/80">
             <button @click="showVerModal = false"
                     class="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-white/[0.1] dark:text-gray-300 dark:hover:bg-white/[0.03]">
                 Cerrar

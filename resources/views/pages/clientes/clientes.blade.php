@@ -3,22 +3,7 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="Clientes" />
 
-    @if (session('sweet_alert'))
-        @php $sa = session('sweet_alert'); @endphp
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        icon: '{{ $sa['type'] }}',
-                        title: '{{ $sa['title'] }}',
-                        text: '{{ $sa['message'] }}',
-                        timer: 3000,
-                        showConfirmButton: false,
-                    });
-                });
-            </script>
-        @endpush
-    @endif
+
 
     <div x-data="{
         showCreate: false,
@@ -49,40 +34,29 @@
         selectAll: false,
         async bulkDelete(routeUrl) {
             if (this.selectedIds.length === 0) return;
-            
-            const result = await Swal.fire({
-                title: '¿Eliminar registros?',
-                html: `<p class='text-gray-500'>Estás a punto de eliminar <strong>${this.selectedIds.length}</strong> registros.<br>Esta acción no se puede deshacer.</p>`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-            });
-
-            if (result.isConfirmed) {
-                try {
-                    const response = await fetch(routeUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({ ids: this.selectedIds })
-                    });
-                    const data = await response.json();
-                    if (response.ok && data.success) {
-                        window.location.reload();
-                    } else {
-                        Swal.fire('Atención', data.message || 'No se pudieron eliminar los registros. Verifique que no tengan datos dependientes.', 'warning');
+            const count = this.selectedIds.length;
+            window.Confirm.show(
+                '¿Eliminar registros?',
+                `Estás a punto de eliminar ${count} registro(s). Esta acción no se puede deshacer.`,
+                'Sí, eliminar',
+                'Cancelar',
+                async () => {
+                    try {
+                        const response = await fetch(routeUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ ids: this.selectedIds })
+                        });
+                        const data = await response.json();
+                        if (response.ok && data.success) { window.location.reload(); }
+                        else { window.Notify.warning(data.message || 'No se pudieron eliminar los registros.'); }
+                    } catch (error) {
+                        window.Notify.failure('Hubo un problema al eliminar los registros.');
                     }
-                } catch (error) {
-                    console.error('Error:', error);
-                    Swal.fire('Error', 'Hubo un problema al eliminar los registros.', 'error');
-                }
-            }
+                },
+                () => {},
+                { okButtonBackground: '#ef4444' }
+            );
         }
     }">
 
@@ -95,7 +69,7 @@
             
             <div class="flex flex-wrap items-center gap-3">
                 <button @click="showImport = true"
-                    class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 transition-colors shadow-sm">
+                    class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
@@ -104,7 +78,7 @@
 
                 <div x-data="{ openExport: false }" class="relative">
                     <button @click="openExport = !openExport"
-                        class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 transition-colors shadow-sm">
+                        class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
@@ -114,7 +88,7 @@
                         </svg>
                     </button>
                     <div x-show="openExport" @click.outside="openExport = false"
-                        class="absolute right-0 mt-2 w-40 origin-top-right rounded-xl border border-gray-100 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-900 z-50">
+                        class="absolute right-0 mt-2 w-40 origin-top-right rounded-xl border border-gray-100 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900 z-50">
                         <div class="p-1">
                             <a href="{{ route('clientes.exportar', 'excel') }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/5">
                                 <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V7.5L14.5 2zM14 8V3.5L18.5 8H14z"/></svg>
@@ -155,14 +129,14 @@
 
 
         {{-- ===== TABLA ===== --}}
-        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
+        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900">
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead>
-                        <tr class="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
+                        <tr class="border-b border-gray-100 dark:border-neutral-800/80 bg-gray-50 dark:bg-neutral-800/20">
                             <th class="px-6 py-4 w-10 text-center">
                                 <input type="checkbox" x-model="selectAll" @change="selectedIds = selectAll ? {{ $clientes->pluck('id') }} : []" 
-                                    class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:checked:bg-brand-500">
+                                    class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-neutral-600 dark:bg-neutral-800 dark:checked:bg-brand-500">
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">#</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Tipo</th>
@@ -175,12 +149,12 @@
                             <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                    <tbody class="divide-y divide-gray-100 dark:divide-neutral-800/80">
                         @forelse ($clientes as $cliente)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors" :class="selectedIds.includes({{ $cliente->id }}) ? 'bg-brand-50 dark:bg-brand-500/5' : ''">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors" :class="selectedIds.includes({{ $cliente->id }}) ? 'bg-brand-50 dark:bg-brand-500/5' : ''">
                                 <td class="px-6 py-4 w-10 text-center">
                                     <input type="checkbox" value="{{ $cliente->id }}" x-model="selectedIds" 
-                                        class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-800 dark:checked:bg-brand-500">
+                                        class="rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-neutral-600 dark:bg-neutral-800 dark:checked:bg-brand-500">
                                 </td>
                                 <td class="px-6 py-4 text-gray-500 dark:text-gray-400">{{ $cliente->id }}</td>
 
@@ -202,7 +176,7 @@
                                             'b2c'        => 'B2C',
                                         ];
                                     @endphp
-                                    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $badgeColors[$cliente->tipo_cliente] ?? 'bg-gray-100 text-gray-600' }}">
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $badgeColors[$cliente->tipo_cliente] ?? 'bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-300' }}">
                                         {{ $tipoLabels[$cliente->tipo_cliente] ?? $cliente->tipo_cliente }}
                                     </span>
                                 </td>
@@ -233,7 +207,7 @@
                                             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Activo
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-500 dark:bg-white/[0.05] dark:text-gray-400">
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-500 dark:bg-neutral-800/40 dark:text-gray-400">
                                             <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span> Inactivo
                                         </span>
                                     @endif
@@ -241,7 +215,6 @@
 
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
-                                        {{-- Ver --}}
                                         <button type="button"
                                             @click='openView({
                                                 id: {{ $cliente->id }},
@@ -269,11 +242,17 @@
                                                 tributo_dian_id: {{ $cliente->tributo_dian_id ?? 'null' }},
                                                 municipio_dian_id: {{ $cliente->municipio_dian_id ?? 'null' }}
                                             })'
-                                            class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 transition-colors"
+                                            class="inline-flex items-center rounded-lg border border-gray-200 bg-white p-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-neutral-700 transition-colors"
                                             title="Ver detalle">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            Ver
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         </button>
+
+                                        {{-- Ficha CRM --}}
+                                        <a href="{{ route('clientes.show', $cliente->id) }}"
+                                            class="inline-flex items-center rounded-lg border border-brand-200 bg-brand-50 p-2 text-brand-600 hover:bg-brand-100 dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400 transition-colors"
+                                            title="Ficha CRM">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        </a>
 
                                         {{-- Editar --}}
                                         <button type="button"
@@ -301,19 +280,17 @@
                                                 tributo_dian_id: {{ $cliente->tributo_dian_id ?? 'null' }},
                                                 municipio_dian_id: {{ $cliente->municipio_dian_id ?? 'null' }}
                                             })'
-                                            class="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 transition-colors"
+                                            class="inline-flex items-center rounded-lg border border-blue-200 bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:border-blue-800/30 dark:bg-blue-500/10 dark:text-blue-400 transition-colors"
                                             title="Editar">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                            Editar
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         </button>
 
                                         {{-- Eliminar --}}
                                         <button type="button"
                                             onclick="confirmarEliminar({{ $cliente->id }}, '{{ addslashes($cliente->nombre_completo) }}')"
-                                            class="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100 dark:border-red-800/30 dark:bg-red-500/10 dark:text-red-400 transition-colors"
+                                            class="inline-flex items-center rounded-lg border border-red-200 bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:border-red-800/30 dark:bg-red-500/10 dark:text-red-400 transition-colors"
                                             title="Eliminar">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                            Eliminar
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                         </button>
                                     </div>
                                 </td>
@@ -332,6 +309,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="p-4 border-t border-gray-100 dark:border-white/5">
+                {{ $clientes->links() }}
+            </div>
         </div>
 
         {{-- ====================  MODAL CREAR  ==================== --}}
@@ -343,7 +323,7 @@
             @keydown.escape.window="showCreate = false" style="display:none">
 
             <div @click.outside="showCreate = false"
-                class="no-scrollbar relative w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 dark:bg-gray-900 mx-4 max-h-[92vh] lg:p-10">
+                class="no-scrollbar relative w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 dark:bg-neutral-900 mx-4 max-h-[92vh] lg:p-10">
 
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -360,7 +340,7 @@
                     @include('pages.clientes._form', ['prefix' => 'create'])
                     <div class="mt-8 flex justify-end gap-3">
                         <button type="button" @click="showCreate = false"
-                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 transition-colors">Cancelar</button>
+                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors">Cancelar</button>
                         <button type="submit"
                             class="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors">Guardar Cliente</button>
                     </div>
@@ -377,7 +357,7 @@
             @keydown.escape.window="showEdit = false" style="display:none">
 
             <div @click.outside="showEdit = false"
-                class="no-scrollbar relative w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 dark:bg-gray-900 mx-4 max-h-[92vh] lg:p-10">
+                class="no-scrollbar relative w-full max-w-2xl overflow-y-auto rounded-3xl bg-white p-6 dark:bg-neutral-900 mx-4 max-h-[92vh] lg:p-10">
 
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -395,7 +375,7 @@
                     @include('pages.clientes._form', ['prefix' => 'edit', 'edit' => true])
                     <div class="mt-8 flex justify-end gap-3">
                         <button type="button" @click="showEdit = false"
-                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 transition-colors">Cancelar</button>
+                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors">Cancelar</button>
                         <button type="submit"
                             class="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors">Actualizar Cliente</button>
                     </div>
@@ -412,7 +392,7 @@
             @keydown.escape.window="showView = false" style="display:none">
 
             <div @click.outside="showView = false"
-                class="no-scrollbar relative w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 dark:bg-gray-900 mx-4 max-h-[90vh] lg:p-8">
+                class="no-scrollbar relative w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 dark:bg-neutral-900 mx-4 max-h-[90vh] lg:p-8">
 
                 <div class="mb-6 flex items-start justify-between">
                     <div class="flex items-center gap-4">
@@ -438,47 +418,47 @@
 
                 <div class="space-y-3">
                     <template x-if="viewData.documento_principal && viewData.documento_principal !== '—'">
-                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-white/[0.03] px-4 py-2.5">
+                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-neutral-800/20 px-4 py-2.5">
                             <span class="text-sm text-gray-500">Documento</span>
                             <span class="text-sm font-medium text-gray-800 dark:text-white/90" x-text="viewData.documento_principal"></span>
                         </div>
                     </template>
                     <template x-if="viewData.telefono">
-                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-white/[0.03] px-4 py-2.5">
+                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-neutral-800/20 px-4 py-2.5">
                             <span class="text-sm text-gray-500">Teléfono</span>
                             <span class="text-sm font-medium text-gray-800 dark:text-white/90" x-text="viewData.telefono"></span>
                         </div>
                     </template>
                     <template x-if="viewData.email">
-                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-white/[0.03] px-4 py-2.5">
+                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-neutral-800/20 px-4 py-2.5">
                             <span class="text-sm text-gray-500">Email</span>
                             <span class="text-sm font-medium text-gray-800 dark:text-white/90" x-text="viewData.email"></span>
                         </div>
                     </template>
                     <template x-if="viewData.provincia || viewData.distrito">
-                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-white/[0.03] px-4 py-2.5">
+                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-neutral-800/20 px-4 py-2.5">
                             <span class="text-sm text-gray-500">Ubicación</span>
                             <span class="text-sm font-medium text-gray-800 dark:text-white/90" x-text="[viewData.distrito, viewData.provincia, viewData.pais].filter(Boolean).join(', ')"></span>
                         </div>
                     </template>
                     <template x-if="viewData.direccion">
-                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-white/[0.03] px-4 py-2.5">
+                        <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-neutral-800/20 px-4 py-2.5">
                             <span class="text-sm text-gray-500">Dirección</span>
                             <span class="text-sm font-medium text-gray-800 dark:text-white/90 text-right max-w-[60%]" x-text="viewData.direccion"></span>
                         </div>
                     </template>
-                    <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-white/[0.03] px-4 py-2.5">
+                    <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-neutral-800/20 px-4 py-2.5">
                         <span class="text-sm text-gray-500">Límite de Crédito</span>
                         <span class="text-sm font-semibold text-gray-800 dark:text-white/90" x-text="'$' + parseFloat(viewData.limite_credito || 0).toFixed(2)"></span>
                     </div>
-                    <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-white/[0.03] px-4 py-2.5">
+                    <div class="flex justify-between rounded-xl bg-gray-50 dark:bg-neutral-800/20 px-4 py-2.5">
                         <span class="text-sm text-gray-500">Estado</span>
                         <span class="inline-flex items-center gap-1 text-sm font-semibold"
                             :class="viewData.estado ? 'text-emerald-600' : 'text-gray-400'"
                             x-text="viewData.estado ? 'Activo' : 'Inactivo'"></span>
                     </div>
                     <template x-if="viewData.notas">
-                        <div class="rounded-xl bg-gray-50 dark:bg-white/[0.03] px-4 py-2.5">
+                        <div class="rounded-xl bg-gray-50 dark:bg-neutral-800/20 px-4 py-2.5">
                             <span class="text-sm text-gray-500">Notas</span>
                             <p class="mt-1 text-sm text-gray-700 dark:text-gray-300" x-text="viewData.notas"></p>
                         </div>
@@ -503,7 +483,7 @@
             @keydown.escape.window="showImport = false" style="display:none">
 
             <div @click.outside="showImport = false"
-                class="no-scrollbar relative w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 dark:bg-gray-900 mx-4 max-h-[90vh] lg:p-8">
+                class="no-scrollbar relative w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 dark:bg-neutral-900 mx-4 max-h-[90vh] lg:p-8">
 
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -518,7 +498,7 @@
                 <form action="{{ route('clientes.importar') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="space-y-4">
-                        <div class="rounded-xl border-2 border-dashed border-gray-200 p-8 text-center dark:border-gray-700">
+                        <div class="rounded-xl border-2 border-dashed border-gray-200 p-8 text-center dark:border-neutral-700">
                             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                             <label for="archivo_import_cli" class="mt-4 block text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
                                 <span class="text-brand-500 hover:text-brand-600">Selecciona un archivo</span> o arrastra y suelta
@@ -543,9 +523,9 @@
                         </div>
                     </div>
 
-                    <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-100 dark:border-gray-800">
+                    <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-100 dark:border-neutral-800">
                         <button type="button" @click="showImport = false"
-                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 transition-colors">Cancelar</button>
+                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors">Cancelar</button>
                         <button type="submit"
                             class="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors">Iniciar Importación</button>
                     </div>
@@ -578,22 +558,19 @@
     @push('scripts')
         <script>
             function confirmarEliminar(id, nombre) {
-                Swal.fire({
-                    title: '¿Eliminar cliente?',
-                    html: `<p class="text-gray-500">Estás a punto de eliminar a <strong>${nombre}</strong>.<br>Esta acción no se puede deshacer.</p>`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#6b7280',
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar',
-                }).then((result) => {
-                    if (result.isConfirmed) {
+                window.Confirm.show(
+                    '¿Eliminar cliente?',
+                    `Estás a punto de eliminar a "${nombre}". Esta acción no se puede deshacer.`,
+                    'Sí, eliminar',
+                    'Cancelar',
+                    () => {
                         const form = document.getElementById('delete-form');
                         form.action = `/clientes/${id}`;
                         form.submit();
-                    }
-                });
+                    },
+                    () => {},
+                    { okButtonBackground: '#ef4444' }
+                );
             }
         </script>
     @endpush

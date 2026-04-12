@@ -30,7 +30,7 @@ class CompraController extends Controller
             $query->where('estado', $request->estado);
         }
 
-        $compras = $query->latest('fecha_compra')->paginate(10);
+        $compras = $query->latest('fecha_compra')->paginate(25);
         return view('pages.compras.index', compact('compras'));
     }
 
@@ -91,6 +91,8 @@ class CompraController extends Controller
                 $total           += $subtotalNet;
             }
 
+            $esCredito = $validated['tipo_compra'] === 'credito';
+
             $compra = Compra::create([
                 'sucursal_id'      => $validated['sucursal_id'],
                 'proveedor_id'     => $validated['proveedor_id'],
@@ -105,7 +107,10 @@ class CompraController extends Controller
                 'total_impuestos'  => $totalImpuestos,
                 'total_descuentos' => $totalDescuentos,
                 'total'            => $total,
+                'saldo_pendiente'  => $esCredito ? $total : 0,
+                'total_pagado'     => $esCredito ? 0 : $total,
                 'estado'           => 'registrada',
+                'estado_pago'      => $esCredito ? 'pendiente' : 'pagado',
                 'observaciones'    => $validated['observaciones'] ?? null,
             ]);
 

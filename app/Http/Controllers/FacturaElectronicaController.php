@@ -71,9 +71,16 @@ class FacturaElectronicaController extends Controller
      */
     public function index()
     {
-        $facturas = FacturaElectronica::with('venta.cliente')->latest()->paginate(15);
+        $facturas = FacturaElectronica::with('venta.cliente')->latest()->paginate(25);
+        
+        $stats = [
+            'validado_monto' => FacturaElectronica::where('status', 'Validado')->sum('total'),
+            'validado_count' => FacturaElectronica::where('status', 'Validado')->count(),
+            'pendiente_monto' => FacturaElectronica::where('status', '!=', 'Validado')->sum('total'),
+            'pendiente_count' => FacturaElectronica::where('status', '!=', 'Validado')->count(),
+        ];
 
-        return view('pages.facturacion.index', compact('facturas'));
+        return view('pages.facturacion.index', compact('facturas', 'stats'));
     }
 
     /**
@@ -167,9 +174,20 @@ class FacturaElectronicaController extends Controller
             $ventaPreloadJs = 'null';
         }
 
+        // Obtener el logo de la empresa desde el último json_response guardado de Factus
+        $companyLogoUrl = null;
+        $latestFactura = FacturaElectronica::whereNotNull('json_response')->latest()->first();
+        if ($latestFactura && $latestFactura->json_response) {
+            $latestData = is_string($latestFactura->json_response)
+                ? json_decode($latestFactura->json_response, true)
+                : $latestFactura->json_response;
+            $companyLogoUrl = $latestData['data']['company']['url_logo'] ?? null;
+        }
+
         return view('pages.facturacion.create', compact(
             'clientes', 'productos', 'ventas', 'ventaPreload',
-            'productosJs', 'clientesJs', 'ventasJs', 'ventaPreloadJs'
+            'productosJs', 'clientesJs', 'ventasJs', 'ventaPreloadJs',
+            'companyLogoUrl'
         ));
     }
 

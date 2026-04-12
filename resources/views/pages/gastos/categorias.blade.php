@@ -5,27 +5,10 @@
 
     <div class="space-y-6" x-data="categoriasApp()">
 
-        @if (session('sweet_alert'))
-            @php $sa = session('sweet_alert'); @endphp
-            @push('scripts')
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        Swal.fire({
-                            icon: '{{ $sa['type'] }}',
-                            title: '{{ $sa['title'] }}',
-                            text: '{{ $sa['message'] }}',
-                            timer: 3000,
-                            showConfirmButton: false,
-                        });
-                    });
-                </script>
-            @endpush
-        @endif
-
-        <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900 overflow-hidden">
+        <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900 overflow-hidden">
 
             {{-- Toolbar --}}
-            <div class="p-5 border-b border-gray-100 dark:border-white/[0.05] flex items-center justify-between">
+            <div class="p-5 border-b border-gray-100 dark:border-neutral-800/80 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <a href="{{ route('gastos.index') }}"
                        class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10" title="Volver a Gastos">
@@ -51,7 +34,7 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead>
-                        <tr class="border-b border-gray-100 bg-gray-50 dark:border-white/[0.05] dark:bg-white/[0.03]">
+                        <tr class="border-b border-gray-100 bg-gray-50 dark:border-neutral-800/80 dark:bg-neutral-800/20">
                             <th class="px-5 py-4 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">#</th>
                             <th class="px-5 py-4 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Nombre</th>
                             <th class="px-5 py-4 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Descripción</th>
@@ -60,9 +43,9 @@
                             <th class="px-5 py-4 text-right text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                    <tbody class="divide-y divide-gray-100 dark:divide-neutral-800/80">
                         @forelse($categorias as $cat)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                                 <td class="px-5 py-4 font-bold text-gray-800 dark:text-white">{{ $cat->id }}</td>
                                 <td class="px-5 py-4">
                                     <span class="font-semibold text-gray-800 dark:text-white">{{ $cat->nombre }}</span>
@@ -79,7 +62,7 @@
                                     @if($cat->estado === 'activo')
                                         <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">Activo</span>
                                     @else
-                                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-gray-100 text-gray-600 dark:bg-white/[0.05] dark:text-gray-400">Inactivo</span>
+                                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold bg-gray-100 text-gray-600 dark:bg-neutral-800/40 dark:text-gray-400">Inactivo</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-right">
@@ -109,6 +92,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="p-4 border-t border-gray-100 dark:border-white/5">
+                {{ $categorias->links() }}
+            </div>
         </div>
 
         {{-- ===== MODAL CATEGORÍA ===== --}}
@@ -120,12 +106,12 @@
 
             <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="showModal = false"></div>
 
-            <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
+            <div class="relative w-full max-w-md rounded-2xl bg-white shadow-2xl dark:bg-neutral-900"
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100">
 
-                <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-white/[0.05]">
+                <div class="flex items-center justify-between border-b border-gray-100 px-6 py-4 dark:border-neutral-800/80">
                     <h3 class="text-lg font-bold text-gray-800 dark:text-white" x-text="isEditing ? 'Editar Categoría' : 'Nueva Categoría'"></h3>
                     <button @click="showModal = false" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,26 +130,26 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nombre <span class="text-red-500">*</span></label>
                         <input type="text" name="nombre" x-model="nombre" required maxlength="100"
                                placeholder="Ej: Servicios, Operativos..."
-                               class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white">
+                               class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Descripción</label>
                         <textarea name="descripcion" x-model="descripcion" rows="2"
                                   placeholder="Descripción opcional..."
-                                  class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white resize-none"></textarea>
+                                  class="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white resize-none"></textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Estado</label>
                         <select name="estado" x-model="estado"
-                                class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-gray-800 dark:text-white">
+                                class="w-full h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-white/[0.1] dark:bg-neutral-800 dark:text-white">
                             <option value="activo">Activo</option>
                             <option value="inactivo">Inactivo</option>
                         </select>
                     </div>
 
-                    <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-white/[0.05]">
+                    <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-neutral-800/80">
                         <button type="button" @click="showModal = false"
                                 class="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 dark:border-white/[0.1] dark:text-gray-300">
                             Cancelar
@@ -216,22 +202,19 @@ function categoriasApp() {
         },
 
         eliminarCategoria(id) {
-            Swal.fire({
-                title: '¿Eliminar categoría?',
-                text: 'Esta acción no se puede deshacer.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar',
-            }).then((result) => {
-                if (result.isConfirmed) {
+            window.Confirm.show(
+                '¿Eliminar categoría?',
+                'Esta acción no se puede deshacer.',
+                'Sí, eliminar',
+                'Cancelar',
+                () => {
                     const form = document.getElementById('form-eliminar-categoria');
                     form.action = `/gastos/categorias/${id}`;
                     form.submit();
-                }
-            });
+                },
+                () => {},
+                { okButtonBackground: '#ef4444' }
+            );
         }
     }
 }

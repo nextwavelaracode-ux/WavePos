@@ -2,23 +2,7 @@
 
 @section('content')
 
-    {{-- SweetAlert2 Notification --}}
-    @if (session('sweet_alert'))
-        @php $sa = session('sweet_alert'); @endphp
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        icon: '{{ $sa['type'] }}',
-                        title: '{{ $sa['title'] }}',
-                        text: '{{ $sa['message'] }}',
-                        timer: 3000,
-                        showConfirmButton: false,
-                    });
-                });
-            </script>
-        @endpush
-    @endif
+
 
 <div class="space-y-6">
     {{-- ===== HEADER ===== --}}
@@ -34,15 +18,15 @@
     </div>
 
     {{-- ===== TABLA ===== --}}
-    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/[0.05] dark:bg-gray-900">
-        <div class="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03] px-6 py-4 flex justify-between items-center">
+    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900">
+        <div class="border-b border-gray-100 dark:border-neutral-800/80 bg-gray-50 dark:bg-neutral-800/20 px-6 py-4 flex justify-between items-center">
             <h4 class="text-lg font-semibold text-gray-800 dark:text-white/90">Pagos Registrados</h4>
         </div>
 
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead>
-                    <tr class="border-b border-gray-100 dark:border-white/[0.05] bg-gray-50 dark:bg-white/[0.03]">
+                    <tr class="border-b border-gray-100 dark:border-neutral-800/80 bg-gray-50 dark:bg-neutral-800/20">
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">ID Pago</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Fecha</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Proveedor</th>
@@ -54,7 +38,7 @@
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
                     @forelse($pagos as $pago)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                             <td class="px-6 py-4 text-gray-500 dark:text-gray-400 font-medium">
                                 #{{ $pago->id }}
                             </td>
@@ -97,7 +81,7 @@
         </div>
         
         @if ($pagos->hasPages())
-            <div class="border-t border-gray-100 px-6 py-4 dark:border-white/[0.05]">
+            <div class="border-t border-gray-100 px-6 py-4 dark:border-neutral-800/80">
                 {{ $pagos->links() }}
             </div>
         @endif

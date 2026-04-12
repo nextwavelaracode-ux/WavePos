@@ -61,7 +61,7 @@
 @endphp
 
 <div
-    class="overflow-hidden rounded-2xl border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03]"
+    class="overflow-hidden rounded-2xl border border-gray-200 bg-white pt-4 dark:border-neutral-800 dark:bg-neutral-800/20"
 >
     <div class="flex flex-col gap-4 px-6 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -70,7 +70,7 @@
 
         <div class="flex items-center gap-3">
             <button
-                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
             >
                 <svg
                     class="stroke-current fill-white dark:fill-gray-800"
@@ -112,7 +112,7 @@
             </button>
 
             <button
-                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-theme-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
             >
                 See all
             </button>
@@ -123,7 +123,7 @@
         <table class="min-w-full">
             <!-- table header start -->
             <thead>
-                <tr class="border-gray-100 border-y dark:border-white/[0.05]">
+                <tr class="border-gray-100 border-y dark:border-neutral-800/80">
                     <th class="px-6 py-3">
                         <div class="flex items-center">
                             <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Products</p>
@@ -154,7 +154,7 @@
             <!-- table header end -->
 
             <!-- table body start -->
-            <tbody class="divide-y divide-gray-100 dark:divide-white/[0.05]">
+            <tbody class="divide-y divide-gray-100 dark:divide-neutral-800/80">
                 @foreach ($orders as $order)
                     <tr>
                         <td class="px-6 py-3.5">

@@ -33,7 +33,7 @@ class CuentaPorCobrarController extends Controller
             $query->where('estado', $request->estado);
         }
 
-        $cuentas = $query->paginate(20)->withQueryString();
+        $cuentas = $query->paginate(25)->withQueryString();
 
         // KPIs
         $kpis = [
@@ -129,7 +129,7 @@ class CuentaPorCobrarController extends Controller
     {
         $pagos = PagoCuentaCobrar::with(['cuenta.cliente', 'usuario', 'caja'])
             ->latest()
-            ->paginate(20);
+            ->paginate(25);
             
         return view('pages.cuentas.historial', compact('pagos'));
     }

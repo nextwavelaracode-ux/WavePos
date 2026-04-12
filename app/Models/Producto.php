@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Producto extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $fillable = [
         'nombre',
         'descripcion',
@@ -67,7 +68,7 @@ class Producto extends Model
     public function getImagenUrlAttribute()
     {
         if ($this->imagen && Storage::disk('public')->exists($this->imagen)) {
-            return Storage::disk('public')->url($this->imagen);
+            return asset('storage/' . $this->imagen);
         }
         return null;
     }

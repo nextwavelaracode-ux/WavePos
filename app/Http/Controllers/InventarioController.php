@@ -14,7 +14,7 @@ class InventarioController extends Controller
     // ─── Listado de stock ─────────────────────────────────────
     public function index()
     {
-        $productos   = Producto::with(['categoria'])->latest()->get();
+        $productos   = Producto::with(['categoria'])->latest()->paginate(25);
         $categorias  = Categoria::where('estado', true)->whereNull('parent_id')->orderBy('nombre')->get();
         $proveedores = Proveedor::where('estado', true)->orderBy('empresa')->get();
 
@@ -35,9 +35,15 @@ class InventarioController extends Controller
     {
         $movimientos = MovimientoInventario::with(['producto', 'proveedor', 'usuario'])
             ->latest()
-            ->get();
+            ->paginate(25);
 
-        return view('pages.inventario.movimientos', compact('movimientos'));
+        // Calculate metrics for KPI cards
+        $totalMovimientos = MovimientoInventario::count();
+        $totalEntradas = MovimientoInventario::where('tipo', 'entrada')->count();
+        $totalSalidas = MovimientoInventario::where('tipo', 'salida')->count();
+        $totalAjustes = MovimientoInventario::where('tipo', 'ajuste')->count();
+
+        return view('pages.inventario.movimientos', compact('movimientos', 'totalMovimientos', 'totalEntradas', 'totalSalidas', 'totalAjustes'));
     }
 
     // ─── Alertas ──────────────────────────────────────────────
