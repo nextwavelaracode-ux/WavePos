@@ -51,6 +51,13 @@ class ConfiguracionController extends Controller
             }
         }
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'La configuración del sistema ha sido actualizada correctamente.'
+            ]);
+        }
+
         return redirect()->route('configuracion.sistema')
             ->with('sweet_alert', [
                 'type'    => 'success',

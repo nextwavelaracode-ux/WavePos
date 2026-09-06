@@ -144,7 +144,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </button>
-                        <div x-show="openExport" @click.outside="openExport = false"
+                        <div x-show="openExport" x-cloak style="display:none;" @click.outside="openExport = false"
                             class="absolute right-0 mt-2 w-48 origin-top-right rounded-xl border border-gray-100 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900 z-50">
                             <div class="p-1 text-xs">
                                 <a href="{{ route('gastos.exportar', array_merge(request()->all(), ['formato' => 'excel'])) }}" 

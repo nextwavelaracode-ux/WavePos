@@ -156,7 +156,7 @@
     </div>
 
     <!-- ARQUEO -->
-    <div x-show="tab === 'arqueo'" class="grid gap-6 xl:grid-cols-3" x-cloak 
+    <div x-show="tab === 'arqueo'" class="grid gap-6 xl:grid-cols-3" x-cloak style="display:none;" 
          x-data="arqueoData({{ $montoEsperado }})">
         <!-- Calculadora Izquierda -->
         <div class="xl:col-span-2 rounded-2xl border border-gray-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm">
@@ -227,7 +227,7 @@
     </div>
 
     <!-- HISTORIAL TURNOS -->
-    <div x-show="tab === 'turnos'" class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 shadow-sm overflow-hidden" x-cloak>
+    <div x-show="tab === 'turnos'" class="rounded-2xl border border-gray-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 shadow-sm overflow-hidden" x-cloak style="display:none;">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-gray-50 dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-800">
@@ -328,7 +328,7 @@
     @endif
 
     {{-- MODAL ABRIR CAJA --}}
-    <div x-show="modalAbrir" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-sm" x-cloak>
+    <div x-show="modalAbrir" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-sm" x-cloak style="display:none;">
         <div @click.outside="modalAbrir = false" class="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-neutral-900 shadow-2xl">
             <h3 class="mb-4 text-xl font-bold text-gray-800 dark:text-white">Apertura de Turno</h3>
             <form action="{{ route('caja.abrir') }}" method="POST">
@@ -356,7 +356,7 @@
 
     {{-- MODAL CERRAR CAJA --}}
     @if($cajaAbierta)
-    <div x-show="modalCerrar" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-sm" x-cloak>
+    <div x-show="modalCerrar" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-sm" x-cloak style="display:none;">
         <div @click.outside="modalCerrar = false" class="w-full max-w-lg rounded-2xl bg-white p-6 dark:bg-neutral-900 shadow-2xl">
             <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Cerrar Caja</h3>
             <p class="text-sm text-gray-500 mb-6">Confirma el cierre de caja para finalizar turno. Asegúrate de verificar el efectivo contabilizado.</p>

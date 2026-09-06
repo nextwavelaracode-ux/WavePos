@@ -275,7 +275,7 @@
         </div>
 
         {{-- ====================  MODAL ENTRADA  ==================== --}}
-        <div x-show="showEntrada" x-transition:enter="transition ease-out duration-200"
+        <div x-show="showEntrada" x-cloak x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -364,7 +364,7 @@
         </div>
 
         {{-- ====================  MODAL SALIDA  ==================== --}}
-        <div x-show="showSalida" x-transition:enter="transition ease-out duration-200"
+        <div x-show="showSalida" x-cloak x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -442,7 +442,7 @@
         </div>
 
         {{-- ====================  MODAL AJUSTE  ==================== --}}
-        <div x-show="showAjuste" x-transition:enter="transition ease-out duration-200"
+        <div x-show="showAjuste" x-cloak x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"

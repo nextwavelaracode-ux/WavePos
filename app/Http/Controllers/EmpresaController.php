@@ -61,6 +61,14 @@ class EmpresaController extends Controller
 
         $empresa->update($validated);
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Los datos de la empresa han sido actualizados correctamente.',
+                'logo_url' => $empresa->logo ? Storage::url($empresa->logo) : null
+            ]);
+        }
+
         return redirect()->route('configuracion.empresa')
             ->with('sweet_alert', [
                 'type'    => 'success',

@@ -249,7 +249,7 @@
             </div>
             
             {{-- 2. Tab de Historial de Ventas (Estilo Timeline/Tarjetas CRM) --}}
-            <div x-cloak x-show="tab === 'historial'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <div x-cloak x-show="tab === 'historial'" style="display:none;" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900">
                     <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 dark:border-neutral-800/80 dark:bg-neutral-800/20 flex justify-between items-center">
                         <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-widest">Historial de Facturas</h3>
@@ -318,7 +318,7 @@
             </div>
 
             {{-- 3. Tab de Cuentas por Cobrar --}}
-            <div x-cloak x-show="tab === 'cuentas'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
+            <div x-cloak x-show="tab === 'cuentas'" style="display:none;" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0">
                 <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900">
                     <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 dark:border-neutral-800/80 dark:bg-neutral-800/20 flex justify-between items-center">
                         <h3 class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-widest">Registro de Deudas</h3>

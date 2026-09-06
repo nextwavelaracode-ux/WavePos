@@ -50,7 +50,7 @@
     }
 }" 
 @open-pago-modal.window="open = true; cuentaId = $event.detail.id; saldoMax = $event.detail.saldo; monto = $event.detail.saldo; cliente = $event.detail.cliente;"
-x-show="open" x-cloak
+x-show="open" x-cloak style="display:none;"
 class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
     
     <div @click.outside="open = false" class="relative w-full max-w-md rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl overflow-hidden shadow-emerald-500/10 border border-gray-100 dark:border-neutral-800/80">

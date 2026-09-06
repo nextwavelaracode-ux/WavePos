@@ -15,7 +15,7 @@
                     <path d="M128 192l128 128 128-128z"/>
                 </svg>
             </button>
-            <div x-show="open" @click.outside="open = false"
+            <div x-show="open" x-cloak style="display:none;" @click.outside="open = false"
                  class="absolute right-0 top-6 z-50 bg-white dark:bg-neutral-800
                         border border-gray-200 dark:border-neutral-700
                         rounded-xl shadow-lg py-1 min-w-[120px]">

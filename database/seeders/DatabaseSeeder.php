@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             MovimientoInventarioSeeder::class,
             CategoriaGastoSeeder::class,
             ClienteSeeder::class,
+            SettingsSeeder::class,
         ]);
     }
 }

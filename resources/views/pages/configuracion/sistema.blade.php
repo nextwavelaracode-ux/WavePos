@@ -13,12 +13,13 @@ $labelClass = 'mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400
 $sectionCard = 'rounded-2xl border border-gray-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900';
 $sectionTitle = 'mb-5 text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400';
 
-function s($settings, $group, $key, $default = '') {
-    return $settings[$group][$key] ?? $default;
+use App\Models\Setting;
+function s($key, $default = '') {
+    return Setting::get($key, $default);
 }
 @endphp
 
-<div x-data="{ tab: 'general' }" class="space-y-5">
+<div x-data="sistemaConfig" class="space-y-5">
 
     {{-- Tab Navigation --}}
     <div class="flex flex-wrap gap-1 rounded-2xl border border-gray-200 bg-white p-1 dark:border-neutral-800 dark:bg-neutral-900 shadow-sm">
@@ -41,13 +42,13 @@ function s($settings, $group, $key, $default = '') {
         @endforeach
     </div>
 
-    <form action="{{ route('configuracion.sistema.update') }}" method="POST">
+    <form @submit.prevent="guardarConfiguracion" id="form-sistema">
         @csrf
 
         {{-- ========================================================
              TAB: GENERAL & POS
         ======================================================== --}}
-        <div x-show="tab === 'general'" class="space-y-5">
+        <div x-show="tab === 'general'" x-cloak class="space-y-5">
 
             {{-- POS --}}
             <div class="{{ $sectionCard }}">
@@ -68,7 +69,7 @@ function s($settings, $group, $key, $default = '') {
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1"
                                    class="sr-only peer"
-                                   {{ ($settings['pos'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s($toggle['key'], '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -79,7 +80,7 @@ function s($settings, $group, $key, $default = '') {
                     <div>
                         <label class="{{ $labelClass }}">Tiempo expiración ventas en espera (minutos)</label>
                         <input type="number" name="pos_expiracion_espera_min" min="1" max="1440"
-                               value="{{ $settings['pos']['pos_expiracion_espera_min'] ?? '60' }}"
+                               value="{{ s('pos_expiracion_espera_min', '60') }}"
                                class="{{ $inputClass }}">
                     </div>
                 </div>
@@ -100,7 +101,7 @@ function s($settings, $group, $key, $default = '') {
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1"
                                    class="sr-only peer"
-                                   {{ ($settings['caja'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s($toggle['key'], '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -110,7 +111,7 @@ function s($settings, $group, $key, $default = '') {
                     <div>
                         <label class="{{ $labelClass }}">Monto mínimo de apertura de caja</label>
                         <input type="number" name="caja_monto_minimo_apertura" min="0" step="0.01"
-                               value="{{ $settings['caja']['caja_monto_minimo_apertura'] ?? '0' }}"
+                               value="{{ s('caja_monto_minimo_apertura', '0') }}"
                                class="{{ $inputClass }}">
                     </div>
                 </div>
@@ -120,7 +121,7 @@ function s($settings, $group, $key, $default = '') {
         {{-- ========================================================
              TAB: FACTURACIÓN (Impuestos + Ventas + Compras)
         ======================================================== --}}
-        <div x-show="tab === 'facturacion'" class="space-y-5">
+        <div x-show="tab === 'facturacion'" x-cloak style="display:none;" class="space-y-5">
 
             {{-- Impuestos (ITBMS) --}}
             <div class="{{ $sectionCard }}">
@@ -130,14 +131,14 @@ function s($settings, $group, $key, $default = '') {
                         <label class="{{ $labelClass }}">Tasa ITBMS por defecto (%)</label>
                         <select name="itbms_tasa_default" class="{{ $selectClass }}">
                             @foreach(['0' => '0% — Exento', '7' => '7% — Estándar', '10' => '10% — Alcohol / Turismo', '15' => '15% — Cigarrillos'] as $val => $lbl)
-                                <option value="{{ $val }}" {{ ($settings['impuestos']['itbms_tasa_default'] ?? '7') == $val ? 'selected' : '' }}>{{ $lbl }}</option>
+                                <option value="{{ $val }}" {{ (s('itbms_tasa_default', '7')) == $val ? 'selected' : '' }}>{{ $lbl }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
                         <label class="{{ $labelClass }}">Tasas activas (separadas por coma)</label>
                         <input type="text" name="itbms_tasas_activas"
-                               value="{{ $settings['impuestos']['itbms_tasas_activas'] ?? '0,7,10,15' }}"
+                               value="{{ s('itbms_tasas_activas', '0,7,10,15') }}"
                                class="{{ $inputClass }}" placeholder="0,7,10,15">
                         <p class="mt-1 text-xs text-gray-400">Define qué tasas pueden seleccionarse al crear productos.</p>
                     </div>
@@ -151,13 +152,13 @@ function s($settings, $group, $key, $default = '') {
                     <div>
                         <label class="{{ $labelClass }}">Prefijo numeración de facturas</label>
                         <input type="text" name="ventas_prefijo"
-                               value="{{ $settings['ventas']['ventas_prefijo'] ?? 'VTA-' }}"
+                               value="{{ s('ventas_prefijo', 'VTA-') }}"
                                class="{{ $inputClass }}" placeholder="VTA-" maxlength="10">
                     </div>
                     <div>
                         <label class="{{ $labelClass }}">Límite máximo de descuento (%)</label>
                         <input type="number" name="ventas_limite_descuento" min="0" max="100"
-                               value="{{ $settings['ventas']['ventas_limite_descuento'] ?? '30' }}"
+                               value="{{ s('ventas_limite_descuento', '30') }}"
                                class="{{ $inputClass }}">
                     </div>
 
@@ -169,7 +170,7 @@ function s($settings, $group, $key, $default = '') {
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
-                                   {{ ($settings['ventas'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s($toggle['key'], '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -185,13 +186,13 @@ function s($settings, $group, $key, $default = '') {
                     <div>
                         <label class="{{ $labelClass }}">Prefijo numeración de compras</label>
                         <input type="text" name="compras_prefijo"
-                               value="{{ $settings['compras']['compras_prefijo'] ?? 'CMP-' }}"
+                               value="{{ s('compras_prefijo', 'CMP-') }}"
                                class="{{ $inputClass }}" placeholder="CMP-" maxlength="10">
                     </div>
                     <div>
                         <label class="{{ $labelClass }}">Días por defecto para vencimiento (crédito)</label>
                         <input type="number" name="compras_dias_vencimiento" min="1" max="365"
-                               value="{{ $settings['compras']['compras_dias_vencimiento'] ?? '30' }}"
+                               value="{{ s('compras_dias_vencimiento', '30') }}"
                                class="{{ $inputClass }}">
                     </div>
 
@@ -199,7 +200,7 @@ function s($settings, $group, $key, $default = '') {
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Compras a crédito habilitadas</span>
                         <div class="relative">
                             <input type="checkbox" name="compras_credito" value="1" class="sr-only peer"
-                                   {{ ($settings['compras']['compras_credito'] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s('compras_credito', '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -211,7 +212,7 @@ function s($settings, $group, $key, $default = '') {
         {{-- ========================================================
              TAB: INVENTARIO & CLIENTES
         ======================================================== --}}
-        <div x-show="tab === 'inventario'" class="space-y-5">
+        <div x-show="tab === 'inventario'" x-cloak style="display:none;" class="space-y-5">
 
             <div class="{{ $sectionCard }}">
                 <h4 class="{{ $sectionTitle }}">📦 Inventario</h4>
@@ -220,7 +221,7 @@ function s($settings, $group, $key, $default = '') {
                         <label class="{{ $labelClass }}">Unidad de medida por defecto</label>
                         <select name="inv_unidad_default" class="{{ $selectClass }}">
                             @foreach(['unidad' => 'Unidad', 'kg' => 'Kilogramo (kg)', 'g' => 'Gramo (g)', 'l' => 'Litro (lt)', 'ml' => 'Mililitro (ml)', 'caja' => 'Caja', 'par' => 'Par'] as $val => $lbl)
-                                <option value="{{ $val }}" {{ ($settings['inventario']['inv_unidad_default'] ?? 'unidad') == $val ? 'selected' : '' }}>{{ $lbl }}</option>
+                                <option value="{{ $val }}" {{ (s('inv_unidad_default', 'unidad')) == $val ? 'selected' : '' }}>{{ $lbl }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -234,7 +235,7 @@ function s($settings, $group, $key, $default = '') {
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
-                                   {{ ($settings['inventario'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s($toggle['key'], '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -249,13 +250,13 @@ function s($settings, $group, $key, $default = '') {
                     <div>
                         <label class="{{ $labelClass }}">Límite de crédito por defecto</label>
                         <input type="number" name="clientes_limite_credito" min="0" step="0.01"
-                               value="{{ $settings['clientes']['clientes_limite_credito'] ?? '500' }}"
+                               value="{{ s('clientes_limite_credito', '500') }}"
                                class="{{ $inputClass }}">
                     </div>
                     <div>
                         <label class="{{ $labelClass }}">Tipos de cliente (separados por coma)</label>
                         <input type="text" name="clientes_tipos"
-                               value="{{ $settings['clientes']['clientes_tipos'] ?? 'regular,vip,mayorista' }}"
+                               value="{{ s('clientes_tipos', 'regular,vip,mayorista') }}"
                                class="{{ $inputClass }}" placeholder="regular,vip,mayorista">
                     </div>
 
@@ -263,7 +264,7 @@ function s($settings, $group, $key, $default = '') {
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">RUC obligatorio para clientes</span>
                         <div class="relative">
                             <input type="checkbox" name="clientes_ruc_obligatorio" value="1" class="sr-only peer"
-                                   {{ ($settings['clientes']['clientes_ruc_obligatorio'] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s('clientes_ruc_obligatorio', '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -275,7 +276,7 @@ function s($settings, $group, $key, $default = '') {
         {{-- ========================================================
              TAB: PAGOS
         ======================================================== --}}
-        <div x-show="tab === 'pagos'" class="space-y-5">
+        <div x-show="tab === 'pagos'" x-cloak style="display:none;" class="space-y-5">
             <div class="{{ $sectionCard }}">
                 <h4 class="{{ $sectionTitle }}">💳 Métodos de Pago Habilitados</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -296,7 +297,7 @@ function s($settings, $group, $key, $default = '') {
                         </div>
                         <div class="relative">
                             <input type="checkbox" name="{{ $pago['key'] }}" value="1" class="sr-only peer"
-                                   {{ ($settings['pagos'][$pago['key']] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s($pago['key'], '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -316,7 +317,7 @@ function s($settings, $group, $key, $default = '') {
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
-                                   {{ ($settings['pagos'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s($toggle['key'], '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -329,20 +330,20 @@ function s($settings, $group, $key, $default = '') {
         {{-- ========================================================
              TAB: SEGURIDAD
         ======================================================== --}}
-        <div x-show="tab === 'seguridad'" class="space-y-5">
+        <div x-show="tab === 'seguridad'" x-cloak style="display:none;" class="space-y-5">
             <div class="{{ $sectionCard }}">
                 <h4 class="{{ $sectionTitle }}">🔐 Seguridad de Sesión</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
                     <div>
                         <label class="{{ $labelClass }}">Tiempo máximo de sesión inactiva (minutos)</label>
                         <input type="number" name="seg_timeout_sesion_min" min="5" max="480"
-                               value="{{ $settings['seguridad']['seg_timeout_sesion_min'] ?? '120' }}"
+                               value="{{ s('seg_timeout_sesion_min', '120') }}"
                                class="{{ $inputClass }}">
                     </div>
                     <div>
                         <label class="{{ $labelClass }}">Intentos fallidos antes de bloqueo</label>
                         <input type="number" name="seg_intentos_fallidos" min="1" max="20"
-                               value="{{ $settings['seguridad']['seg_intentos_fallidos'] ?? '5' }}"
+                               value="{{ s('seg_intentos_fallidos', '5') }}"
                                class="{{ $inputClass }}">
                     </div>
 
@@ -354,7 +355,7 @@ function s($settings, $group, $key, $default = '') {
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
-                                   {{ ($settings['seguridad'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s($toggle['key'], '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -367,15 +368,15 @@ function s($settings, $group, $key, $default = '') {
         {{-- ========================================================
              TAB: REPORTES
         ======================================================== --}}
-        <div x-show="tab === 'reportes'" class="space-y-5">
+        <div x-show="tab === 'reportes'" x-cloak style="display:none;" class="space-y-5">
             <div class="{{ $sectionCard }}">
                 <h4 class="{{ $sectionTitle }}">📄 Formato de Reportes PDF</h4>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
                     <div>
                         <label class="{{ $labelClass }}">Tamaño de papel para reportes</label>
                         <select name="rep_formato_papel" class="{{ $selectClass }}">
-                            <option value="A4" {{ ($settings['reportes']['rep_formato_papel'] ?? 'A4') == 'A4' ? 'selected' : '' }}>A4 (210 × 297 mm)</option>
-                            <option value="letter" {{ ($settings['reportes']['rep_formato_papel'] ?? '') == 'letter' ? 'selected' : '' }}>Carta / Letter (216 × 279 mm)</option>
+                            <option value="A4" {{ (s('rep_formato_papel', 'A4')) == 'A4' ? 'selected' : '' }}>A4 (210 × 297 mm)</option>
+                            <option value="letter" {{ (s('rep_formato_papel', '')) == 'letter' ? 'selected' : '' }}>Carta / Letter (216 × 279 mm)</option>
                         </select>
                     </div>
 
@@ -387,7 +388,7 @@ function s($settings, $group, $key, $default = '') {
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ $toggle['label'] }}</span>
                         <div class="relative">
                             <input type="checkbox" name="{{ $toggle['key'] }}" value="1" class="sr-only peer"
-                                   {{ ($settings['reportes'][$toggle['key']] ?? '0') == '1' ? 'checked' : '' }}>
+                                   {{ (s($toggle['key'], '0')) == '1' ? 'checked' : '' }}>
                             <div class="w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-brand-500 transition-colors dark:bg-neutral-700"></div>
                             <div class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
                         </div>
@@ -409,4 +410,47 @@ function s($settings, $group, $key, $default = '') {
         </div>
     </form>
 </div>
+
+<!-- AlpineJS logic for AJAX save -->
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('sistemaConfig', () => ({
+        tab: 'general',
+        guardando: false,
+
+        guardarConfiguracion(e) {
+            this.guardando = true;
+            const form = e.target;
+            const formData = new FormData(form);
+
+            fetch('{{ route('configuracion.sistema.update') }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    // Show Toast Notification
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed bottom-5 right-5 bg-brand-500 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-y-0 opacity-100 flex items-center gap-2 z-50';
+                    toast.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> ${data.message}`;
+                    document.body.appendChild(toast);
+                    setTimeout(() => {
+                        toast.classList.add('translate-y-10', 'opacity-0');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                }
+            })
+            .catch(error => console.error('Error:', error))
+            .finally(() => {
+                this.guardando = false;
+            });
+        }
+    }));
+});
+</script>
+
 @endsection

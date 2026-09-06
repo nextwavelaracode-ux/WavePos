@@ -11,8 +11,10 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Alpine.js -->
-    {{-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
+    <!-- Alpine.js x-cloak helper to eliminate FOUC -->
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 
     <!-- Theme Store -->
     <script>
@@ -33,13 +35,12 @@
                 },
                 updateTheme() {
                     const html = document.documentElement;
-                    const body = document.body;
                     if (this.theme === 'dark') {
                         html.classList.add('dark');
-                        body.classList.add('dark', 'bg-gray-900');
+                        if (document.body) document.body.classList.add('dark', 'bg-gray-900');
                     } else {
                         html.classList.remove('dark');
-                        body.classList.remove('dark', 'bg-gray-900');
+                        if (document.body) document.body.classList.remove('dark', 'bg-gray-900');
                     }
                 }
             });
@@ -75,26 +76,34 @@
         });
     </script>
 
-    <!-- Apply dark mode immediately to prevent flash -->
+    <!-- Apply dark mode immediately to prevent flash (FOUC) -->
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('theme');
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            const theme = savedTheme || systemTheme;
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                document.body.classList.add('dark', 'bg-gray-900');
-            } else {
-                document.documentElement.classList.remove('dark');
-                document.body.classList.remove('dark', 'bg-gray-900');
-            }
+            try {
+                const savedTheme = localStorage.getItem('theme');
+                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                const theme = savedTheme || systemTheme;
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+
+            // Pre-calculate sidebar margin before Alpine boots to prevent layout flash
+            document.addEventListener('DOMContentLoaded', function() {
+                const mainContent = document.getElementById('main-content-wrapper');
+                if (mainContent && window.innerWidth >= 1280) {
+                    mainContent.style.marginLeft = '260px';
+                }
+            });
         })();
     </script>
     
 </head>
 
 <body
-    x-data="{ 'loaded': true}"
+    x-data="{}"
     x-init="$store.sidebar.isExpanded = window.innerWidth >= 1280;
     const checkMobile = () => {
         if (window.innerWidth < 1280) {
@@ -107,9 +116,7 @@
     };
     window.addEventListener('resize', checkMobile);">
 
-    {{-- preloader --}}
-    <x-common.preloader/>
-    {{-- preloader end --}}
+
 
     <div class="min-h-screen bg-neutral-100 dark:bg-neutral-950">
 
@@ -117,11 +124,9 @@
 
         {{-- Main area: shifts when sidebar is open, full-width when hidden --}}
         <div
-            class="flex flex-col min-h-screen transition-all duration-300 ease-in-out lg:ml-[260px]"
-            :class="{
-                'lg:ml-[260px]': $store.sidebar.isExpanded,
-                'lg:ml-0'      : !$store.sidebar.isExpanded
-            }"
+            id="main-content-wrapper"
+            class="flex flex-col min-h-screen transition-[margin-left] duration-300 ease-in-out"
+            x-effect="$el.style.marginLeft = (window.innerWidth >= 1280 && $store.sidebar.isExpanded) ? '260px' : '0px'"
         >
             @include('layouts.app-header')
 
@@ -135,40 +140,55 @@
     <x-ticket-offcanvas />
 
     {{-- Notiflix Global Notification System --}}
-    <script type="module">
-        if (typeof window.Notify !== 'undefined') {
-            
-            // 1. Manejo nativo de notificaciones Notify() desde PHP
-            @if(session('notiflix'))
-                @php $n = session('notiflix'); @endphp
-                const type = '{{ $n['type'] === 'error' ? 'failure' : $n['type'] }}';
-                window.Notify[type]('{{ $n['title'] }} {{ $n['message'] ? " - " . $n['message'] : "" }}');
-            @endif
+    <script>
+        (function showSessionNotifications() {
+            function tryNotify() {
+                if (typeof window.Notify === 'undefined') {
+                    // Retry on next frame if Notiflix hasn't loaded yet
+                    requestAnimationFrame(tryNotify);
+                    return;
+                }
 
-            // 2. Errores de Validación (Request Validation)
-            @if($errors->any())
-                const validationErrors = @json($errors->all());
-                validationErrors.forEach(err => {
-                    window.Notify.failure(err);
-                });
-            @endif
+                @if(session('notiflix'))
+                    @php $n = session('notiflix'); @endphp
+                    (function() {
+                        const type = '{{ $n['type'] === 'error' ? 'failure' : $n['type'] }}';
+                        window.Notify[type]('{{ $n['title'] }}{{ $n['message'] ? " - " . addslashes($n['message']) : "" }}');
+                    })();
+                @endif
 
-            // 3. Fallbacks para redirects antiguos
-            @if(session('success'))
-                window.Notify.success('{{ session('success') }}');
-            @endif
+                @if($errors->any())
+                    (function() {
+                        const validationErrors = @json($errors->all());
+                        validationErrors.forEach(function(err) {
+                            window.Notify.failure(err);
+                        });
+                    })();
+                @endif
 
-            @if(session('error'))
-                window.Notify.failure('{{ session('error') }}');
-            @endif
+                @if(session('success'))
+                    window.Notify.success('{{ addslashes(session('success')) }}');
+                @endif
 
-            // 4. Fallback del antiguo sweet_alert
-            @if(session('sweet_alert'))
-                @php $sa = session('sweet_alert'); @endphp
-                const saType = '{{ strtolower($sa['type'] ?? 'success') }}' === 'error' ? 'failure' : '{{ strtolower($sa['type'] ?? 'success') }}';
-                window.Notify[saType]('{{ $sa['title'] ?? '' }} {{ $sa['message'] ?? '' }}');
-            @endif
-        }
+                @if(session('error'))
+                    window.Notify.failure('{{ addslashes(session('error')) }}');
+                @endif
+
+                @if(session('sweet_alert'))
+                    @php $sa = session('sweet_alert'); @endphp
+                    (function() {
+                        const saType = '{{ strtolower($sa['type'] ?? 'success') }}' === 'error' ? 'failure' : '{{ strtolower($sa['type'] ?? 'success') }}';
+                        window.Notify[saType]('{{ addslashes(($sa['title'] ?? '') . ($sa['message'] ? ' ' . $sa['message'] : '')) }}');
+                    })();
+                @endif
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', tryNotify);
+            } else {
+                tryNotify();
+            }
+        })();
     </script>
 
     {{-- Guardián de Sesión por Expirar --}}
@@ -209,8 +229,8 @@
             window.addEventListener('keypress', startInactivityTimer);
         });
     </script>
-</body>
+    @stack('scripts')
 
-@stack('scripts')
+</body>
 
 </html>

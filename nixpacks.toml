@@ -1,8 +1,0 @@
-[phases.build]
-cmds = [
-    "npm run build",
-    "php artisan package:discover --ansi"
-]
-
-[start]
-cmd = "bash railway-start.sh"

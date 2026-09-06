@@ -126,7 +126,7 @@
     </div>
 
     {{-- ===== MODAL CREAR ===== --}}
-    <div x-show="showCreate" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+    <div x-show="showCreate" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm"
         @keydown.escape.window="showCreate = false" style="display:none">
@@ -206,7 +206,7 @@
     </div>
 
     {{-- ===== MODAL EDITAR ===== --}}
-    <div x-show="showEdit" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+    <div x-show="showEdit" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm"
         @keydown.escape.window="showEdit = false" style="display:none">

@@ -79,7 +79,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-                <div x-show="openExport" @click.outside="openExport = false"
+                <div x-show="openExport" x-cloak style="display:none;" @click.outside="openExport = false"
                     class="absolute right-0 mt-2 w-40 origin-top-right rounded-xl border border-gray-100 bg-white shadow-lg dark:border-neutral-800 dark:bg-neutral-900 z-50">
                     <div class="p-1">
                         <a href="{{ route('inventario.proveedores.exportar', 'excel') }}" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/5">
@@ -249,7 +249,7 @@
     </div>
 
     {{-- ===== MODAL CREAR ===== --}}
-    <div x-show="showCreate" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+    <div x-show="showCreate" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-[99999] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm"
         @keydown.escape.window="showCreate = false" style="display:none">
@@ -373,7 +373,7 @@
 
 
     {{-- ===== MODAL EDITAR ===== --}}
-    <div x-show="showEdit" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+    <div x-show="showEdit" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-[99999] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm"
         @keydown.escape.window="showEdit = false" style="display:none">
@@ -496,7 +496,7 @@
     </div>
 
     {{-- ====================  MODAL IMPORTAR  ==================== --}}
-    <div x-show="showImport" x-transition:enter="transition ease-out duration-200"
+    <div x-show="showImport" x-cloak x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
         x-transition:leave="transition ease-in duration-150"
         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"

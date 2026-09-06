@@ -10,7 +10,7 @@
         </svg>
     </button>
 
-    <div x-show="openDropDown" @click.outside="openDropDown = false"
+    <div x-show="openDropDown" @click.outside="openDropDown = false" style="display:none;"
         class="absolute right-0 z-40 w-40 p-2 space-y-1 bg-white border border-gray-200 shadow-theme-lg dark:bg-neutral-900 top-full rounded-2xl dark:border-neutral-800">
         @forelse($items as $item)
             <button

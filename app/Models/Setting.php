@@ -43,8 +43,39 @@ class Setting extends Model
      */
     public static function set(string $key, mixed $value): void
     {
-        static::updateOrCreate(['key' => $key], ['value' => $value]);
+        $group = static::inferGroupFromKey($key);
+        static::updateOrCreate(
+            ['key' => $key], 
+            ['value' => $value, 'group' => $group]
+        );
         static::clearCache();
+    }
+
+    /**
+     * Infer the setting group based on its key prefix.
+     */
+    private static function inferGroupFromKey(string $key): string
+    {
+        $map = [
+            'pos_' => 'pos',
+            'caja_' => 'caja',
+            'ventas_' => 'ventas',
+            'compras_' => 'compras',
+            'inv_' => 'inventario',
+            'clientes_' => 'clientes',
+            'pago_' => 'pagos',
+            'seg_' => 'seguridad',
+            'rep_' => 'reportes',
+            'itbms_' => 'impuestos',
+        ];
+
+        foreach ($map as $prefix => $group) {
+            if (str_starts_with($key, $prefix)) {
+                return $group;
+            }
+        }
+
+        return 'general';
     }
 
     /**

@@ -1,5 +1,5 @@
 {{-- Modal Ver Detalle de Gasto --}}
-<div x-show="showVerModal" x-cloak
+<div x-show="showVerModal" x-cloak style="display:none;"
      class="fixed inset-0 z-[99999] flex items-center justify-center p-4"
      x-transition:enter="transition ease-out duration-200"
      x-transition:enter-start="opacity-0"

@@ -2,24 +2,22 @@
 
 @section('content')
 
-{{-- Modo táctil CSS --}}
-@if(($posSettings['pos_modo_tactil'] ?? '0') == '1')
+{{-- Modo táctil CSS Dinámico --}}
 <style>
-.pos-tactil .pos-product-card { min-height: 160px; }
-.pos-tactil .pos-product-card img { height: 100px; }
-.pos-tactil .pos-product-card .pos-product-placeholder { height: 100px; }
-.pos-tactil .pos-product-card .pos-product-name { font-size: 0.9rem; }
-.pos-tactil .pos-product-card .pos-product-price { font-size: 1.1rem; }
-.pos-tactil .pos-product-card .pos-product-stock { font-size: 0.8rem; }
-.pos-tactil .pos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0.75rem !important; }
-@media (min-width: 640px) { .pos-tactil .pos-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
-@media (min-width: 1024px) { .pos-tactil .pos-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
-@media (min-width: 1280px) { .pos-tactil .pos-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; } }
+.pos-touch .pos-product-card { min-height: 160px; }
+.pos-touch .pos-product-card img { height: 100px; }
+.pos-touch .pos-product-card .pos-product-placeholder { height: 100px; }
+.pos-touch .pos-product-card .pos-product-name { font-size: 0.9rem; margin-top: 0.25rem; }
+.pos-touch .pos-product-card .pos-product-price { font-size: 1.15rem; }
+.pos-touch .pos-product-card .pos-product-stock { font-size: 0.8rem; }
+.pos-touch .pos-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important; gap: 0.75rem !important; }
+/* Ocultar barra de scroll para las categorías */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
-@endif
 
     {{-- Full-height POS layout --}}
-    <div class="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-gray-100 dark:bg-neutral-950{{ ($posSettings['pos_modo_tactil'] ?? '0') == '1' ? ' pos-tactil' : '' }}" x-data="posApp()">
+    <div class="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-gray-100 dark:bg-neutral-950 transition-all duration-300" :class="{'pos-touch': touchMode}" x-data="posApp()" x-init="init()">
 
         {{-- ── MOBILE TAB BAR (visible only on small screens) ── --}}
         <div class="flex lg:hidden border-b border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900">
@@ -43,8 +41,8 @@
         <div class="flex flex-1 min-h-0 overflow-hidden">
 
             {{-- LEFT PANEL: Product Catalog --}}
-            <div class="flex flex-col flex-1 min-w-0 overflow-hidden"
-                 :class="{ 'hidden lg:flex': mobileTab !== 'productos' }">
+            <div class="flex flex-col flex-1 min-w-0 overflow-hidden transition-all duration-300"
+                 :class="{ 'hidden lg:flex': mobileTab !== 'productos', 'lg:w-[70%] lg:flex-none': touchMode }">
 
                 {{-- Search & Filters Bar --}}
                                 <div class="p-3 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 flex flex-wrap gap-2 items-center">
@@ -59,6 +57,16 @@
                             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
                         </button>
                     </div>
+
+                    <!-- Touch Mode Toggle -->
+                    <button @click="toggleTouchMode()" 
+                        class="hidden sm:inline-flex relative h-9 w-9 items-center justify-center rounded-lg border transition-colors shrink-0"
+                        :class="touchMode ? 'bg-brand-500 border-brand-600 text-white shadow-sm' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 dark:bg-neutral-800 dark:border-neutral-700 dark:text-gray-300'"
+                        title="Alternar Modo Táctil">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                        </svg>
+                    </button>
                     <div class="relative flex-1 min-w-[160px]">
                         <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
@@ -79,7 +87,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         <span class="text-xs font-semibold hidden sm:inline">Cámara</span>
                     </button>
-                    <select x-model="categoriaFiltro"
+                    <select x-show="!touchMode" x-model="categoriaFiltro"
                         class="h-9 rounded-lg border border-gray-300 bg-white px-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white">
                         <option value="">Todas las categorías</option>
                         @foreach ($categorias as $cat)
@@ -116,7 +124,7 @@
                         @foreach ($productos as $producto)
                             <div x-show="productoVisible({{ $producto->id }}, {{ $producto->categoria_id ?? 'null' }})"
                                 @click="agregarProductoMobile({{ $producto->id }})"
-                                class="group cursor-pointer rounded-xl border border-gray-200 bg-white hover:border-brand-400 hover:shadow-md transition-all duration-200 dark:border-neutral-800/80 dark:bg-[#1e1e1e] dark:hover:border-brand-500/50 overflow-hidden"
+                                class="group cursor-pointer rounded-xl border border-gray-200 bg-white hover:border-brand-400 hover:shadow-md transition-all duration-200 dark:border-neutral-800/80 dark:bg-[#1e1e1e] dark:hover:border-brand-500/50 overflow-hidden active:scale-95 active:shadow-inner"
                                 :class="viewMode === 'cards' ? 'pos-product-card flex flex-col' : 'flex flex-row items-center p-3 gap-4 hover:bg-brand-50/20 dark:hover:bg-neutral-800/10'"
                                 data-id="{{ $producto->id }}" data-nombre="{{ $producto->nombre }}"
                                 data-precio="{{ $producto->precio_venta }}" data-impuesto="{{ $producto->impuesto }}"
@@ -158,12 +166,27 @@
                         @endforeach
                     </div>
                 </div>
+
+                {{-- Bottom Category Tabs (Touch Mode) --}}
+                <div x-show="touchMode" class="border-t border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-2 overflow-x-auto flex gap-2 whitespace-nowrap hide-scrollbar shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                    <button @click="categoriaFiltro = ''" 
+                        class="px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 border"
+                        :class="categoriaFiltro === '' ? 'bg-brand-500 text-white border-brand-600 shadow-md' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200 dark:bg-neutral-800 dark:border-neutral-700 dark:text-gray-300'">
+                        <span class="text-xl">🌟</span> Todas
+                    </button>
+                    @foreach ($categorias as $cat)
+                        <button @click="categoriaFiltro = '{{ $cat->id }}'" 
+                            class="px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 border"
+                            :class="categoriaFiltro == '{{ $cat->id }}' ? 'bg-brand-500 text-white border-brand-600 shadow-md' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200 dark:bg-neutral-800 dark:border-neutral-700 dark:text-gray-300'">
+                            <span class="text-xl">{{ ['🍔','🍕','🌮','🍰','☕','🍺','🍹','🍟','🥑','🥗'][$loop->index % 10] }}</span> {{ $cat->nombre }}
+                        </button>
+                    @endforeach
+                </div>
             </div>
 
             {{-- RIGHT PANEL: Cart --}}
-            <div class="flex flex-col bg-white dark:bg-neutral-900 border-l border-gray-200 dark:border-neutral-800
-                        w-full lg:w-96 lg:flex-shrink-0"
-                 :class="{ 'hidden lg:flex': mobileTab !== 'carrito', 'flex': mobileTab === 'carrito' }">
+            <div class="flex flex-col bg-white dark:bg-neutral-900 border-l border-gray-200 dark:border-neutral-800 transition-all duration-300"
+                 :class="{ 'hidden lg:flex': mobileTab !== 'carrito', 'flex': mobileTab === 'carrito', 'w-full lg:w-[30%] lg:flex-none': touchMode, 'w-full lg:w-96 lg:flex-shrink-0': !touchMode }">
 
                 {{-- Cart Header --}}
                 <div class="p-4 border-b border-gray-200 dark:border-neutral-800 flex items-center justify-between">
@@ -221,34 +244,41 @@
                         </div>
                     </template>
                     <template x-for="(item, index) in carrito" :key="index">
-                        <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
+                        <div class="rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-neutral-700 dark:bg-neutral-800">
                             <div class="flex items-start justify-between gap-2">
                                 <p class="text-xs font-semibold text-gray-800 dark:text-white leading-tight flex-1"
                                     x-text="item.nombre"></p>
-                                <button @click="eliminarItem(index)" class="text-gray-400 hover:text-red-500 flex-shrink-0">
+                                {{-- Botón eliminar táctil --}}
+                                <button @click="eliminarItem(index)" 
+                                    class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 transition-colors"
+                                    :class="touchMode ? 'w-10 h-10' : 'w-8 h-8'">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12" />
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                 </button>
                             </div>
                             <div class="mt-2 flex items-center justify-between">
+                                {{-- Controles de cantidad táctiles --}}
                                 <div class="flex items-center gap-1.5">
                                     <button @click="cambiarCantidad(index, -1)"
-                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-300">
-                                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        class="flex items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-600 hover:bg-red-50 hover:text-red-500 hover:border-red-300 active:scale-95 transition-all dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-300 font-bold"
+                                        :class="touchMode ? 'h-11 w-11 text-xl' : 'h-7 w-7 text-sm'">
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                                 d="M20 12H4" />
                                         </svg>
                                     </button>
                                     <input type="number" :value="item.cantidad"
                                         @change="setCantidad(index, $event.target.value)" min="1"
                                         :max="item.stock"
-                                        class="w-12 h-7 rounded-lg border border-gray-300 bg-white text-center text-xs font-medium focus:border-brand-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white">
+                                        class="rounded-lg border border-gray-300 bg-white text-center font-bold focus:border-brand-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-white"
+                                        :class="touchMode ? 'w-14 h-11 text-base' : 'w-12 h-7 text-xs'">
                                     <button @click="cambiarCantidad(index, 1)"
-                                        class="flex h-7 w-7 items-center justify-center rounded-lg border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-300">
-                                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        class="flex items-center justify-center rounded-xl border border-gray-300 bg-white text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-300 active:scale-95 transition-all dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-300 font-bold"
+                                        :class="touchMode ? 'h-11 w-11 text-xl' : 'h-7 w-7 text-sm'">
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                                 d="M12 4v16m8-8H4" />
                                         </svg>
                                     </button>
@@ -271,34 +301,69 @@
 
                 {{-- Totals & Actions --}}
                 <div class="border-t border-gray-200 dark:border-neutral-800 p-4 space-y-2">
+
+                    {{-- Fila Subtotal --}}
                     <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>Subtotal</span>
                         <span x-text="'$' + subtotal.toFixed(2)"></span>
                     </div>
+                    {{-- Fila ITBMS --}}
                     <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                        <span>ITBMS</span>
+                        <span>ITBMS (7%)</span>
                         <span x-text="'$' + itbms.toFixed(2)"></span>
                     </div>
-                    <div
-                        class="flex justify-between text-lg font-bold text-gray-800 dark:text-white border-t border-gray-200 dark:border-neutral-700 pt-2">
-                        <span>TOTAL</span>
-                        <span x-text="'$' + total.toFixed(2)"></span>
+
+                    {{-- Total destacado --}}
+                    <div class="flex justify-between items-center border-t border-gray-200 dark:border-neutral-700 pt-2"
+                         :class="touchMode ? 'mt-1' : ''">
+                        <span class="font-black text-gray-800 dark:text-white uppercase tracking-wide"
+                              :class="touchMode ? 'text-xl' : 'text-lg'">TOTAL</span>
+                        <span class="font-black text-brand-600 dark:text-brand-400"
+                              :class="touchMode ? 'text-2xl' : 'text-lg'"
+                              x-text="'$' + total.toFixed(2)"></span>
                     </div>
 
-                    <div class="flex gap-2 pt-1">
-                        <button @click="pausarVenta()" :disabled="carrito.length === 0"
-                            class="flex-1 rounded-lg border border-amber-400 py-2.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
-                            Pausar
-                        </button>
-                        <button @click="abrirPago()" :disabled="carrito.length === 0"
-                            class="flex-2 flex-1 rounded-lg bg-brand-500 py-2.5 text-sm font-bold text-white hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center justify-center gap-1.5">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                            </svg>
-                            Cobrar $<span x-text="total.toFixed(2)"></span>
-                        </button>
-                    </div>
+                    {{-- Botones de acción — modo táctil: apilados, más grandes --}}
+                    <template x-if="touchMode">
+                        <div class="flex flex-col gap-2 pt-1">
+                            <button @click="abrirPago()" :disabled="carrito.length === 0"
+                                class="w-full rounded-xl bg-brand-500 py-4 text-base font-black text-white hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-brand-500/30">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                                Cobrar $<span x-text="total.toFixed(2)"></span>
+                            </button>
+                            <div class="flex gap-2">
+                                <button @click="pausarVenta()" :disabled="carrito.length === 0"
+                                    class="flex-1 rounded-xl border-2 border-amber-400 py-3 text-sm font-bold text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.97]">
+                                    ⏸ Pausar
+                                </button>
+                                <button @click="limpiarCarrito()" :disabled="carrito.length === 0"
+                                    class="flex-1 rounded-xl border-2 border-red-300 py-3 text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.97]">
+                                    ✕ Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
+                    {{-- Botones de acción — modo desktop: originales --}}
+                    <template x-if="!touchMode">
+                        <div class="flex gap-2 pt-1">
+                            <button @click="pausarVenta()" :disabled="carrito.length === 0"
+                                class="flex-1 rounded-lg border border-amber-400 py-2.5 text-xs font-semibold text-amber-600 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                                Pausar
+                            </button>
+                            <button @click="abrirPago()" :disabled="carrito.length === 0"
+                                class="flex-2 flex-1 rounded-lg bg-brand-500 py-2.5 text-sm font-bold text-white hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center justify-center gap-1.5">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                                Cobrar $<span x-text="total.toFixed(2)"></span>
+                            </button>
+                        </div>
+                    </template>
                 </div>
             </div>
         </div>
@@ -307,7 +372,7 @@
     {{-- ============================================================
      MODAL PAGO
 ============================================================ --}}
-    <div x-data x-show="$store.posModal.open" x-cloak
+    <div x-data x-show="$store.posModal.open" x-cloak style="display:none;"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
         <div @click.stop class="relative w-full max-w-lg rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl overflow-hidden"
             x-show="$store.posModal.open" x-transition:enter="transition ease-out duration-200"
@@ -471,7 +536,7 @@
     </div>
 
     {{-- Modal Ventas en Espera --}}
-    <div x-data x-show="$store.posEspera.open" x-cloak
+    <div x-data x-show="$store.posEspera.open" x-cloak style="display:none;"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
         <div class="w-full max-w-md rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl overflow-hidden" @click.stop>
             <div class="flex items-center justify-between p-5 border-b border-gray-200 dark:border-neutral-800">
@@ -571,8 +636,18 @@
                 categoriaFiltro: '',
                 carrito: [],
                 clienteId: null,
+                touchMode: false,
 
                 init() {
+                    // ─── Cargar preferencia de Modo Táctil desde localStorage ───
+                    const savedTouchMode = localStorage.getItem('wavepos_touch_mode');
+                    if (savedTouchMode !== null) {
+                        this.touchMode = savedTouchMode === '1';
+                    } else {
+                        // Si no hay preferencia local, usar la configuración global de la BD
+                        this.touchMode = {{ \App\Models\Setting::get('pos_modo_tactil', '0') == '1' ? 'true' : 'false' }};
+                    }
+
                     // Auto-focus search input
                     if (POS_AUTOFOCUS) {
                         this.$nextTick(() => {
@@ -589,6 +664,11 @@
                             return evento.returnValue;
                         }
                     });
+                },
+
+                toggleTouchMode() {
+                    this.touchMode = !this.touchMode;
+                    localStorage.setItem('wavepos_touch_mode', this.touchMode ? '1' : '0');
                 },
 
                 get subtotal() {

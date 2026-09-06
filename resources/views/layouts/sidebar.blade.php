@@ -43,6 +43,15 @@
 
     // Top-level "menu" items (Dashboard, Profile)
     $mainItems = MenuHelper::filterMenuItems(MenuHelper::getMainNavItems());
+
+    // Determine active group server-side to prevent submenu flash/flicker on navigation
+    $activeGroupIndex = null;
+    foreach ($navGroups as $gi => $group) {
+        if (collect($group['items'])->contains(fn($i) => request()->is(ltrim($i['path'],'/')) || request()->is(ltrim($i['path'],'/').'/*'))) {
+            $activeGroupIndex = $gi;
+            break;
+        }
+    }
 @endphp
 
 {{-- ==========  OVERLAY (Mobile)  ========== --}}
@@ -66,7 +75,7 @@
     }"
     style="will-change: transform;"
     x-data="{
-        openGroup: null,
+        openGroup: {{ $activeGroupIndex !== null ? $activeGroupIndex : 'null' }},
         isActive(path) {
             return window.location.pathname === path
                 || window.location.pathname.startsWith(path + '/');
@@ -75,14 +84,15 @@
             return items.some(i => this.isActive(i.path));
         },
         init() {
-            {{-- Auto-open group that contains the active link --}}
-            @foreach($navGroups as $gi => $group)
-                @if(count($group['items']))
-                    if (this.currentGroupContains({{ json_encode(collect($group['items'])->map(fn($i) => ['path' => $i['path']])->values()) }})) {
-                        this.openGroup = {{ $gi }};
-                    }
-                @endif
-            @endforeach
+            if (this.openGroup === null) {
+                @foreach($navGroups as $gi => $group)
+                    @if(count($group['items']))
+                        if (this.currentGroupContains({{ json_encode(collect($group['items'])->map(fn($i) => ['path' => $i['path']])->values()) }})) {
+                            this.openGroup = {{ $gi }};
+                        }
+                    @endif
+                @endforeach
+            }
         }
     }"
 >
@@ -188,7 +198,7 @@
                             :class="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen ? 'opacity-100 max-w-[130px]' : 'opacity-0 max-w-0 absolute'"
                         >{{ $group['label'] }}</span>
                         <svg
-                            class="ml-auto h-3.5 w-3.5 shrink-0 transition-transform duration-200"
+                            class="ml-auto h-3.5 w-3.5 shrink-0 transition-transform duration-200 {{ $activeGroupIndex === $gi ? 'rotate-90' : '' }}"
                             :class="{
                                 'rotate-90' : openGroup === {{ $gi }},
                                 'hidden'    : !($store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen)
@@ -209,7 +219,7 @@
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 -translate-y-1"
                         class="mt-0.5 ml-4 pl-2 border-l border-neutral-200 dark:border-neutral-800 space-y-0.5"
-                        style="display:none;"
+                        style="{{ $activeGroupIndex === $gi ? '' : 'display:none;' }}"
                     >
                         @foreach($group['items'] as $item)
                             <a

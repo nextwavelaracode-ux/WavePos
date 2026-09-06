@@ -2,81 +2,80 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Setting;
+use Illuminate\Database\Seeder;
 
 class SettingsSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        $settings = [
-            // ── POS ────────────────────────────────────────────────
-            ['group' => 'pos', 'key' => 'pos_ventas_credito',          'value' => '0'],
-            ['group' => 'pos', 'key' => 'pos_ventas_sin_cliente',       'value' => '1'],
-            ['group' => 'pos', 'key' => 'pos_producto_generico_id',     'value' => ''],
-            ['group' => 'pos', 'key' => 'pos_expiracion_espera_min',    'value' => '60'],
-            ['group' => 'pos', 'key' => 'pos_confirmacion_venta',       'value' => '1'],
-            ['group' => 'pos', 'key' => 'pos_modo_tactil',              'value' => '0'],
-            ['group' => 'pos', 'key' => 'pos_venta_rapida',             'value' => '0'],
-            ['group' => 'pos', 'key' => 'pos_autofocus_buscador',       'value' => '1'],
+        $defaults = [
+            // POS
+            'pos_ventas_credito' => '0',
+            'pos_ventas_sin_cliente' => '1',
+            'pos_confirmacion_venta' => '1',
+            'pos_modo_tactil' => '0',
+            'pos_venta_rapida' => '0',
+            'pos_autofocus_buscador' => '1',
+            'pos_expiracion_espera_min' => '60',
 
-            // ── CAJA ───────────────────────────────────────────────
-            ['group' => 'caja', 'key' => 'caja_monto_minimo_apertura',  'value' => '0'],
-            ['group' => 'caja', 'key' => 'caja_multiples_cajas',        'value' => '0'],
-            ['group' => 'caja', 'key' => 'caja_arqueo_obligatorio',     'value' => '1'],
-            ['group' => 'caja', 'key' => 'caja_permitir_diferencias',   'value' => '1'],
+            // Caja
+            'caja_multiples_cajas' => '0',
+            'caja_arqueo_obligatorio' => '1',
+            'caja_permitir_diferencias' => '0',
+            'caja_monto_minimo_apertura' => '0',
 
-            // ── IMPUESTOS ──────────────────────────────────────────
-            ['group' => 'impuestos', 'key' => 'itbms_tasa_default',     'value' => '7'],
-            ['group' => 'impuestos', 'key' => 'itbms_tasas_activas',    'value' => '0,7,10,15'],
+            // Inventario
+            'inv_unidad_default' => 'unidad',
+            'inv_stock_negativo' => '0',
+            'inv_alertas_minimo' => '1',
+            'inv_lotes' => '0',
 
-            // ── INVENTARIO ─────────────────────────────────────────
-            ['group' => 'inventario', 'key' => 'inv_stock_negativo',    'value' => '0'],
-            ['group' => 'inventario', 'key' => 'inv_alertas_minimo',    'value' => '1'],
-            ['group' => 'inventario', 'key' => 'inv_unidad_default',    'value' => 'unidad'],
-            ['group' => 'inventario', 'key' => 'inv_lotes',             'value' => '0'],
+            // Compras
+            'compras_credito' => '0',
+            'compras_prefijo' => 'CMP-',
+            'compras_dias_vencimiento' => '30',
 
-            // ── COMPRAS ────────────────────────────────────────────
-            ['group' => 'compras', 'key' => 'compras_credito',          'value' => '1'],
-            ['group' => 'compras', 'key' => 'compras_dias_vencimiento', 'value' => '30'],
-            ['group' => 'compras', 'key' => 'compras_prefijo',          'value' => 'CMP-'],
+            // Ventas
+            'ventas_descuentos' => '1',
+            'ventas_cliente_obligatorio' => '0',
+            'ventas_prefijo' => 'VTA-',
+            'ventas_limite_descuento' => '30',
 
-            // ── VENTAS ─────────────────────────────────────────────
-            ['group' => 'ventas', 'key' => 'ventas_prefijo',            'value' => 'VTA-'],
-            ['group' => 'ventas', 'key' => 'ventas_descuentos',         'value' => '1'],
-            ['group' => 'ventas', 'key' => 'ventas_limite_descuento',   'value' => '30'],
-            ['group' => 'ventas', 'key' => 'ventas_cliente_obligatorio','value' => '0'],
+            // Clientes
+            'clientes_ruc_obligatorio' => '0',
+            'clientes_limite_credito' => '500',
+            'clientes_tipos' => 'regular,vip,mayorista',
 
-            // ── CLIENTES ───────────────────────────────────────────
-            ['group' => 'clientes', 'key' => 'clientes_limite_credito', 'value' => '500'],
-            ['group' => 'clientes', 'key' => 'clientes_ruc_obligatorio','value' => '0'],
-            ['group' => 'clientes', 'key' => 'clientes_tipos',          'value' => 'regular,vip,mayorista'],
+            // Pagos
+            'pago_efectivo' => '1',
+            'pago_tarjeta' => '1',
+            'pago_transferencia' => '1',
+            'pago_yappy' => '0',
+            'pago_referencia_tarjeta' => '1',
+            'pago_referencia_transferencia' => '1',
 
-            // ── PAGOS ──────────────────────────────────────────────
-            ['group' => 'pagos', 'key' => 'pago_efectivo',              'value' => '1'],
-            ['group' => 'pagos', 'key' => 'pago_tarjeta',               'value' => '1'],
-            ['group' => 'pagos', 'key' => 'pago_transferencia',         'value' => '1'],
-            ['group' => 'pagos', 'key' => 'pago_yappy',                 'value' => '1'],
-            ['group' => 'pagos', 'key' => 'pago_referencia_tarjeta',    'value' => '0'],
-            ['group' => 'pagos', 'key' => 'pago_referencia_transferencia','value' => '1'],
+            // Seguridad
+            'seg_bloqueo_auto' => '1',
+            'seg_auditoria' => '1',
+            'seg_timeout_sesion_min' => '120',
+            'seg_intentos_fallidos' => '5',
 
-            // ── SEGURIDAD ──────────────────────────────────────────
-            ['group' => 'seguridad', 'key' => 'seg_timeout_sesion_min', 'value' => '120'],
-            ['group' => 'seguridad', 'key' => 'seg_intentos_fallidos',  'value' => '5'],
-            ['group' => 'seguridad', 'key' => 'seg_bloqueo_auto',       'value' => '1'],
-            ['group' => 'seguridad', 'key' => 'seg_auditoria',          'value' => '1'],
+            // Reportes
+            'rep_formato_papel' => 'A4',
+            'rep_logo_en_pdf' => '1',
+            'rep_datos_fiscales' => '1',
 
-            // ── REPORTES ──────────────────────────────────────────
-            ['group' => 'reportes', 'key' => 'rep_logo_en_pdf',         'value' => '1'],
-            ['group' => 'reportes', 'key' => 'rep_datos_fiscales',      'value' => '1'],
-            ['group' => 'reportes', 'key' => 'rep_formato_papel',       'value' => 'A4'],
+            // Impuestos
+            'itbms_tasa_default' => '7',
+            'itbms_tasas_activas' => '0,7,10,15',
         ];
 
-        foreach ($settings as $setting) {
-            Setting::updateOrCreate(
-                ['key' => $setting['key']],
-                ['group' => $setting['group'], 'value' => $setting['value']]
-            );
+        foreach ($defaults as $key => $value) {
+            Setting::set($key, $value);
         }
     }
 }

@@ -39,7 +39,7 @@
                         <path d="M128 192l128 128 128-128z"/>
                     </svg>
                 </button>
-                <div x-show="open" @click.outside="open = false"
+                <div x-show="open" x-cloak style="display:none;" @click.outside="open = false"
                      x-transition:enter="transition ease-out duration-150"
                      x-transition:enter-start="opacity-0 scale-95"
                      x-transition:enter-end="opacity-100 scale-100"

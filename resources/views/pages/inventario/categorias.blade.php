@@ -90,7 +90,7 @@
                         </svg>
                     </button>
 
-                    <div x-show="openExport" @click.outside="openExport = false"
+                    <div x-show="openExport" x-cloak style="display:none;" @click.outside="openExport = false"
                         class="absolute right-0 mt-2 w-48 rounded-xl border border-gray-200 bg-white py-2 shadow-lg dark:border-neutral-700 dark:bg-neutral-800 z-50">
                         <a href="{{ route('inventario.categorias.exportar', 'excel') }}"
                             class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/[0.03]">
@@ -324,7 +324,7 @@
         </div>
 
         {{-- ===== MODAL CREAR ===== --}}
-        <div x-show="showCreate" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+        <div x-show="showCreate" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
             class="fixed inset-0 z-[99999] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm"
@@ -492,7 +492,7 @@
 
 
         {{-- ===== MODAL EDITAR ===== --}}
-        <div x-show="showEdit" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+        <div x-show="showEdit" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
             class="fixed inset-0 z-[99999] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm"
@@ -656,7 +656,7 @@
         </div>
 
         {{-- ===== MODAL CREAR SUBCATEGORÍA ===== --}}
-        <div x-show="showCreateSub" x-transition:enter="transition ease-out duration-200"
+        <div x-show="showCreateSub" x-cloak x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
@@ -778,7 +778,7 @@
         </div>
 
         {{-- ===== MODAL IMPORTAR ===== --}}
-        <div x-show="showImport" x-transition:enter="transition ease-out duration-200"
+        <div x-show="showImport" x-cloak x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"

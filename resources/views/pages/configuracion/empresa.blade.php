@@ -5,10 +5,10 @@
 
 
 
-<div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-800/20 lg:p-6">
+<div x-data="empresaConfig" class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-800/20 lg:p-6">
     <h3 class="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">Datos de la Empresa</h3>
 
-    <form action="{{ route('configuracion.empresa.update') }}" method="POST" enctype="multipart/form-data">
+    <form @submit.prevent="guardarEmpresa" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -141,7 +141,7 @@
                                 Prefijo Facturas
                             </label>
                             <input type="text" name="prefijo_factura"
-                                value="{{ old('prefijo_factura', $empresa->prefijo_factura ?? 'FACT-') }}"
+                                x-model="prefijo_factura"
                                 class="h-11 w-full rounded-lg border border-gray-300 bg-white dark:border-neutral-600 dark:bg-neutral-800 px-4 py-2.5 text-sm font-mono text-gray-800 dark:text-white/90 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
                                 placeholder="FACT-">
                             <p class="mt-1 text-xs text-gray-400">Ej: FACT-, FACV-, INV-</p>
@@ -153,7 +153,7 @@
                                 Prefijo Compras
                             </label>
                             <input type="text" name="prefijo_compra"
-                                value="{{ old('prefijo_compra', $empresa->prefijo_compra ?? 'COMP-') }}"
+                                x-model="prefijo_compra"
                                 class="h-11 w-full rounded-lg border border-gray-300 bg-white dark:border-neutral-600 dark:bg-neutral-800 px-4 py-2.5 text-sm font-mono text-gray-800 dark:text-white/90 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20"
                                 placeholder="COMP-">
                             <p class="mt-1 text-xs text-gray-400">Ej: COMP-, ORD-, PO-</p>
@@ -165,9 +165,9 @@
                                 Último Nº Factura
                             </label>
                             <input type="number" min="0" name="ultimo_numero_factura"
-                                value="{{ old('ultimo_numero_factura', $empresa->ultimo_numero_factura ?? 0) }}"
+                                x-model.number="ultimo_numero_factura"
                                 class="h-11 w-full rounded-lg border border-gray-300 bg-white dark:border-neutral-600 dark:bg-neutral-800 px-4 py-2.5 text-sm font-mono text-gray-800 dark:text-white/90 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20">
-                            <p class="mt-1 text-xs text-gray-400">Próximo: <span class="font-bold text-amber-600">{{ ($empresa->prefijo_factura ?? 'FACT-') . str_pad(($empresa->ultimo_numero_factura ?? 0) + 1, $empresa->digitos_correlativo ?? 5, '0', STR_PAD_LEFT) }}</span></p>
+                            <p class="mt-1 text-xs text-gray-400">Próximo: <span class="font-bold text-amber-600" x-text="previewFactura"></span></p>
                         </div>
 
                         {{-- Último número compra --}}
@@ -176,9 +176,9 @@
                                 Último Nº Compra
                             </label>
                             <input type="number" min="0" name="ultimo_numero_compra"
-                                value="{{ old('ultimo_numero_compra', $empresa->ultimo_numero_compra ?? 0) }}"
+                                x-model.number="ultimo_numero_compra"
                                 class="h-11 w-full rounded-lg border border-gray-300 bg-white dark:border-neutral-600 dark:bg-neutral-800 px-4 py-2.5 text-sm font-mono text-gray-800 dark:text-white/90 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20">
-                            <p class="mt-1 text-xs text-gray-400">Próximo: <span class="font-bold text-amber-600">{{ ($empresa->prefijo_compra ?? 'COMP-') . str_pad(($empresa->ultimo_numero_compra ?? 0) + 1, $empresa->digitos_correlativo ?? 5, '0', STR_PAD_LEFT) }}</span></p>
+                            <p class="mt-1 text-xs text-gray-400">Próximo: <span class="font-bold text-amber-600" x-text="previewCompra"></span></p>
                         </div>
 
                         {{-- Dígitos del correlativo --}}
@@ -186,7 +186,7 @@
                             <label class="mb-1.5 block text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 Dígitos Correlativo
                             </label>
-                            <select name="digitos_correlativo"
+                            <select name="digitos_correlativo" x-model.number="digitos_correlativo"
                                 class="h-11 w-full rounded-lg border border-gray-300 bg-white dark:border-neutral-600 dark:bg-neutral-800 px-4 py-2.5 text-sm text-gray-800 dark:text-white/90 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20">
                                 @foreach([3, 4, 5, 6, 7, 8] as $d)
                                     <option value="{{ $d }}" {{ ($empresa->digitos_correlativo ?? 5) == $d ? 'selected' : '' }}>
@@ -203,15 +203,11 @@
                     <div class="mt-4 p-3 rounded-xl bg-white dark:bg-neutral-800 border border-amber-200 dark:border-amber-800/30 flex flex-wrap gap-6 text-sm">
                         <div>
                             <span class="text-gray-400 text-xs uppercase tracking-wider block mb-0.5">Ejemplo Factura</span>
-                            <span class="font-mono font-bold text-brand-600 dark:text-brand-400">
-                                {{ ($empresa->prefijo_factura ?? 'FACT-') . str_pad(($empresa->ultimo_numero_factura ?? 0) + 1, $empresa->digitos_correlativo ?? 5, '0', STR_PAD_LEFT) }}
-                            </span>
+                            <span class="font-mono font-bold text-brand-600 dark:text-brand-400" x-text="previewFactura"></span>
                         </div>
                         <div>
                             <span class="text-gray-400 text-xs uppercase tracking-wider block mb-0.5">Ejemplo Compra</span>
-                            <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                                {{ ($empresa->prefijo_compra ?? 'COMP-') . str_pad(($empresa->ultimo_numero_compra ?? 0) + 1, $empresa->digitos_correlativo ?? 5, '0', STR_PAD_LEFT) }}
-                            </span>
+                            <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400" x-text="previewCompra"></span>
                         </div>
                         <div class="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -239,6 +235,57 @@
 
 @push('scripts')
 <script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('empresaConfig', () => ({
+        guardando: false,
+        prefijo_factura: '{{ $empresa->prefijo_factura ?? 'FACT-' }}',
+        prefijo_compra: '{{ $empresa->prefijo_compra ?? 'COMP-' }}',
+        ultimo_numero_factura: {{ $empresa->ultimo_numero_factura ?? 0 }},
+        ultimo_numero_compra: {{ $empresa->ultimo_numero_compra ?? 0 }},
+        digitos_correlativo: {{ $empresa->digitos_correlativo ?? 5 }},
+
+        get previewFactura() {
+            let next = (parseInt(this.ultimo_numero_factura) || 0) + 1;
+            return this.prefijo_factura + String(next).padStart(this.digitos_correlativo, '0');
+        },
+        get previewCompra() {
+            let next = (parseInt(this.ultimo_numero_compra) || 0) + 1;
+            return this.prefijo_compra + String(next).padStart(this.digitos_correlativo, '0');
+        },
+
+        guardarEmpresa(e) {
+            this.guardando = true;
+            const form = e.target;
+            const formData = new FormData(form);
+
+            fetch('{{ route('configuracion.empresa.update') }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    // Muestra el Toast (igual que en sistema)
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed bottom-5 right-5 bg-brand-500 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-y-0 opacity-100 flex items-center gap-2 z-50';
+                    toast.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> ${data.message}`;
+                    document.body.appendChild(toast);
+                    setTimeout(() => {
+                        toast.classList.add('translate-y-10', 'opacity-0');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                }
+            })
+            .catch(error => console.error('Error:', error))
+            .finally(() => {
+                this.guardando = false;
+            });
+        }
+    }));
+});
     // Preview logo before upload
     document.getElementById('logo-input').addEventListener('change', function(e) {
         const file = e.target.files[0];

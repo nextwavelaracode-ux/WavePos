@@ -27,6 +27,7 @@
         <!-- Notification Badge -->
         <span
             x-show="notifying"
+            style="display:none;"
             class="absolute right-0 top-0.5 z-1 h-2 w-2 rounded-full bg-orange-400"
         >
             <span
