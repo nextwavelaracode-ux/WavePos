@@ -1,5 +1,6 @@
 import './bootstrap';
 import './notiflix.config.js';
+import 'flyonui/flyonui';
 
 import Alpine from 'alpinejs';
 import ApexCharts from 'apexcharts';
@@ -22,6 +23,9 @@ Alpine.start();
 
 // Initialize components on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
+    // FlyonUI autoInit
+    window.HSStaticMethods?.autoInit();
+
     // Map imports
     if (document.querySelector('#mapOne')) {
         import('./components/map').then(module => module.initMap());

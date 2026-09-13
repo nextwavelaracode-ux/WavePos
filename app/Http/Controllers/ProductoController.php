@@ -139,17 +139,47 @@ class ProductoController extends Controller
     public function importar(Request $request)
     {
         $request->validate([
-            'archivo' => 'required|extensions:xlsx,xls,csv|max:5120',
+            'archivo' => 'required|file|mimes:xlsx,xls,csv|max:5120',
         ]);
 
         try {
-            Excel::import(new ProductosImport, $request->file('archivo'));
+            $import = new ProductosImport;
+            Excel::import($import, $request->file('archivo'));
+
+            $importados = $import->getImportados();
+            $errores = $import->getErrores();
+
+            if (count($errores) > 0 && $importados === 0) {
+                return redirect()->route('inventario.productos')
+                    ->with('sweet_alert', [
+                        'type'    => 'error',
+                        'title'   => 'Error en importación',
+                        'message' => 'No se pudo importar ningún producto. Revisa que las columnas del archivo coincidan con la plantilla. Errores: ' . implode(' | ', array_slice($errores, 0, 3)),
+                    ]);
+            }
+
+            $msg = "{$importados} productos importados correctamente.";
+            if (count($errores) > 0) {
+                $msg .= ' ' . count($errores) . ' filas con errores fueron omitidas.';
+            }
 
             return redirect()->route('inventario.productos')
                 ->with('sweet_alert', [
                     'type'    => 'success',
                     'title'   => '¡Importación exitosa!',
-                    'message' => 'Los productos han sido cargados correctamente.',
+                    'message' => $msg,
+                ]);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $msgs = [];
+            foreach (array_slice($failures, 0, 5) as $failure) {
+                $msgs[] = 'Fila ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+            return redirect()->route('inventario.productos')
+                ->with('sweet_alert', [
+                    'type'    => 'error',
+                    'title'   => 'Errores de validación',
+                    'message' => implode(' | ', $msgs),
                 ]);
         } catch (\Exception $e) {
             return redirect()->route('inventario.productos')
@@ -164,28 +194,51 @@ class ProductoController extends Controller
     public function plantilla()
     {
         $headers = [
-            'nombre',
-            'sku',
-            'codigo_barras',
-            'categoria',
-            'subcategoria',
-            'precio_compra',
-            'precio_venta',
-            'precio_minimo',
-            'impuesto',
-            'stock',
-            'stock_minimo',
-            'unidad_medida',
-            'ubicacion',
-            'estado'
+            'Nombre',
+            'SKU',
+            'Código Barras',
+            'Categoría',
+            'Subcategoría',
+            'Precio Compra',
+            'Precio Venta',
+            'Precio Mínimo',
+            'Margen %',
+            'Impuesto %',
+            'Stock',
+            'Stock Mínimo',
+            'Stock Máximo',
+            'Unidad Medida',
+            'Ubicación',
+            'Estado',
         ];
 
-        $callback = function() use ($headers) {
+        // Fila de ejemplo para guiar al usuario
+        $ejemplo = [
+            'Lata de Soda',
+            'BEB-001',
+            '7501055312152',
+            'Bebidas',
+            '',
+            '0.50',
+            '1.00',
+            '0.75',
+            '',
+            '7',
+            '100',
+            '10',
+            '500',
+            'Unidad (Und)',
+            'Pasillo 3, Estante B',
+            'Activo',
+        ];
+
+        $callback = function() use ($headers, $ejemplo) {
             $file = fopen('php://output', 'w');
             // Añadir BOM para UTF-8 para que Excel reconozca el formato y carácteres especiales
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
             // Usar punto y coma como delimitador para mejor compatibilidad con Excel en español
             fputcsv($file, $headers, ';');
+            fputcsv($file, $ejemplo, ';');
             fclose($file);
         };
 

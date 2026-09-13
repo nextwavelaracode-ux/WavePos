@@ -16,12 +16,10 @@
         .login-left {
             position: relative;
             display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 55%;
+            width: 50%;
+            height: 100vh;
             overflow: hidden;
-            padding: 48px;
+            background-color: #03173d;
         }
 
         @media (min-width: 1024px) {
@@ -30,174 +28,12 @@
             }
         }
 
-        .login-bg {
-            position: absolute;
-            inset: 0;
-            background-image: url('/images/login/fondo-2.svg');
-            /* Imagen de fondo */
-            background-size: cover;
-            background-position: center top;
-            background-repeat: no-repeat;
-        }
-
-        .login-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(160deg,
-                    rgba(10, 17, 40, 0.92) 0%,
-                    rgba(30, 58, 95, 0.88) 35%,
-                    rgba(80, 158, 189, 0.82) 70%,
-                    rgba(0, 191, 255, 0.75) 100%);
-        }
-
-        .login-grid {
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
-        .glow-circle-1 {
-            position: absolute;
-            top: -80px;
-            left: -80px;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(167, 139, 250, 0.15) 0%, transparent 70%);
-            filter: blur(40px);
-            pointer-events: none;
-        }
-
-        .glow-circle-2 {
-            position: absolute;
-            bottom: 40px;
-            right: -60px;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
-            filter: blur(50px);
-            pointer-events: none;
-        }
-
-        .login-left-content {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            max-width: 100%;
+        .login-left-img {
             width: 100%;
-            padding: 0 20px;
-        }
-
-        .welcome-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 24px;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-            letter-spacing: -0.5px;
-        }
-
-        .welcome-title span {
-            background: linear-gradient(135deg, #a78bfa 0%, #2dd4bf 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .mascot-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 24px;
-        }
-
-        .mascot-container img {
-            width: 280px;
-            height: auto;
-            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.4));
-        }
-
-        .pos-description {
-            font-size: 15px;
-            color: rgba(255, 255, 255, 0.85);
-            line-height: 1.7;
-            font-weight: 400;
-            max-width: 500px;
-            margin-bottom: 28px;
-        }
-
-        .pos-features {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-        }
-
-        .pos-feature {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .pos-feature-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .pos-feature h4 {
-            font-size: 14px;
-            font-weight: 700;
-            color: #ffffff;
-            margin: 0 0 2px;
-            text-align: left;
-        }
-
-        .pos-feature p {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            margin: 0;
-            text-align: left;
-        }
-
-        .pos-stats {
-            display: flex;
-            justify-content: center;
-            gap: 48px;
-        }
-
-        .pos-stat {
-            text-align: center;
-        }
-
-        .pos-stat-value {
-            font-size: 26px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f0edf9ff 0%, #ffffffff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .pos-stat-label {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.6);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 4px;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
         }
 
         /* ===================== RIGHT PANEL ===================== */
@@ -272,8 +108,32 @@
             margin-bottom: 24px;
         }
 
-        .form-logo-row img {
-            height: 38px;
+        .form-logo-icon {
+            height: 40px;
+            width: 40px;
+            object-fit: contain;
+            flex-shrink: 0;
+            filter: drop-shadow(0 4px 10px rgba(2, 132, 199, 0.25));
+        }
+
+        .form-logo-text {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: -0.8px;
+            color: #0f172a;
+            line-height: 1;
+        }
+
+        .dark .form-logo-text {
+            color: #ffffff;
+        }
+
+        .form-logo-accent {
+            color: #0284c7;
+        }
+
+        .dark .form-logo-accent {
+            color: #38bdf8;
         }
 
         .form-divider-v {
@@ -637,69 +497,7 @@
 
         {{-- ==================== LEFT PANEL ==================== --}}
         <div class="login-left">
-            {{-- Background image --}}
-            <div class="login-bg"></div>
-            {{-- Overlay --}}
-            <div class="login-overlay"></div>
-            {{-- Grid --}}
-            <div class="login-grid"></div>
-            {{-- Ambient glows --}}
-            <div class="glow-circle-1"></div>
-            <div class="glow-circle-2"></div>
-
-            <div class="login-left-content">
-                <h1 class="welcome-title">Bienvenido a <span>WAVEPOS</span></h1>
-
-                <div class="mascot-container">
-                    <img src="/images/login/mascota-2.png" alt="Mascota WavePOS">
-                </div>
-
-                <p class="pos-description">
-                    Sistema integral de punto de venta para gestionar ventas, inventario,
-                    clientes y reportes en una sola plataforma moderna y eficiente.
-                </p>
-
-                <div class="pos-features">
-                    <div class="pos-feature">
-                        <div class="pos-feature-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">⚡</div>
-                        <div>
-                            <h4>Ventas Rápidas</h4>
-                            <p>Transacciones ágiles y seguras</p>
-                        </div>
-                    </div>
-                    <div class="pos-feature">
-                        <div class="pos-feature-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">📦
-                        </div>
-                        <div>
-                            <h4>Inventario</h4>
-                            <p>Control de stock en tiempo real</p>
-                        </div>
-                    </div>
-                    <div class="pos-feature">
-                        <div class="pos-feature-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">📊
-                        </div>
-                        <div>
-                            <h4>Reportes</h4>
-                            <p>Análisis y métricas clave</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pos-stats">
-                    <div class="pos-stat">
-                        <div class="pos-stat-value">+500</div>
-                        <div class="pos-stat-label">Empresas</div>
-                    </div>
-                    <div class="pos-stat">
-                        <div class="pos-stat-value">99.9%</div>
-                        <div class="pos-stat-label">Disponibilidad</div>
-                    </div>
-                    <div class="pos-stat">
-                        <div class="pos-stat-value">24/7</div>
-                        <div class="pos-stat-label">Soporte</div>
-                    </div>
-                </div>
-            </div>
+            <img src="/images/login/loginimage.png" alt="WavePOS" class="login-left-img">
         </div>
 
         {{-- ==================== RIGHT PANEL ==================== --}}
@@ -734,10 +532,8 @@
                     {{-- Header --}}
                     <div class="form-header">
                         <div class="form-logo-row">
-                            {{-- Light mode: wavepos-logo-dark.svg tiene POS en azul oscuro = visible en fondo claro --}}
-                            <img src="/images/logo/wavepos-logo-dark.svg" alt="WavePOS" class="block dark:hidden">
-                            {{-- Dark mode: wavepos-logo.svg tiene POS en blanco = visible en fondo oscuro --}}
-                            <img src="/images/logo/wavepos-logo.svg" alt="WavePOS" class="hidden dark:block">
+                            <img src="/images/logo/logotipohd.png" alt="WavePOS" class="form-logo-icon">
+                            <span class="form-logo-text">Wave<span class="form-logo-accent">POS</span></span>
                             <div class="form-divider-v"></div>
                             <span class="form-product-tag">POS Empresarial<br>Panamá</span>
                         </div>

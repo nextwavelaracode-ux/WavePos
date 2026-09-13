@@ -154,11 +154,12 @@
                     <!-- ===== Common Grid Shape Start ===== -->
                     <x-common.common-grid-shape />
                     <div class="flex max-w-xs flex-col items-center">
-                        <a href="/" class="mb-4 block">
-                            <img src="./images/logo/auth-logo.svg" alt="Logo" />
+                        <a href="/" class="mb-4 flex items-center gap-3">
+                            <img src="/images/logo/logotipohd.png" alt="WavePOS" class="h-12 w-12 object-contain" />
+                            <span class="text-3xl font-black tracking-tight text-white">Wave<span class="text-blue-400">POS</span></span>
                         </a>
                         <p class="text-center text-gray-400 dark:text-white/60">
-                            Free and Open-Source Tailwind CSS Admin Dashboard Template
+                            Sistema integral de punto de venta para tu negocio
                         </p>
                     </div>
                 </div>

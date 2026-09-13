@@ -7,6 +7,8 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@iconify-json/tabler": "^1.2.38",
+        "@iconify/tailwind4": "^1.2.3",
         "@tailwindcss/vite": "^4.1.12",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
@@ -25,6 +27,7 @@
         "alpinejs": "^3.14.9",
         "apexcharts": "^5.3.5",
         "flatpickr": "^4.6.13",
+        "flyonui": "^2.4.1",
         "jsvectormap": "^1.7.0",
         "notiflix": "^3.2.8",
         "prismjs": "^1.30.0",

@@ -2,15 +2,11 @@
   <nav class="px-4 lg:px-6 py-2.5">
       <div class="flex flex-wrap justify-between items-center">
           <div class="flex justify-start items-center">
-              <button @click="$store.sidebar.toggleExpanded(); $store.sidebar.setMobileOpen($store.sidebar.isExpanded)" aria-expanded="true" aria-controls="sidebar" class="hidden p-2 mr-3 text-neutral-600 rounded cursor-pointer lg:inline hover:text-neutral-900 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-neutral-800 transition-colors">
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12"> <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h14M1 6h14M1 11h7"/> </svg>
-              </button>
-              <button @click="$store.sidebar.setMobileOpen(true)" aria-expanded="true" aria-controls="sidebar" class="p-2 mr-2 text-neutral-600 rounded-lg cursor-pointer lg:hidden hover:text-neutral-900 hover:bg-neutral-100 focus:bg-neutral-100 dark:focus:bg-neutral-800 focus:ring-2 focus:ring-neutral-100 dark:focus:ring-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white transition-colors">
-                <svg class="w-[18px] h-[18px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/></svg>
-                <span class="sr-only">Toggle sidebar</span>
+              <button type="button" class="btn btn-text btn-square mr-2 text-base-content" aria-haspopup="dialog" aria-expanded="false" aria-controls="collapsible-sidebar" data-overlay="#collapsible-sidebar">
+                <span class="icon-[tabler--menu-2] size-5"></span>
               </button>
               <a href="/" class="flex mr-4">
-                <img src="/images/logo/wavepos-icon.svg" class="mr-3 h-8" alt="WavePOS Logo" />
+                <img src="/images/logo/logotipohd.png" class="mr-3 h-8 w-8 object-contain" alt="WavePOS Logo" />
                 <span class="self-center hidden sm:block text-2xl font-semibold whitespace-nowrap dark:text-white text-brand-600">WavePOS</span>
               </a>
               <form action="#" method="GET" class="hidden lg:block lg:pl-2">

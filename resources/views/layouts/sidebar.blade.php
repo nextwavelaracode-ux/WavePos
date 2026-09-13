@@ -1,299 +1,299 @@
 @php
     use App\Helpers\MenuHelper;
-    $currentPath = request()->path();
 
-    $navGroups = [
-        [
-            'label'  => 'Caja & Ventas',
-            'icon'   => 'pos',
-            'items'  => MenuHelper::filterMenuItems(MenuHelper::getCajaNavItems()),
-        ],
-        [
-            'label'  => 'Inventario',
-            'icon'   => 'productos',
-            'items'  => MenuHelper::filterMenuItems(MenuHelper::getInventarioNavItems()),
-        ],
-        [
-            'label'  => 'Compras & Gastos',
-            'icon'   => 'compras',
-            'items'  => MenuHelper::filterMenuItems(array_merge(
-                MenuHelper::getComprasNavItems(),
-                MenuHelper::getGastosNavItems()
-            )),
-        ],
-        [
-            'label'  => 'Facturación DIAN',
-            'icon'   => 'facturacion',
-            'items'  => MenuHelper::filterMenuItems(MenuHelper::getFacturacionNavItems()),
-        ],
-        [
-            'label'  => 'Clientes',
-            'icon'   => 'clientes',
-            'items'  => MenuHelper::filterMenuItems(MenuHelper::getClientesNavItems()),
-        ],
-        [
-            'label'  => 'Configuración',
-            'icon'   => 'configuracion-sistema',
-            'items'  => MenuHelper::filterMenuItems(MenuHelper::getPosNavItems()),
-        ],
-    ];
-
-    // Remove groups with 0 items
-    $navGroups = array_values(array_filter($navGroups, fn($g) => count($g['items']) > 0));
-
-    // Top-level "menu" items (Dashboard, Profile)
-    $mainItems = MenuHelper::filterMenuItems(MenuHelper::getMainNavItems());
-
-    // Determine active group server-side to prevent submenu flash/flicker on navigation
-    $activeGroupIndex = null;
-    foreach ($navGroups as $gi => $group) {
-        if (collect($group['items'])->contains(fn($i) => request()->is(ltrim($i['path'],'/')) || request()->is(ltrim($i['path'],'/').'/*'))) {
-            $activeGroupIndex = $gi;
-            break;
-        }
-    }
+    // Determine active section server-side
+    $isHomeActive = request()->is('/') || request()->is('finanzas*');
+    $isCajaActive = request()->is('caja*') || request()->is('cuentas-por-cobrar*');
+    $isInvActive = request()->is('inventario*');
+    $isComprasActive = request()->is('compras*') || request()->is('cuentas-por-pagar*') || request()->is('gastos*');
+    $isFacturacionActive = request()->is('facturacion*');
+    $isClientesActive = request()->is('clientes*');
+    $isConfigActive = request()->is('configuracion*');
+    $isProfileActive = request()->is('profile*');
 @endphp
 
-{{-- ==========  OVERLAY (Mobile)  ========== --}}
-<div
-    x-show="$store.sidebar.isMobileOpen"
-    @click="$store.sidebar.setMobileOpen(false)"
-    class="fixed inset-0 z-[998] bg-black/40 backdrop-blur-sm lg:hidden"
-    style="display:none;"
-></div>
-
-{{-- ==========  SIDEBAR  ========== --}}
-<aside
-    id="sidebar"
-    class="fixed top-0 left-0 h-screen w-[260px] z-[999] flex flex-col
-           bg-neutral-50 dark:bg-neutral-900
-           border-r border-neutral-200 dark:border-neutral-800
-           transition-transform duration-300 ease-in-out"
-    :class="{
-        'translate-x-0'    : $store.sidebar.isExpanded || $store.sidebar.isMobileOpen,
-        '-translate-x-full': !$store.sidebar.isExpanded && !$store.sidebar.isMobileOpen
-    }"
-    style="will-change: transform;"
-    x-data="{
-        openGroup: {{ $activeGroupIndex !== null ? $activeGroupIndex : 'null' }},
-        isActive(path) {
-            return window.location.pathname === path
-                || window.location.pathname.startsWith(path + '/');
-        },
-        currentGroupContains(items) {
-            return items.some(i => this.isActive(i.path));
-        },
-        init() {
-            if (this.openGroup === null) {
-                @foreach($navGroups as $gi => $group)
-                    @if(count($group['items']))
-                        if (this.currentGroupContains({{ json_encode(collect($group['items'])->map(fn($i) => ['path' => $i['path']])->values()) }})) {
-                            this.openGroup = {{ $gi }};
-                        }
-                    @endif
-                @endforeach
-            }
-        }
-    }"
->
-
-    {{-- ── HEADER (Logo) ──────────────────────────────────────── --}}
-    <div class="flex h-14 shrink-0 items-center px-4 border-b border-neutral-200 dark:border-neutral-800">
-        <a href="/" class="flex items-center gap-2.5 overflow-hidden min-w-0">
-            <img src="/images/logo/wavepos-icon.svg" alt="WavePOS" class="h-8 w-8 shrink-0"/>
-            <span class="font-semibold text-sm text-neutral-900 dark:text-white whitespace-nowrap">WavePOS</span>
-        </a>
+<aside id="collapsible-sidebar" class="overlay [--body-scroll:true] border-base-content/20 overlay-open:translate-x-0 drawer drawer-start sm:overlay-layout-open:translate-x-0 hidden w-64 border-e [--auto-close:sm] [--is-layout-affect:true] [--opened:lg] fixed sm:fixed top-0 start-0 h-screen z-[998] sm:flex sm:shadow-none lg:[--overlay-backdrop:false]" role="dialog" tabindex="-1">
+  <div class="drawer-body px-2 pt-4 flex flex-col h-full">
+    
+    {{-- Brand Logo / Header --}}
+    <div class="flex items-center gap-2.5 px-3 pb-3 mb-2 border-b border-base-content/10">
+      <img src="/images/logo/logotipohd.png" alt="WavePOS" class="h-8 w-8 shrink-0 object-contain" />
+      <span class="font-bold text-lg text-base-content tracking-tight">WavePOS</span>
     </div>
 
-    {{-- ── NAVIGATION ──────────────────────────────────────────── --}}
-    <nav class="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 space-y-0.5 no-scrollbar text-neutral-700 dark:text-neutral-200">
-
-        {{-- Top-level items (Dashboard, Profile) --}}
-        @foreach($mainItems as $item)
-            @if(isset($item['subItems']))
-                {{-- Dashboard with sub-items → render as flat items --}}
-                @foreach($item['subItems'] as $sub)
-                    <a
-                        href="{{ $sub['path'] }}"
-                        title="{{ $sub['name'] }}"
-                        class="group flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-medium
-                               transition-colors relative overflow-hidden
-                               {{ request()->is(ltrim($sub['path'], '/')) || request()->is(ltrim($sub['path'], '/').'/*')
-                                    ? 'bg-primary-500/10 dark:bg-primary-500/15 text-primary-600 dark:text-primary-400'
-                                    : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200/60 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white' }}"
-                    >
-                        <span class="shrink-0 h-5 w-5 flex items-center justify-center">
-                            {!! MenuHelper::getIconSvg($item['icon']) !!}
-                        </span>
-                        <span
-                            class="truncate transition-all duration-200 whitespace-nowrap"
-                            :class="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen ? 'opacity-100 max-w-[160px]' : 'opacity-0 max-w-0 absolute'"
-                        >{{ $sub['name'] }}</span>
-                    </a>
-                @endforeach
-            @else
-                <a
-                    href="{{ $item['path'] }}"
-                    title="{{ $item['name'] }}"
-                    class="group flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-medium
-                           transition-colors relative overflow-hidden
-                           {{ request()->is(ltrim($item['path'], '/'))
-                                ? 'bg-primary-500/10 dark:bg-primary-500/15 text-primary-600 dark:text-primary-400'
-                                : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200/60 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white' }}"
-                >
-                    <span class="shrink-0 h-5 w-5 flex items-center justify-center">
-                        {!! MenuHelper::getIconSvg($item['icon']) !!}
-                    </span>
-                    <span
-                        class="truncate transition-all duration-200 whitespace-nowrap"
-                        :class="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen ? 'opacity-100 max-w-[160px]' : 'opacity-0 max-w-0 absolute'"
-                    >{{ $item['name'] }}</span>
+    {{-- Main Menu with Submenus --}}
+    <div class="flex-1 overflow-y-auto space-y-0.5 pr-1">
+      <ul class="menu accordion p-0 w-full" data-accordion-always-open>
+        
+        {{-- 1. HOME / DASHBOARD (Submenu) --}}
+        <li class="accordion-item {{ $isHomeActive ? 'active' : '' }}" id="menu-home">
+          <button type="button" class="accordion-toggle inline-flex items-center justify-between w-full" aria-controls="menu-home-collapse" aria-expanded="{{ $isHomeActive ? 'true' : 'false' }}">
+            <span class="inline-flex items-center gap-2">
+              <span class="icon-[tabler--home] size-5"></span>
+              Home
+            </span>
+            <span class="icon-[tabler--chevron-right] size-4 transition-transform duration-300 accordion-item-active:rotate-90"></span>
+          </button>
+          <div id="menu-home-collapse" class="accordion-content {{ $isHomeActive ? '' : 'hidden' }} w-full overflow-hidden transition-[height] duration-300">
+            <ul class="pt-1 ps-6 space-y-0.5">
+              <li>
+                <a href="{{ url('/') }}" class="{{ request()->is('/') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Ecommerce
                 </a>
-            @endif
-        @endforeach
+              </li>
+              <li>
+                <a href="{{ url('/finanzas') }}" class="{{ request()->is('finanzas*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Financiero
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        {{-- 2. ACCOUNT (Direct Link) --}}
+        <li>
+          <a href="{{ url('/profile') }}" class="{{ $isProfileActive ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+            <span class="icon-[tabler--user] size-5"></span>
+            Account
+          </a>
+        </li>
+
+        {{-- 3. CAJA & VENTAS (Submenu) --}}
+        <li class="accordion-item {{ $isCajaActive ? 'active' : '' }}" id="menu-caja">
+          <button type="button" class="accordion-toggle inline-flex items-center justify-between w-full" aria-controls="menu-caja-collapse" aria-expanded="{{ $isCajaActive ? 'true' : 'false' }}">
+            <span class="inline-flex items-center gap-2">
+              <span class="icon-[tabler--device-laptop] size-5"></span>
+              Caja & Ventas
+            </span>
+            <span class="icon-[tabler--chevron-right] size-4 transition-transform duration-300 accordion-item-active:rotate-90"></span>
+          </button>
+          <div id="menu-caja-collapse" class="accordion-content {{ $isCajaActive ? '' : 'hidden' }} w-full overflow-hidden transition-[height] duration-300">
+            <ul class="pt-1 ps-6 space-y-0.5">
+              <li>
+                <a href="{{ url('/caja/pos') }}" class="{{ request()->is('caja/pos*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Punto de Venta
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/caja') }}" class="{{ request()->is('caja') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Estado de Caja
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/caja/ventas/historial') }}" class="{{ request()->is('caja/ventas/historial*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Historial de Ventas
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/caja/devoluciones') }}" class="{{ request()->is('caja/devoluciones*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Devoluciones
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/caja/espera') }}" class="{{ request()->is('caja/espera*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Ventas en Espera
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/cuentas-por-cobrar') }}" class="{{ request()->is('cuentas-por-cobrar') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Cuentas por Cobrar
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/cuentas-por-cobrar/reportes/historial-pagos') }}" class="{{ request()->is('cuentas-por-cobrar/reportes*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Historial de Cobros
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        {{-- 4. PRODUCT / INVENTARIO (Submenu) --}}
+        <li class="accordion-item {{ $isInvActive ? 'active' : '' }}" id="menu-product">
+          <button type="button" class="accordion-toggle inline-flex items-center justify-between w-full" aria-controls="menu-product-collapse" aria-expanded="{{ $isInvActive ? 'true' : 'false' }}">
+            <span class="inline-flex items-center gap-2">
+              <span class="icon-[tabler--shopping-bag] size-5"></span>
+              Product
+            </span>
+            <span class="icon-[tabler--chevron-right] size-4 transition-transform duration-300 accordion-item-active:rotate-90"></span>
+          </button>
+          <div id="menu-product-collapse" class="accordion-content {{ $isInvActive ? '' : 'hidden' }} w-full overflow-hidden transition-[height] duration-300">
+            <ul class="pt-1 ps-6 space-y-0.5">
+              <li>
+                <a href="{{ url('/inventario/productos') }}" class="{{ request()->is('inventario/productos*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Productos
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/inventario/categorias') }}" class="{{ request()->is('inventario/categorias*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Categorías
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/inventario/proveedores') }}" class="{{ request()->is('inventario/proveedores*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Proveedores
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/inventario/stock') }}" class="{{ request()->is('inventario/stock*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Control de Stock
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/inventario/movimientos') }}" class="{{ request()->is('inventario/movimientos*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Movimientos
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/inventario/alertas') }}" class="{{ request()->is('inventario/alertas*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Alertas de Stock
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        {{-- 5. COMPRAS & GASTOS (Submenu) --}}
+        <li class="accordion-item {{ $isComprasActive ? 'active' : '' }}" id="menu-compras">
+          <button type="button" class="accordion-toggle inline-flex items-center justify-between w-full" aria-controls="menu-compras-collapse" aria-expanded="{{ $isComprasActive ? 'true' : 'false' }}">
+            <span class="inline-flex items-center gap-2">
+              <span class="icon-[tabler--truck] size-5"></span>
+              Compras & Gastos
+            </span>
+            <span class="icon-[tabler--chevron-right] size-4 transition-transform duration-300 accordion-item-active:rotate-90"></span>
+          </button>
+          <div id="menu-compras-collapse" class="accordion-content {{ $isComprasActive ? '' : 'hidden' }} w-full overflow-hidden transition-[height] duration-300">
+            <ul class="pt-1 ps-6 space-y-0.5">
+              <li>
+                <a href="{{ url('/compras') }}" class="{{ request()->is('compras') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Historial de Compras
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/compras/crear') }}" class="{{ request()->is('compras/crear*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Registrar Compra
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/cuentas-por-pagar') }}" class="{{ request()->is('cuentas-por-pagar*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Cuentas por Pagar
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/gastos') }}" class="{{ request()->is('gastos') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Gastos
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/gastos/categorias') }}" class="{{ request()->is('gastos/categorias*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Categorías de Gastos
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        {{-- 6. FACTURACIÓN DIAN (Direct Link) --}}
+        <li>
+          <a href="{{ url('/facturacion') }}" class="{{ $isFacturacionActive ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+            <span class="icon-[tabler--file-invoice] size-5"></span>
+            Facturación DIAN
+          </a>
+        </li>
+
+        {{-- 7. CLIENTES (Direct Link) --}}
+        <li>
+          <a href="{{ url('/clientes') }}" class="{{ $isClientesActive ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+            <span class="icon-[tabler--users] size-5"></span>
+            Clientes
+          </a>
+        </li>
+
+        {{-- 8. CONFIGURACIÓN (Submenu) --}}
+        <li class="accordion-item {{ $isConfigActive ? 'active' : '' }}" id="menu-config">
+          <button type="button" class="accordion-toggle inline-flex items-center justify-between w-full" aria-controls="menu-config-collapse" aria-expanded="{{ $isConfigActive ? 'true' : 'false' }}">
+            <span class="inline-flex items-center gap-2">
+              <span class="icon-[tabler--settings] size-5"></span>
+              Configuración
+            </span>
+            <span class="icon-[tabler--chevron-right] size-4 transition-transform duration-300 accordion-item-active:rotate-90"></span>
+          </button>
+          <div id="menu-config-collapse" class="accordion-content {{ $isConfigActive ? '' : 'hidden' }} w-full overflow-hidden transition-[height] duration-300">
+            <ul class="pt-1 ps-6 space-y-0.5">
+              <li>
+                <a href="{{ url('/configuracion/empresa') }}" class="{{ request()->is('configuracion/empresa*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Empresa
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/configuracion/sucursales') }}" class="{{ request()->is('configuracion/sucursales*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Sucursales
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/configuracion/usuarios') }}" class="{{ request()->is('configuracion/usuarios*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Usuarios
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/configuracion/roles') }}" class="{{ request()->is('configuracion/roles*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Roles y Permisos
+                </a>
+              </li>
+              <li>
+                <a href="{{ url('/configuracion/sistema') }}" class="{{ request()->is('configuracion/sistema*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Config. del Sistema
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
 
         {{-- Divider --}}
-        <div class="my-2 border-t border-neutral-200 dark:border-neutral-800"></div>
+        <div class="my-1 border-t border-base-content/10"></div>
 
-        {{-- Grouped navigation --}}
-        @foreach($navGroups as $gi => $group)
-            @if(count($group['items']) === 1)
-                {{-- Single item group → render directly --}}
-                @php $item = $group['items'][0]; @endphp
-                <a
-                    href="{{ $item['path'] }}"
-                    title="{{ $item['name'] }}"
-                    class="group flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-medium
-                           transition-colors relative overflow-hidden
-                           {{ request()->is(ltrim($item['path'], '/')) || request()->is(ltrim($item['path'],'/').'/*')
-                                ? 'bg-primary-500/10 dark:bg-primary-500/15 text-primary-600 dark:text-primary-400'
-                                : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200/60 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white' }}"
-                >
-                    <span class="shrink-0 h-5 w-5 flex items-center justify-center">
-                        {!! MenuHelper::getIconSvg($group['icon']) !!}
-                    </span>
-                    <span
-                        class="truncate whitespace-nowrap transition-all duration-200"
-                        :class="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen ? 'opacity-100 max-w-[160px]' : 'opacity-0 max-w-0 absolute'"
-                    >{{ $item['name'] }}</span>
-                </a>
-            @else
-                {{-- Multi-item group → collapsible --}}
-                <div>
-                    {{-- Group trigger --}}
-                    <button
-                        @click="($store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen) && (openGroup = openGroup === {{ $gi }} ? null : {{ $gi }})"
-                        title="{{ $group['label'] }}"
-                        class="group w-full flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-medium
-                               transition-colors relative overflow-hidden
-                               {{ collect($group['items'])->contains(fn($i) => request()->is(ltrim($i['path'],'/')) || request()->is(ltrim($i['path'],'/').'/*'))
-                                    ? 'text-primary-600 dark:text-primary-400'
-                                    : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200/60 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white' }}"
-                    >
-                        <span class="shrink-0 h-5 w-5 flex items-center justify-center">
-                            {!! MenuHelper::getIconSvg($group['icon']) !!}
-                        </span>
-                        <span
-                            class="flex-1 text-left truncate whitespace-nowrap transition-all duration-200"
-                            :class="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen ? 'opacity-100 max-w-[130px]' : 'opacity-0 max-w-0 absolute'"
-                        >{{ $group['label'] }}</span>
-                        <svg
-                            class="ml-auto h-3.5 w-3.5 shrink-0 transition-transform duration-200 {{ $activeGroupIndex === $gi ? 'rotate-90' : '' }}"
-                            :class="{
-                                'rotate-90' : openGroup === {{ $gi }},
-                                'hidden'    : !($store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen)
-                            }"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                        >
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </button>
+        {{-- 9. NOTIFICATIONS, EMAIL, CALENDAR --}}
+        <li>
+          <a href="#">
+            <span class="icon-[tabler--message] size-5"></span>
+            Notifications
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <span class="icon-[tabler--mail] size-5"></span>
+            Email
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            <span class="icon-[tabler--calendar] size-5"></span>
+            Calendar
+          </a>
+        </li>
 
-                    {{-- Sub-items --}}
-                    <div
-                        x-show="openGroup === {{ $gi }} && ($store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen)"
-                        x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="opacity-0 -translate-y-1"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-75"
-                        x-transition:leave-start="opacity-100 translate-y-0"
-                        x-transition:leave-end="opacity-0 -translate-y-1"
-                        class="mt-0.5 ml-4 pl-2 border-l border-neutral-200 dark:border-neutral-800 space-y-0.5"
-                        style="{{ $activeGroupIndex === $gi ? '' : 'display:none;' }}"
-                    >
-                        @foreach($group['items'] as $item)
-                            <a
-                                href="{{ $item['path'] }}"
-                                class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm
-                                       transition-colors
-                                       {{ request()->is(ltrim($item['path'],'/')) || request()->is(ltrim($item['path'],'/').'/*')
-                                            ? 'text-primary-600 dark:text-primary-400 font-medium bg-primary-500/8 dark:bg-primary-500/10'
-                                            : 'text-neutral-500 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-neutral-800' }}"
-                            >
-                                {{ $item['name'] }}
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-        @endforeach
-    </nav>
+        {{-- 10. AUTH (Sign In / Sign Out) --}}
+        @guest
+        <li>
+          <a href="{{ route('login') }}">
+            <span class="icon-[tabler--login] size-5"></span>
+            Sign In
+          </a>
+        </li>
+        @else
+        <li>
+          <form method="POST" action="{{ route('logout') }}" class="w-full">
+            @csrf
+            <button type="submit" class="w-full flex items-center gap-2 text-error hover:bg-error/10 text-left">
+              <span class="icon-[tabler--logout-2] size-5"></span>
+              Sign Out
+            </button>
+          </form>
+        </li>
+        @endguest
 
-    {{-- ── USER PROFILE ────────────────────────────────────────── --}}
-    <div class="shrink-0 border-t border-neutral-200 dark:border-neutral-800 p-2"
-         x-data="{ profileOpen: false }" @click.outside="profileOpen = false">
-        <button
-            @click="($store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen) && (profileOpen = !profileOpen)"
-            class="w-full flex items-center gap-2.5 rounded-lg px-2 py-2
-                   text-neutral-600 dark:text-neutral-300
-                   hover:bg-neutral-200/60 dark:hover:bg-neutral-800
-                   hover:text-neutral-900 dark:hover:text-white
-                   transition-colors"
-        >
-            {{-- Avatar --}}
-            <div class="h-8 w-8 shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-semibold text-sm">
-                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-            </div>
-            <div
-                class="flex-1 text-left min-w-0 transition-all duration-200"
-                :class="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'"
-            >
-                <p class="text-sm font-medium text-neutral-900 dark:text-white truncate leading-tight">{{ auth()->user()->name ?? 'Usuario' }}</p>
-                <p class="text-xs text-neutral-400 dark:text-neutral-400 truncate leading-tight">{{ auth()->user()->email ?? '' }}</p>
-            </div>
-            <svg
-                class="h-4 w-4 shrink-0 text-neutral-400 transition-all duration-200"
-                :class="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen ? 'opacity-100' : 'opacity-0 w-0'"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-            </svg>
-        </button>
-
-        {{-- Profile dropdown --}}
-        <div
-            x-show="profileOpen"
-            x-transition:enter="transition ease-out duration-100"
-            x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-75"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95"
-            class="absolute bottom-16 left-2 right-2 z-50 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-xl shadow-neutral-900/10 dark:shadow-black/30 p-1"
-            style="display:none;"
-        >
-            <a href="/profile" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                Mi Perfil
-            </a>
-            <div class="my-1 border-t border-neutral-100 dark:border-neutral-800"></div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Cerrar Sesión
-                </button>
-            </form>
-        </div>
+      </ul>
     </div>
+
+  </div>
 </aside>

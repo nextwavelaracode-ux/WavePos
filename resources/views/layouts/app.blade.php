@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Dashboard' }} | TailAdmin - Laravel Tailwind CSS Admin Dashboard Template</title>
+    <title>{{ $title ?? 'WavePOS' }} | Sistema de Punto de Venta</title>
+    <link rel="icon" type="image/png" href="/images/logo/logotipohd.png">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -37,41 +38,22 @@
                     const html = document.documentElement;
                     if (this.theme === 'dark') {
                         html.classList.add('dark');
-                        if (document.body) document.body.classList.add('dark', 'bg-gray-900');
+                        html.setAttribute('data-theme', 'dark');
                     } else {
                         html.classList.remove('dark');
-                        if (document.body) document.body.classList.remove('dark', 'bg-gray-900');
+                        html.setAttribute('data-theme', 'light');
                     }
                 }
             });
 
             Alpine.store('sidebar', {
-                // Initialize based on screen size
-                isExpanded: window.innerWidth >= 1280, // true for desktop, false for mobile
+                isExpanded: window.innerWidth >= 1024,
                 isMobileOpen: false,
                 isHovered: false,
-
-                toggleExpanded() {
-                    this.isExpanded = !this.isExpanded;
-                    // When toggling desktop sidebar, ensure mobile menu is closed
-                    this.isMobileOpen = false;
-                },
-
-                toggleMobileOpen() {
-                    this.isMobileOpen = !this.isMobileOpen;
-                    // Don't modify isExpanded when toggling mobile menu
-                },
-
-                setMobileOpen(val) {
-                    this.isMobileOpen = val;
-                },
-
-                setHovered(val) {
-                    // Only allow hover effects on desktop when sidebar is collapsed
-                    if (window.innerWidth >= 1280 && !this.isExpanded) {
-                        this.isHovered = val;
-                    }
-                }
+                toggleExpanded() { this.isExpanded = !this.isExpanded; },
+                toggleMobileOpen() { this.isMobileOpen = !this.isMobileOpen; },
+                setMobileOpen(val) { this.isMobileOpen = val; },
+                setHovered(val) { this.isHovered = val; }
             });
         });
     </script>
@@ -85,49 +67,25 @@
                 const theme = savedTheme || systemTheme;
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
                 } else {
                     document.documentElement.classList.remove('dark');
+                    document.documentElement.setAttribute('data-theme', 'light');
                 }
             } catch (e) {}
-
-            // Pre-calculate sidebar margin before Alpine boots to prevent layout flash
-            document.addEventListener('DOMContentLoaded', function() {
-                const mainContent = document.getElementById('main-content-wrapper');
-                if (mainContent && window.innerWidth >= 1280) {
-                    mainContent.style.marginLeft = '260px';
-                }
-            });
         })();
     </script>
     
 </head>
 
-<body
-    x-data="{}"
-    x-init="$store.sidebar.isExpanded = window.innerWidth >= 1280;
-    const checkMobile = () => {
-        if (window.innerWidth < 1280) {
-            $store.sidebar.setMobileOpen(false);
-            $store.sidebar.isExpanded = false;
-        } else {
-            $store.sidebar.isMobileOpen = false;
-            $store.sidebar.isExpanded = true;
-        }
-    };
-    window.addEventListener('resize', checkMobile);">
+<body x-data="{}">
 
-
-
-    <div class="min-h-screen bg-neutral-100 dark:bg-neutral-950">
+    <div class="min-h-screen bg-base-100 text-base-content relative">
 
         @include('layouts.sidebar')
 
-        {{-- Main area: shifts when sidebar is open, full-width when hidden --}}
-        <div
-            id="main-content-wrapper"
-            class="flex flex-col min-h-screen transition-[margin-left] duration-300 ease-in-out"
-            x-effect="$el.style.marginLeft = (window.innerWidth >= 1280 && $store.sidebar.isExpanded) ? '260px' : '0px'"
-        >
+        {{-- Main area: shifts when FlyonUI collapsible sidebar is open --}}
+        <div class="sm:overlay-layout-open:ps-64 min-h-screen flex flex-col transition-all duration-300">
             @include('layouts.app-header')
 
             <main class="flex-1 p-4 md:p-6 max-w-screen-2xl w-full mx-auto">

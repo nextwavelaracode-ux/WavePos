@@ -562,42 +562,173 @@
                          x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                          @click.outside="showImport = false"
                          @keydown.escape.window="showImport = false"
-                         class="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-200 dark:border-gray-700">
+                         class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-200 dark:border-gray-700"
+                         x-data="{
+                            fileName: '',
+                            fileSize: '',
+                            fileType: '',
+                            isDragging: false,
+                            hasFile: false,
+                            handleFile(e) {
+                                const file = e.target.files[0];
+                                if (file) {
+                                    this.fileName = file.name;
+                                    this.fileSize = this.formatSize(file.size);
+                                    this.fileType = file.name.split('.').pop().toUpperCase();
+                                    this.hasFile = true;
+                                }
+                            },
+                            handleDrop(e) {
+                                e.preventDefault();
+                                this.isDragging = false;
+                                const file = e.dataTransfer.files[0];
+                                if (file) {
+                                    const input = this.$refs.fileInput;
+                                    const dt = new DataTransfer();
+                                    dt.items.add(file);
+                                    input.files = dt.files;
+                                    this.fileName = file.name;
+                                    this.fileSize = this.formatSize(file.size);
+                                    this.fileType = file.name.split('.').pop().toUpperCase();
+                                    this.hasFile = true;
+                                }
+                            },
+                            removeFile() {
+                                this.$refs.fileInput.value = '';
+                                this.fileName = '';
+                                this.fileSize = '';
+                                this.fileType = '';
+                                this.hasFile = false;
+                            },
+                            formatSize(bytes) {
+                                if (bytes < 1024) return bytes + ' B';
+                                if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+                                return (bytes / 1048576).toFixed(1) + ' MB';
+                            }
+                         }">
                         
-                        <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-                            <h3 id="modal-import-product-label" class="text-xl font-semibold text-gray-900 dark:text-white">
-                                Importar Productos
-                            </h3>
-                            <button type="button" @click="showImport = false" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
-                                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/></svg>
-                                <span class="sr-only">Close modal</span>
+                        {{-- Header --}}
+                        <div class="flex items-start justify-between p-5 border-b dark:border-gray-700">
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-500/10">
+                                    <svg class="w-5 h-5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                                </div>
+                                <div>
+                                    <h3 id="modal-import-product-label" class="text-lg font-semibold text-gray-900 dark:text-white">Importar Productos</h3>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Sube un archivo Excel o CSV con tus productos</p>
+                                </div>
+                            </div>
+                            <button type="button" @click="showImport = false; removeFile()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white transition-colors">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/></svg>
                             </button>
                         </div>
-                        <div class="p-6 space-y-6">
+
+                        {{-- Body --}}
+                        <div class="p-6">
                             <form action="{{ route('inventario.productos.importar') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
-                                <div class="flex items-center justify-center w-full mb-4">
-                                    <label for="archivo_import" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                            <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/></svg>
-                                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold text-brand-600">Click para subir</span> o arrastra y suelta</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">Excel (.xlsx, .xls) o CSV</p>
+
+                                {{-- Dropzone: estado sin archivo --}}
+                                <div x-show="!hasFile"
+                                     @dragover.prevent="isDragging = true"
+                                     @dragleave.prevent="isDragging = false"
+                                     @drop="handleDrop($event)"
+                                     :class="isDragging ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/5' : 'border-gray-300 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700'"
+                                     class="flex flex-col items-center justify-center w-full h-52 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 dark:border-gray-600">
+                                    <label for="archivo_import" class="flex flex-col items-center justify-center w-full h-full cursor-pointer px-4">
+                                        <div class="flex flex-col items-center justify-center py-6">
+                                            <div class="w-14 h-14 rounded-2xl bg-brand-100 dark:bg-brand-500/10 flex items-center justify-center mb-4" :class="isDragging ? 'scale-110' : ''" style="transition: transform 0.2s;">
+                                                <svg class="w-7 h-7 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                                            </div>
+                                            <p class="mb-1 text-sm text-gray-600 dark:text-gray-300">
+                                                <span class="font-semibold text-brand-600 dark:text-brand-400">Click para seleccionar</span> o arrastra aquí
+                                            </p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">Excel (.xlsx, .xls) o CSV — Máx. 5MB</p>
                                         </div>
-                                        <input id="archivo_import" name="archivo" type="file" class="hidden" required accept=".xlsx,.xls,.csv" />
                                     </label>
+                                    <input id="archivo_import" x-ref="fileInput" name="archivo" type="file" class="hidden" required accept=".xlsx,.xls,.csv" @change="handleFile($event)" />
                                 </div>
-                                
-                                <div class="flex items-center p-4 mb-4 text-sm text-blue-800 border border-blue-300 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400 dark:border-blue-800" role="alert">
-                                    <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"><path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/></svg>
-                                    <span class="sr-only">Info</span>
-                                    <div>
-                                        ¿No tienes la plantilla? <a href="{{ route('inventario.productos.plantilla') }}" class="font-medium underline hover:text-blue-900 dark:hover:text-blue-300">Descarga la plantilla aquí</a>.
+
+                                {{-- Estado con archivo seleccionado --}}
+                                <div x-show="hasFile" x-cloak
+                                     class="w-full rounded-xl border-2 border-brand-200 dark:border-brand-500/30 bg-brand-50/50 dark:bg-brand-500/5 p-4 transition-all duration-300">
+                                    <div class="flex items-start gap-4">
+                                        {{-- Ícono del tipo de archivo --}}
+                                        <div class="flex-shrink-0">
+                                            <div class="w-12 h-14 rounded-lg flex flex-col items-center justify-center relative overflow-hidden"
+                                                 :class="fileType === 'CSV' ? 'bg-green-100 dark:bg-green-500/10' : 'bg-emerald-100 dark:bg-emerald-500/10'">
+                                                <svg class="w-6 h-6" :class="fileType === 'CSV' ? 'text-green-600 dark:text-green-400' : 'text-emerald-600 dark:text-emerald-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <span class="text-[10px] font-bold mt-0.5" :class="fileType === 'CSV' ? 'text-green-700 dark:text-green-400' : 'text-emerald-700 dark:text-emerald-400'" x-text="fileType"></span>
+                                            </div>
+                                        </div>
+
+                                        {{-- Info del archivo --}}
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-semibold text-gray-900 dark:text-white truncate" x-text="fileName"></p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5" x-text="fileSize"></p>
+                                            <div class="flex items-center gap-1.5 mt-2">
+                                                <div class="w-4 h-4 rounded-full bg-brand-500 flex items-center justify-center">
+                                                    <svg class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                                <span class="text-xs font-medium text-brand-700 dark:text-brand-400">Listo para importar</span>
+                                            </div>
+                                        </div>
+
+                                        {{-- Botón quitar archivo --}}
+                                        <button type="button" @click="removeFile()"
+                                                class="flex-shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                                title="Quitar archivo">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div class="flex items-center justify-end space-x-2 border-t border-gray-200 dark:border-gray-600 rounded-b pt-4 mt-4">
-                                    <button type="button" @click="showImport = false" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-brand-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Cancelar</button>
-                                    <button type="submit" class="text-white bg-brand-700 hover:bg-brand-800 focus:ring-4 focus:outline-none focus:ring-brand-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-brand-600 dark:hover:bg-brand-700 dark:focus:ring-brand-800">Subir e Importar</button>
+                                {{-- Info plantilla --}}
+                                <div class="flex items-center gap-3 p-3.5 mt-4 text-sm text-blue-800 border border-blue-200 rounded-xl bg-blue-50/80 dark:bg-blue-900/10 dark:text-blue-400 dark:border-blue-800/50">
+                                    <svg class="flex-shrink-0 w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/></svg>
+                                    <div>
+                                        ¿Primera vez? <a href="{{ route('inventario.productos.plantilla') }}" class="font-semibold underline underline-offset-2 hover:text-blue-900 dark:hover:text-blue-300 transition-colors">Descarga la plantilla aquí</a> con las columnas correctas.
+                                    </div>
+                                </div>
+
+                                {{-- Columnas esperadas --}}
+                                <details class="mt-3 group">
+                                    <summary class="text-xs text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors select-none flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        Ver columnas esperadas
+                                    </summary>
+                                    <div class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-gray-600 dark:text-gray-400 pl-5">
+                                        <span>• Nombre <span class="text-red-400">*</span></span>
+                                        <span>• SKU</span>
+                                        <span>• Código Barras</span>
+                                        <span>• Categoría</span>
+                                        <span>• Subcategoría</span>
+                                        <span>• Precio Compra <span class="text-red-400">*</span></span>
+                                        <span>• Precio Venta <span class="text-red-400">*</span></span>
+                                        <span>• Precio Mínimo</span>
+                                        <span>• Margen %</span>
+                                        <span>• Impuesto %</span>
+                                        <span>• Stock</span>
+                                        <span>• Stock Mínimo</span>
+                                        <span>• Stock Máximo</span>
+                                        <span>• Unidad Medida</span>
+                                        <span>• Ubicación</span>
+                                        <span>• Estado</span>
+                                    </div>
+                                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5 pl-5">Los campos con <span class="text-red-400">*</span> son obligatorios</p>
+                                </details>
+
+                                {{-- Botones --}}
+                                <div class="flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-5 mt-5">
+                                    <button type="button" @click="showImport = false; removeFile()" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-xl border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600 transition-colors">Cancelar</button>
+                                    <button type="submit" :disabled="!hasFile"
+                                            :class="hasFile ? 'bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-600 cursor-pointer' : 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'"
+                                            class="text-white focus:ring-4 focus:outline-none focus:ring-brand-300 font-medium rounded-xl text-sm px-5 py-2.5 text-center dark:focus:ring-brand-800 transition-colors inline-flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                                        Subir e Importar
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -607,28 +738,6 @@
         </div>
 
 
-                    <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-100 dark:border-neutral-800">
-                        <button type="button" @click="showImport = false"
-                            class="rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300 transition-colors">Cancelar</button>
-                        <button type="submit"
-                            class="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors">Iniciar Importación</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                document.getElementById('archivo_import')?.addEventListener('change', function(e) {
-                    const fileName = e.target.files[0]?.name;
-                    const display = document.getElementById('file-name-display');
-                    if (fileName && display) {
-                        display.textContent = 'Archivo seleccionado: ' + fileName;
-                        display.classList.remove('hidden');
-                    }
-                });
-            });
-        </script>
 
 
         {{-- Formulario oculto para eliminar --}}
