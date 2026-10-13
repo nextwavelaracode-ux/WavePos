@@ -380,4 +380,8 @@ Route::get('/vercel-artisan', function (\Illuminate\Http\Request $request) {
             'message' => $e->getMessage(),
         ], 500);
     }
-})->name('vercel.artisan');
+})->withoutMiddleware([
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+])->name('vercel.artisan');

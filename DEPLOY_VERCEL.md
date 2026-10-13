@@ -63,7 +63,7 @@ SUPABASE_PUBLISHABLE_KEY=sb_publishable_pDQuNQQ9A7DKYrJ8D_v6NQ_cLgSwu2e
 SUPABASE_SECRET_KEY=your_supabase_secret_key_here
 SUPABASE_JWKS_URL=https://cbzrrsijtgurpszwtone.supabase.co/auth/v1/.well-known/jwks.json
 
-SESSION_DRIVER=database
+SESSION_DRIVER=cookie
 CACHE_STORE=array
 QUEUE_CONNECTION=sync
 FILESYSTEM_DISK=public

@@ -77,5 +77,19 @@ $app = require_once __DIR__ . '/../bootstrap/app.php';
 // 7. Redirigir el almacenamiento dinámico al directorio escribible /tmp/storage
 $app->useStoragePath('/tmp/storage');
 
-// 8. Capturar y despachar la petición HTTP
-$app->handleRequest(\Illuminate\Http\Request::capture());
+// 8. Capturar y despachar la petición HTTP con captura de diagnóstico
+try {
+    $app->handleRequest(\Illuminate\Http\Request::capture());
+} catch (\Throwable $e) {
+    error_log((string) $e);
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/html; charset=utf-8');
+    }
+    echo '<div style="font-family:sans-serif;padding:2rem;background:#fff1f2;color:#9f1239;border:1px solid #fecdd3;border-radius:8px;max-width:900px;margin:2rem auto;">';
+    echo '<h2 style="margin-top:0;">⚠️ WavePos - Error en Despliegue Serverless</h2>';
+    echo '<p><strong>Detalle del Error:</strong> ' . htmlspecialchars($e->getMessage()) . '</p>';
+    echo '<p><strong>Ubicación:</strong> ' . htmlspecialchars($e->getFile()) . ':' . $e->getLine() . '</p>';
+    echo '<pre style="background:#fff;padding:1rem;border-radius:4px;overflow:auto;font-size:12px;color:#333;">' . htmlspecialchars($e->getTraceAsString()) . '</pre>';
+    echo '</div>';
+}
