@@ -51,10 +51,10 @@ LOG_CHANNEL=stderr
 LOG_LEVEL=error
 
 DB_CONNECTION=pgsql
-DB_HOST=db.cbzrrsijtgurpszwtone.supabase.co
-DB_PORT=5432
+DB_HOST=aws-1-us-west-2.pooler.supabase.com
+DB_PORT=6543
 DB_DATABASE=postgres
-DB_USERNAME=postgres
+DB_USERNAME=postgres.cbzrrsijtgurpszwtone
 DB_PASSWORD=3plPJkjUYcMuAUQN
 DB_SSLMODE=require
 
