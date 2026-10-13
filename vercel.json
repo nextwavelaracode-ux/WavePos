@@ -49,6 +49,10 @@
   ],
   "env": {
     "APP_ENV": "production",
+    "APP_DEBUG": "true",
+    "APP_KEY": "base64:2Zo099X8sUSrZ0pCePa72gAje02rPqI1pFpgpedahWg=",
+    "SESSION_DRIVER": "cookie",
+    "ARTISAN_KEY": "wv_sec_8d4f91b72e063a5c9d18e24fa7b30c1e",
     "VERCEL_SUPPORT_LARGE_FUNCTIONS": "1",
     "APP_CONFIG_CACHE": "/tmp/bootstrap/cache/config.php",
     "APP_EVENTS_CACHE": "/tmp/bootstrap/cache/events.php",
