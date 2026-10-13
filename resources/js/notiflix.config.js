@@ -1,17 +1,17 @@
 import { Notify, Confirm, Loading } from 'notiflix';
 
 Notify.init({
-    width: '320px',
+    width: '340px',
     position: 'right-bottom',
     distance: '24px',
     opacity: 1,
     borderRadius: '12px',
     rtl: false,
-    timeout: 4000,
-    messageMaxLength: 150,
+    timeout: 4500,
+    messageMaxLength: 1000,
     backOverlay: false,
     backOverlayColor: 'rgba(0,0,0,0.5)',
-    plainText: false, // Changed to false to allow HTML for the stock alerts
+    plainText: true, // Set to true to prevent Notiflix "Possible HTML Tags Error"
     showOnlyTheLastOne: false,
     clickToClose: true,
     pauseOnHover: true,
@@ -82,10 +82,10 @@ Confirm.init({
     plainText: true,
     titleColor: '#111827', 
     titleFontSize: '18px',
-    titleMaxLength: 50,
+    titleMaxLength: 100,
     messageColor: '#4b5563', 
     messageFontSize: '15px',
-    messageMaxLength: 200,
+    messageMaxLength: 600,
     
     buttonsFontSize: '14px',
     buttonsMaxLength: 34,
@@ -110,10 +110,26 @@ Loading.init({
     svgColor: '#3b82f6', 
     messageID: 'NotiflixLoadingMessage',
     messageFontSize: '16px',
-    messageMaxLength: 50,
+    messageMaxLength: 100,
     messageColor: '#ffffff',
 });
 
-window.Notify = Notify;
+// Safe wrapper to strip HTML and truncate length defensively for any future caller
+function cleanMessage(msg) {
+    if (typeof msg !== 'string') return String(msg ?? '');
+    // Strip HTML tags defensively and normalize whitespace
+    return msg.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+}
+
+const safeNotify = {
+    success(msg, cb, opt) { return Notify.success(cleanMessage(msg), cb, opt); },
+    failure(msg, cb, opt) { return Notify.failure(cleanMessage(msg), cb, opt); },
+    warning(msg, cb, opt) { return Notify.warning(cleanMessage(msg), cb, opt); },
+    info(msg, cb, opt) { return Notify.info(cleanMessage(msg), cb, opt); },
+    init(opt) { return Notify.init(opt); },
+    merge(opt) { return Notify.merge(opt); },
+};
+
+window.Notify = safeNotify;
 window.Confirm = Confirm;
 window.Loading = Loading;

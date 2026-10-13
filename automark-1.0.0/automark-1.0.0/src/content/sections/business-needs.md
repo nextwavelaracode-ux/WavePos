@@ -1,0 +1,26 @@
+---
+enable: true
+badge: ""
+title: "Las 5 cosas que todo <strong>Negocio Necesita</strong>"
+items:
+  - image: "/images/brands-group-1.png"
+    number: "01"
+    title: "VENDER"
+    content: "Procesa ventas rápidas con un punto de venta intuitivo que acepta múltiples métodos de pago."
+  - image: "/images/brands-group-2.png"
+    number: "02"
+    title: "CONTROLAR"
+    content: "Mantén tu inventario actualizado en tiempo real con alertas automáticas de stock bajo."
+  - image: "/images/brands-group-3.png"
+    number: "03"
+    title: "FACTURAR"
+    content: "Genera facturas electrónicas válidas ante la DIAN directamente desde tu punto de venta."
+  - image: "/images/brands-group-4.png"
+    number: "04"
+    title: "ANALIZAR"
+    content: "Toma decisiones inteligentes con reportes de ventas, ganancias y tendencias en tiempo real."
+  - image: "/images/brands-group-5.png"
+    number: "05"
+    title: "CRECER"
+    content: "Escala tu negocio con multi-sucursal, gestión de clientes y control financiero completo."
+---

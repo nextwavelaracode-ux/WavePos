@@ -38,21 +38,39 @@
     --breakpoint-xl: 1280px;
     --breakpoint-2xl: 1536px;
 
-    --text-title-2xl: 72px;
-    --text-title-2xl--line-height: 90px;
-    --text-title-xl: 60px;
-    --text-title-xl--line-height: 72px;
-    --text-title-lg: 48px;
-    --text-title-lg--line-height: 60px;
-    --text-title-md: 36px;
-    --text-title-md--line-height: 44px;
-    --text-title-sm: 30px;
-    --text-title-sm--line-height: 38px;
-    --text-theme-xl: 20px;
-    --text-theme-xl--line-height: 30px;
-    --text-theme-sm: 14px;
-    --text-theme-sm--line-height: 20px;
-    --text-theme-xs: 12px;
+    /* ─── Global Typography Scale (Mínimo global 13px) ─────────── */
+    --text-xs: 13px;
+    --text-xs--line-height: 18px;
+    --text-sm: 13px;
+    --text-sm--line-height: 19px;
+    --text-base: 14px;
+    --text-base--line-height: 21px;
+    --text-lg: 16px;
+    --text-lg--line-height: 24px;
+    --text-xl: 18px;
+    --text-xl--line-height: 26px;
+    --text-2xl: 20px;
+    --text-2xl--line-height: 28px;
+    --text-3xl: 24px;
+    --text-3xl--line-height: 32px;
+    --text-4xl: 28px;
+    --text-4xl--line-height: 36px;
+
+    --text-title-2xl: 52px;
+    --text-title-2xl--line-height: 64px;
+    --text-title-xl: 44px;
+    --text-title-xl--line-height: 54px;
+    --text-title-lg: 36px;
+    --text-title-lg--line-height: 44px;
+    --text-title-md: 28px;
+    --text-title-md--line-height: 36px;
+    --text-title-sm: 22px;
+    --text-title-sm--line-height: 28px;
+    --text-theme-xl: 18px;
+    --text-theme-xl--line-height: 26px;
+    --text-theme-sm: 13px;
+    --text-theme-sm--line-height: 19px;
+    --text-theme-xs: 13px;
     --text-theme-xs--line-height: 18px;
 
     --color-current: currentColor;
@@ -212,8 +230,20 @@
         cursor: pointer;
     }
 
+    html {
+        font-size: 16px;
+        -webkit-text-size-adjust: 100%;
+    }
+
     body {
         @apply relative font-normal font-outfit z-1 bg-gray-50;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    /* Regla base: tamaño mínimo global de 13px en controles interactivos */
+    button, input, optgroup, select, textarea {
+        font-size: 13px;
     }
 }
 
@@ -424,7 +454,7 @@
 }
 
 .apexcharts-tooltip-title {
-    @apply !mb-0 !border-b-0 !bg-transparent !p-0 !text-[10px] !leading-4 !text-gray-800 dark:!text-white/90;
+    @apply !mb-0 !border-b-0 !bg-transparent !p-0 !text-[13px] !leading-4 !text-gray-800 dark:!text-white/90;
 }
 
 .apexcharts-tooltip-text {
@@ -1026,7 +1056,7 @@ pre[class*='language-'] {
     background-color: var(--color-wpos-accent);
     color: var(--color-wpos-dark);
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 13px;
     border-radius: 0.5rem;
     border: none;
     cursor: pointer;
@@ -1054,7 +1084,7 @@ pre[class*='language-'] {
     background-color: var(--color-wpos-primary);
     color: #ffffff;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 13px;
     border-radius: 0.5rem;
     border: none;
     cursor: pointer;
@@ -1075,7 +1105,7 @@ pre[class*='language-'] {
     background-color: transparent;
     color: var(--color-wpos-accent);
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 13px;
     border-radius: 0.5rem;
     border: 1.5px solid var(--color-wpos-accent);
     cursor: pointer;
@@ -1107,7 +1137,7 @@ pre[class*='language-'] {
     background-color: #ffffff;
     border: 1.5px solid #e4e7ec;
     border-radius: 0.5rem;
-    font-size: 0.875rem;
+    font-size: 13px;
     color: var(--color-wpos-dark);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -1129,7 +1159,7 @@ pre[class*='language-'] {
     background-color: var(--color-wpos-light);
     color: var(--color-wpos-primary);
     font-weight: 600;
-    font-size: 0.75rem;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 0.75rem 1rem;
@@ -1158,4 +1188,16 @@ pre[class*='language-'] {
 
 @utility wpos-input {
     @apply block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-brand-500 dark:focus:ring-brand-500;
+}
+
+/* ─── Regla global: tamaño de fuente mínimo de 13px en todo el sistema ─── */
+.text-\[10px\],
+.text-\[11px\],
+.text-\[12px\],
+[class*="text-[10px]"],
+[class*="text-[11px]"],
+[class*="text-[12px]"],
+[class*="text-[10.5px]"],
+[class*="text-[11.5px]"] {
+    font-size: 13px !important;
 }

@@ -77,8 +77,9 @@
             {{-- Top: Logo & Main Navigation --}}
             <div class="flex flex-col items-center gap-4 w-full">
                 {{-- Brand Icon --}}
-                <a href="{{ url('/') }}" class="group relative flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-600 to-brand-400 text-white shadow-md shadow-brand-500/25 transition-transform duration-200 hover:scale-105 active:scale-95" title="Ir al Dashboard">
-                    <img src="/images/logo/logotipohd.png" alt="WavePOS" class="h-7 w-7 object-contain drop-shadow-sm" />
+                <a href="{{ url('/') }}" class="group relative flex items-center justify-center w-11 h-11 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all duration-200" title="Ir al Dashboard">
+                    <img src="/images/logo/logotipohd.png" alt="WavePOS" class="h-8 w-8 object-contain transition-transform duration-200 group-hover:scale-105 active:scale-95" />
+                    <span class="absolute left-full ml-3 px-2 py-1 bg-slate-900 text-white text-xs font-semibold rounded-md shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap">Ir al Dashboard</span>
                 </a>
 
                 {{-- Navigation Divider --}}
@@ -184,10 +185,17 @@
                 }
 
                 @if(session('notiflix'))
-                    @php $n = session('notiflix'); @endphp
+                    @php
+                        $n = session('notiflix');
+                        $nType = ($n['type'] ?? '') === 'error' ? 'failure' : ($n['type'] ?? 'info');
+                        $nTitle = trim(strip_tags($n['title'] ?? ''));
+                        $nMsg = trim(strip_tags($n['message'] ?? ''));
+                        $nFull = $nTitle ? ($nMsg ? "{$nTitle} - {$nMsg}" : $nTitle) : $nMsg;
+                        $nFull = \Illuminate\Support\Str::limit($nFull, 300);
+                    @endphp
                     (function() {
-                        const type = '{{ $n['type'] === 'error' ? 'failure' : $n['type'] }}';
-                        window.Notify[type]('{{ $n['title'] }}{{ $n['message'] ? " - " . addslashes($n['message']) : "" }}');
+                        const type = '{{ in_array($nType, ['success', 'failure', 'warning', 'info']) ? $nType : 'info' }}';
+                        window.Notify[type](@json($nFull));
                     })();
                 @endif
 
@@ -201,11 +209,29 @@
                 @endif
 
                 @if(session('success'))
-                    window.Notify.success('{{ addslashes(session('success')) }}');
+                    @php $sMsg = \Illuminate\Support\Str::limit(trim(strip_tags(session('success'))), 300); @endphp
+                    window.Notify.success(@json($sMsg));
                 @endif
 
                 @if(session('error'))
-                    window.Notify.failure('{{ addslashes(session('error')) }}');
+                    @php $eMsg = \Illuminate\Support\Str::limit(trim(strip_tags(session('error'))), 300); @endphp
+                    window.Notify.failure(@json($eMsg));
+                @endif
+
+                @if(session('sweet_alert'))
+                    @php
+                        $sa = session('sweet_alert');
+                        $saType = strtolower($sa['type'] ?? 'success');
+                        if ($saType === 'error') $saType = 'failure';
+                        $saTitle = trim(strip_tags($sa['title'] ?? ''));
+                        $saMsg = trim(strip_tags($sa['message'] ?? ''));
+                        $saFull = $saTitle ? ($saMsg ? "{$saTitle}: {$saMsg}" : $saTitle) : $saMsg;
+                        $saFull = \Illuminate\Support\Str::limit($saFull, 300);
+                    @endphp
+                    (function() {
+                        const saType = '{{ in_array($saType, ['success', 'failure', 'warning', 'info']) ? $saType : 'info' }}';
+                        window.Notify[saType](@json($saFull));
+                    })();
                 @endif
             }
             tryNotify();

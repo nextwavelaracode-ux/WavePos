@@ -1,0 +1,39 @@
+{
+  "site": {
+    "title": "WavePos",
+    "base_url": "http://localhost:8000",
+    "base_path": "/website",
+    "trailing_slash": false,
+    "favicon": "/images/favicon.png",
+    "logo": "/images/logo.svg",
+    "logo_width": "160",
+    "logo_height": "45",
+    "logo_text": "WavePos"
+  },
+  "settings": {
+    "sticky_header": true
+  },
+  "params": {
+    "contact_form_action": "#",
+    "checklist_form_action": "#",
+    "apply_form_action": "#",
+    "copyright": "Copyright &copy; 2026 <strong><a target=\"_blank\" href=\"#\">WavePos</a></strong> Todos los derechos reservados.",
+    "footer_tagline": "El sistema POS más inteligente para hacer crecer tu negocio.",
+    "footer_email": "soporte@wavepos.com",
+    "footer_phone": "(+57) 300-000-0000"
+  },
+  "navigation_button": {
+    "enable": true,
+    "label": "Iniciar Gratis",
+    "link": "/website/pricing"
+  },
+  "google_tag_manager": {
+    "enable": false,
+    "gtm_id": "GTM-XXXXXX"
+  },
+  "metadata": {
+    "meta_author": "WavePos",
+    "meta_image": "/images/og-image.png",
+    "meta_description": "WavePos - El sistema de punto de venta todo en uno para gestionar tu negocio con inteligencia"
+  }
+}

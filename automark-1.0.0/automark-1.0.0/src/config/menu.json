@@ -1,0 +1,85 @@
+{
+  "main": [
+    {
+      "name": "Características",
+      "url": "/website/features"
+    },
+    {
+      "name": "Precios",
+      "url": "/website/pricing"
+    },
+    {
+      "name": "Blog",
+      "url": "/website/blog"
+    },
+    {
+      "name": "Integraciones",
+      "url": "/website/integrations"
+    },
+    {
+      "name": "Casos de Éxito",
+      "url": "/website/case-study"
+    },
+    {
+      "name": "Contacto",
+      "url": "/website/contact"
+    }
+  ],
+  "footer_col_1_title": "Principal",
+  "footer_col_2_title": "Recursos",
+  "footer_col_3_title": "Legal",
+  "footer_primary": [
+    {
+      "name": "Inicio",
+      "url": "/website"
+    },
+    {
+      "name": "Sobre Nosotros",
+      "url": "/website/about"
+    },
+    {
+      "name": "Características",
+      "url": "/website/features"
+    },
+    {
+      "name": "Precios",
+      "url": "/website/pricing"
+    },
+    {
+      "name": "Contacto",
+      "url": "/website/contact"
+    }
+  ],
+  "footer_resource": [
+    {
+      "name": "Casos de Éxito",
+      "url": "/website/case-study"
+    },
+    {
+      "name": "Elementos",
+      "url": "/website/elements"
+    },
+    {
+      "name": "Blog",
+      "url": "/website/blog"
+    },
+    {
+      "name": "Carreras",
+      "url": "/website/careers"
+    },
+    {
+      "name": "Integraciones",
+      "url": "/website/integrations"
+    }
+  ],
+  "footer_legal": [
+    {
+      "name": "Política de Privacidad",
+      "url": "/website/privacy-policy"
+    },
+    {
+      "name": "Términos y Condiciones",
+      "url": "/website/term-and-condition"
+    }
+  ]
+}

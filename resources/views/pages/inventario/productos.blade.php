@@ -660,7 +660,7 @@
                                                 <svg class="w-6 h-6" :class="fileType === 'CSV' ? 'text-green-600 dark:text-green-400' : 'text-emerald-600 dark:text-emerald-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                 </svg>
-                                                <span class="text-[10px] font-bold mt-0.5" :class="fileType === 'CSV' ? 'text-green-700 dark:text-green-400' : 'text-emerald-700 dark:text-emerald-400'" x-text="fileType"></span>
+                                                <span class="text-xs font-bold mt-0.5" :class="fileType === 'CSV' ? 'text-green-700 dark:text-green-400' : 'text-emerald-700 dark:text-emerald-400'" x-text="fileType"></span>
                                             </div>
                                         </div>
 
@@ -717,7 +717,7 @@
                                         <span>• Ubicación</span>
                                         <span>• Estado</span>
                                     </div>
-                                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1.5 pl-5">Los campos con <span class="text-red-400">*</span> son obligatorios</p>
+                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1.5 pl-5">Los campos con <span class="text-red-400">*</span> son obligatorios</p>
                                 </details>
 
                                 {{-- Botones --}}

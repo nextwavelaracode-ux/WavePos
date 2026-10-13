@@ -108,10 +108,17 @@
                 }
 
                 @if(session('notiflix'))
-                    @php $n = session('notiflix'); @endphp
+                    @php
+                        $n = session('notiflix');
+                        $nType = ($n['type'] ?? '') === 'error' ? 'failure' : ($n['type'] ?? 'info');
+                        $nTitle = trim(strip_tags($n['title'] ?? ''));
+                        $nMsg = trim(strip_tags($n['message'] ?? ''));
+                        $nFull = $nTitle ? ($nMsg ? "{$nTitle} - {$nMsg}" : $nTitle) : $nMsg;
+                        $nFull = \Illuminate\Support\Str::limit($nFull, 300);
+                    @endphp
                     (function() {
-                        const type = '{{ $n['type'] === 'error' ? 'failure' : $n['type'] }}';
-                        window.Notify[type]('{{ $n['title'] }}{{ $n['message'] ? " - " . addslashes($n['message']) : "" }}');
+                        const type = '{{ in_array($nType, ['success', 'failure', 'warning', 'info']) ? $nType : 'info' }}';
+                        window.Notify[type](@json($nFull));
                     })();
                 @endif
 
@@ -125,18 +132,28 @@
                 @endif
 
                 @if(session('success'))
-                    window.Notify.success('{{ addslashes(session('success')) }}');
+                    @php $sMsg = \Illuminate\Support\Str::limit(trim(strip_tags(session('success'))), 300); @endphp
+                    window.Notify.success(@json($sMsg));
                 @endif
 
                 @if(session('error'))
-                    window.Notify.failure('{{ addslashes(session('error')) }}');
+                    @php $eMsg = \Illuminate\Support\Str::limit(trim(strip_tags(session('error'))), 300); @endphp
+                    window.Notify.failure(@json($eMsg));
                 @endif
 
                 @if(session('sweet_alert'))
-                    @php $sa = session('sweet_alert'); @endphp
+                    @php
+                        $sa = session('sweet_alert');
+                        $saType = strtolower($sa['type'] ?? 'success');
+                        if ($saType === 'error') $saType = 'failure';
+                        $saTitle = trim(strip_tags($sa['title'] ?? ''));
+                        $saMsg = trim(strip_tags($sa['message'] ?? ''));
+                        $saFull = $saTitle ? ($saMsg ? "{$saTitle}: {$saMsg}" : $saTitle) : $saMsg;
+                        $saFull = \Illuminate\Support\Str::limit($saFull, 300);
+                    @endphp
                     (function() {
-                        const saType = '{{ strtolower($sa['type'] ?? 'success') }}' === 'error' ? 'failure' : '{{ strtolower($sa['type'] ?? 'success') }}';
-                        window.Notify[saType]('{{ addslashes(($sa['title'] ?? '') . ($sa['message'] ? ' ' . $sa['message'] : '')) }}');
+                        const saType = '{{ in_array($saType, ['success', 'failure', 'warning', 'info']) ? $saType : 'info' }}';
+                        window.Notify[saType](@json($saFull));
                     })();
                 @endif
             }

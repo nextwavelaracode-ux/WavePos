@@ -64,7 +64,7 @@
                 
                 <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4 dark:border-neutral-800/80">
                     <div>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Documento Respaldo</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Documento Respaldo</p>
                         <h3 class="text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
                             Factura de Venta / POS: <span class="text-brand-600 dark:text-brand-400 font-mono">{{ $cuenta->venta->numero }}</span>
                         </h3>
@@ -88,10 +88,10 @@
                         <table class="w-full text-sm">
                             <thead class="bg-gray-50 dark:bg-neutral-800/40">
                                 <tr>
-                                    <th class="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-gray-500">Producto</th>
-                                    <th class="px-4 py-2.5 text-center text-[10px] font-bold uppercase tracking-widest text-gray-500">Cantidad</th>
-                                    <th class="px-4 py-2.5 text-right text-[10px] font-bold uppercase tracking-widest text-gray-500">Precio Unit.</th>
-                                    <th class="px-4 py-2.5 text-right text-[10px] font-bold uppercase tracking-widest text-gray-500">Total</th>
+                                    <th class="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-widest text-gray-500">Producto</th>
+                                    <th class="px-4 py-2.5 text-center text-xs font-bold uppercase tracking-widest text-gray-500">Cantidad</th>
+                                    <th class="px-4 py-2.5 text-right text-xs font-bold uppercase tracking-widest text-gray-500">Precio Unit.</th>
+                                    <th class="px-4 py-2.5 text-right text-xs font-bold uppercase tracking-widest text-gray-500">Total</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 dark:divide-neutral-700/60 bg-white dark:bg-transparent">
@@ -123,10 +123,10 @@
                     <table class="w-full text-sm">
                         <thead class="bg-gray-50 dark:bg-neutral-800/40 border-b border-gray-100 dark:border-neutral-700">
                             <tr>
-                                <th class="px-6 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-gray-500">Fecha Control</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-gray-500">Cajero / Cajera</th>
-                                <th class="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-widest text-gray-500">Comprobante</th>
-                                <th class="px-6 py-3 text-right text-[10px] font-bold uppercase tracking-widest text-gray-500">Porción Abonada</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-widest text-gray-500">Fecha Control</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-widest text-gray-500">Cajero / Cajera</th>
+                                <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-widest text-gray-500">Comprobante</th>
+                                <th class="px-6 py-3 text-right text-xs font-bold uppercase tracking-widest text-gray-500">Porción Abonada</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-neutral-700/60">
@@ -134,15 +134,15 @@
                                 <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                                     <td class="px-6 py-4">
                                         <p class="font-semibold text-gray-900 dark:text-white">{{ $pago->created_at->format('d M, Y') }}</p>
-                                        <p class="text-[11px] font-mono text-gray-400">{{ $pago->created_at->format('h:i A') }}</p>
+                                        <p class="text-xs font-mono text-gray-400">{{ $pago->created_at->format('h:i A') }}</p>
                                     </td>
                                     <td class="px-4 py-4 text-gray-600 dark:text-gray-300">{{ $pago->usuario->name }}</td>
                                     <td class="px-4 py-4">
-                                        <span class="inline-flex items-center rounded bg-gray-100 px-2 py-1 text-[11px] font-bold text-gray-700 dark:bg-neutral-800 dark:text-gray-300 {{ $pago->status_color }}">
+                                        <span class="inline-flex items-center rounded bg-gray-100 px-2 py-1 text-xs font-bold text-gray-700 dark:bg-neutral-800 dark:text-gray-300 {{ $pago->status_color }}">
                                             {{ $pago->metodo_label }}
                                         </span>
                                         @if($pago->referencia)
-                                            <p class="text-[10px] text-gray-400 mt-1 font-mono">Ref: {{ $pago->referencia }}</p>
+                                            <p class="text-xs text-gray-400 mt-1 font-mono">Ref: {{ $pago->referencia }}</p>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 text-right tabular-nums">
@@ -171,7 +171,7 @@
             
             {{-- Status Card (Big Summary) --}}
             <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-neutral-800/80 dark:bg-neutral-900 border-t-4 {{ $cuenta->saldo_pendiente > 0 ? ($cuenta->estado === 'vencido' ? 'border-t-red-500' : 'border-t-amber-500') : 'border-t-emerald-500' }}">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Balance Actual</p>
+                <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Balance Actual</p>
                 <h3 class="text-4xl font-black tabular-nums tracking-tight {{ $cuenta->saldo_pendiente > 0 ? ($cuenta->estado === 'vencido' ? 'text-red-600 dark:text-red-500' : 'text-brand-600 dark:text-brand-500') : 'text-emerald-600 dark:text-emerald-500' }}">
                     ${{ number_format($cuenta->saldo_pendiente, 2) }}
                 </h3>
@@ -193,21 +193,21 @@
                             @endphp
                             <div class="bg-emerald-500 h-2.5 rounded-full" style="width: {{ $porcentaje }}%"></div>
                         </div>
-                        <p class="text-[10px] font-bold text-gray-500 text-right mt-1">{{ number_format($porcentaje, 1) }}% Pagado</p>
+                        <p class="text-xs font-bold text-gray-500 text-right mt-1">{{ number_format($porcentaje, 1) }}% Pagado</p>
                     </div>
                 </div>
 
                 <div class="mt-6 rounded-xl bg-gray-50 p-4 border border-gray-100 dark:bg-neutral-800/40 dark:border-neutral-700">
                     <div class="flex items-start justify-between gap-3">
                         <div>
-                            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Cierre Previsto</p>
+                            <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Cierre Previsto</p>
                             <p class="text-sm font-bold flex items-center gap-1.5 {{ $cuenta->estado === 'vencido' ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }}">
                                 <svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 {{ $cuenta->fecha_vencimiento->format('d M, Y') }}
                             </p>
                         </div>
                         @if($cuenta->estado === 'vencido')
-                            <span class="shrink-0 bg-red-100 text-red-600 px-2.5 py-1 rounded border border-red-200 text-[10px] font-black uppercase tracking-widest dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400">Expiró</span>
+                            <span class="shrink-0 bg-red-100 text-red-600 px-2.5 py-1 rounded border border-red-200 text-xs font-black uppercase tracking-widest dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400">Expiró</span>
                         @endif
                     </div>
                 </div>

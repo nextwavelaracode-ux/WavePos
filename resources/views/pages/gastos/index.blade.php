@@ -195,7 +195,7 @@
                                 <td class="px-5 py-4">
                                     <span class="font-bold text-gray-800 dark:text-white">#{{ $gasto->id }}</span>
                                     @if($gasto->es_recurrente)
-                                        <span class="ml-1 inline-flex items-center rounded px-1 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">↺ Recurrente</span>
+                                        <span class="ml-1 inline-flex items-center rounded px-1 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400">↺ Recurrente</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4">
@@ -212,7 +212,7 @@
                                         {{ $gasto->metodo_pago_label }}
                                     </span>
                                     @if($gasto->referencia)
-                                        <p class="text-[10px] text-gray-400 mt-0.5">Ref: {{ $gasto->referencia }}</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">Ref: {{ $gasto->referencia }}</p>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-center text-gray-600 dark:text-gray-400">

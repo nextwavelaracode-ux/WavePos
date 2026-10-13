@@ -42,7 +42,7 @@
                             <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                                 <td class="px-6 py-4">
                                     <span class="font-medium text-gray-700 dark:text-gray-300">{{ $pago->created_at->format('d/m/Y') }}</span>
-                                    <p class="text-[10px] text-gray-400">{{ $pago->created_at->format('H:i') }}</p>
+                                    <p class="text-xs text-gray-400">{{ $pago->created_at->format('H:i') }}</p>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col">
@@ -63,7 +63,7 @@
                                         {{ $pago->metodo_label }}
                                     </span>
                                     @if($pago->referencia)
-                                        <p class="text-[10px] text-gray-400 mt-0.5">Ref: {{ $pago->referencia }}</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">Ref: {{ $pago->referencia }}</p>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-right font-black text-emerald-600 dark:text-emerald-400">

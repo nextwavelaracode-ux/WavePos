@@ -9,6 +9,7 @@
     $isFacturacionActive = request()->is('facturacion*');
     $isClientesActive = request()->is('clientes*');
     $isConfigActive = request()->is('configuracion*');
+    $isWcActive = request()->is('woocommerce*');
     $isProfileActive = request()->is('profile*');
 @endphp
 
@@ -102,6 +103,11 @@
               <li>
                 <a href="{{ url('/cuentas-por-cobrar/reportes/historial-pagos') }}" class="{{ request()->is('cuentas-por-cobrar/reportes*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
                   Historial de Cobros
+                </a>
+              </li>
+              <li>
+                <a href="{{ route('woocommerce.cobro') }}" class="{{ request()->is('woocommerce/cobro*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Cobro Contra Reembolso
                 </a>
               </li>
             </ul>
@@ -209,6 +215,31 @@
           </a>
         </li>
 
+        {{-- 8. WOOCOMMERCE / TIENDA ONLINE (Submenu) --}}
+        <li class="accordion-item {{ $isWcActive ? 'active' : '' }}" id="menu-woocommerce">
+          <button type="button" class="accordion-toggle inline-flex items-center justify-between w-full" aria-controls="menu-woocommerce-collapse" aria-expanded="{{ $isWcActive ? 'true' : 'false' }}">
+            <span class="inline-flex items-center gap-2">
+              <span class="icon-[tabler--building-store] size-5"></span>
+              WooCommerce
+            </span>
+            <span class="icon-[tabler--chevron-right] size-4 transition-transform duration-300 accordion-item-active:rotate-90"></span>
+          </button>
+          <div id="menu-woocommerce-collapse" class="accordion-content {{ $isWcActive ? '' : 'hidden' }} w-full overflow-hidden transition-[height] duration-300">
+            <ul class="pt-1 ps-6 space-y-0.5">
+              <li>
+                <a href="{{ route('woocommerce.index') }}" class="{{ request()->routeIs('woocommerce.index') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Panel & Sincronización
+                </a>
+              </li>
+              <li>
+                <a href="{{ route('woocommerce.cobro') }}" class="{{ request()->routeIs('woocommerce.cobro*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+                  Cobro Contra Reembolso
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
         {{-- 8. CONFIGURACIÓN (Submenu) --}}
         <li class="accordion-item {{ $isConfigActive ? 'active' : '' }}" id="menu-config">
           <button type="button" class="accordion-toggle inline-flex items-center justify-between w-full" aria-controls="menu-config-collapse" aria-expanded="{{ $isConfigActive ? 'true' : 'false' }}">
@@ -252,6 +283,14 @@
         {{-- Divider --}}
         <div class="my-1 border-t border-base-content/10"></div>
 
+        {{-- WEBSITE / LANDING PAGE --}}
+        <li>
+          <a href="{{ url('/website') }}" target="_blank" class="{{ request()->is('website*') ? 'menu-active bg-primary/10 text-primary font-medium' : '' }}">
+            <span class="icon-[tabler--world] size-5"></span>
+            Página Web
+          </a>
+        </li>
+
         {{-- 9. NOTIFICATIONS, EMAIL, CALENDAR --}}
         <li>
           <a href="#">
@@ -259,6 +298,7 @@
             Notifications
           </a>
         </li>
+
         <li>
           <a href="#">
             <span class="icon-[tabler--mail] size-5"></span>

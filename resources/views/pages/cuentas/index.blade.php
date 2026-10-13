@@ -107,7 +107,7 @@
                             <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
                                 <td class="px-6 py-4">
                                     <span class="font-bold text-gray-800 dark:text-white">{{ $cuenta->venta->numero }}</span>
-                                    <p class="text-[10px] text-gray-400">{{ $cuenta->venta->fecha }}</p>
+                                    <p class="text-xs text-gray-400">{{ $cuenta->venta->fecha }}</p>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col">

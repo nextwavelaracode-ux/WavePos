@@ -23,6 +23,8 @@ class Venta extends Model
         'forma_pago_dian',
         'metodo_pago_dian',
         'fecha_vencimiento_dian',
+        'origen',
+        'woocommerce_order_id',
     ];
 
     protected $casts = [

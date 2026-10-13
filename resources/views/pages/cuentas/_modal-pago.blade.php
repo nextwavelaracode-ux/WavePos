@@ -63,7 +63,7 @@ class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 
 
         <div class="p-6 space-y-5">
             <div class="rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
-                <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Cliente</p>
+                <p class="text-xs font-black text-emerald-600 uppercase tracking-widest">Cliente</p>
                 <p class="text-sm font-bold text-emerald-900 dark:text-emerald-300" x-text="cliente"></p>
                 <div class="mt-3 flex justify-between items-end border-t border-emerald-200 pt-2 dark:border-emerald-500/20">
                     <span class="text-xs font-medium text-emerald-600">Saldo Pendiente:</span>
@@ -73,7 +73,7 @@ class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Monto del Abono / Pago</label>
+                    <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Monto del Abono / Pago</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">$</span>
                         <input type="number" x-model.number="monto" step="0.01" :max="saldoMax" 
@@ -83,7 +83,7 @@ class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 
 
                 <div class="grid grid-cols-2 gap-3">
                     <div class="col-span-2">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Método de Cobro</label>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Método de Cobro</label>
                         <select x-model="metodo"
                             class="w-full h-11 rounded-xl border border-gray-100 bg-white px-4 text-sm font-semibold focus:border-brand-500 focus:ring-0 dark:border-neutral-800/80 dark:bg-neutral-800 dark:text-white">
                             <option value="efectivo">💵 Efectivo</option>
@@ -95,14 +95,14 @@ class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/60 
 
                     <template x-if="metodo !== 'efectivo'">
                         <div class="col-span-2">
-                            <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">N° Referencia / Voucher</label>
+                            <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">N° Referencia / Voucher</label>
                             <input type="text" x-model="referencia" placeholder="Obligatorio para electrónicos"
                                 class="w-full h-11 rounded-xl border border-gray-100 bg-white px-4 text-sm focus:border-brand-500 focus:ring-0 dark:border-neutral-800/80 dark:bg-neutral-800 dark:text-white">
                         </div>
                     </template>
 
                     <div class="col-span-2">
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Observaciones</label>
+                        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Observaciones</label>
                         <textarea x-model="observaciones" rows="2" placeholder="Opcional..."
                             class="w-full rounded-xl border border-gray-100 bg-white px-4 py-3 text-sm focus:border-brand-500 focus:ring-0 dark:border-neutral-800/80 dark:bg-neutral-800 dark:text-white"></textarea>
                     </div>

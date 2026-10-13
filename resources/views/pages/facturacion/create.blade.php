@@ -185,7 +185,7 @@
                     
                     {{-- Etiqueta Flotante --}}
                     <div class="absolute -top-3 -right-3">
-                        <span class="bg-gray-900 text-white dark:bg-white dark:text-gray-900 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded shadow-lg border border-gray-800 dark:border-white">Preview en Vivo</span>
+                        <span class="bg-gray-900 text-white dark:bg-white dark:text-gray-900 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded shadow-lg border border-gray-800 dark:border-white">Preview en Vivo</span>
                     </div>
 
                         {{-- Header de la Factura --}}

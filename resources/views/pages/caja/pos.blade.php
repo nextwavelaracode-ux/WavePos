@@ -408,25 +408,6 @@
                     </div>
                 </div>
 
-                {{-- Tipo de Orden: Píldoras (Estilo CHILI POS) --}}
-                <div class="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-xs font-bold mb-2.5">
-                    <button @click="tipoOrden = 'directo'"
-                            :class="tipoOrden === 'directo' ? 'bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
-                            class="py-1.5 rounded-lg transition-all text-center">
-                        🍽️ Directo
-                    </button>
-                    <button @click="tipoOrden = 'llevar'"
-                            :class="tipoOrden === 'llevar' ? 'bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
-                            class="py-1.5 rounded-lg transition-all text-center">
-                        🛍️ Para Llevar
-                    </button>
-                    <button @click="tipoOrden = 'delivery'"
-                            :class="tipoOrden === 'delivery' ? 'bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
-                            class="py-1.5 rounded-lg transition-all text-center">
-                        🛵 Delivery
-                    </button>
-                </div>
-
                 {{-- Selector de Cliente Inteligente --}}
                 <div class="relative">
                     <div class="flex items-center gap-2">

@@ -91,7 +91,7 @@
                     </div>
 
                     <div class="md:text-right mt-4 md:mt-0 bg-gray-50 p-4 rounded-xl border border-gray-100 md:border-none md:bg-transparent md:p-0 dark:bg-neutral-800/40 dark:border-neutral-700 md:dark:bg-transparent">
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Factura del Proveedor</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-400">Factura del Proveedor</p>
                         <p class="text-3xl font-black text-gray-900 dark:text-white font-mono mt-1 leading-none break-all">
                             {{ $compra->numero_factura ?? '—' }}
                         </p>
@@ -116,22 +116,22 @@
                     <table class="w-full text-sm text-left">
                         <thead class="bg-gray-50 dark:bg-neutral-800/40 border-b border-gray-100 dark:border-neutral-700">
                             <tr>
-                                <th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-500">#</th>
-                                <th class="px-3 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-500">Concepto</th>
-                                <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-500 text-center">Cant.</th>
-                                <th class="px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-500 text-right">Costo Und</th>
-                                <th class="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-500 text-right">Subtotal</th>
+                                <th class="px-6 py-3 text-xs font-bold uppercase tracking-widest text-gray-500">#</th>
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-widest text-gray-500">Concepto</th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase tracking-widest text-gray-500 text-center">Cant.</th>
+                                <th class="px-4 py-3 text-xs font-bold uppercase tracking-widest text-gray-500 text-right">Costo Und</th>
+                                <th class="px-6 py-3 text-xs font-bold uppercase tracking-widest text-gray-500 text-right">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 dark:divide-neutral-700/60">
                             @foreach ($compra->detalles as $index => $detalle)
                             <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800/10 transition-colors">
-                                <td class="px-6 py-4 text-[11px] font-mono text-gray-400 font-bold w-10">
+                                <td class="px-6 py-4 text-xs font-mono text-gray-400 font-bold w-10">
                                     {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
                                 </td>
                                 <td class="px-3 py-4">
                                     <p class="font-semibold text-gray-900 dark:text-white">{{ $detalle->producto->nombre }}</p>
-                                    <p class="text-[11px] font-mono text-gray-400 mt-0.5">SKU: {{ $detalle->producto->sku ?? 'N/A' }}</p>
+                                    <p class="text-xs font-mono text-gray-400 mt-0.5">SKU: {{ $detalle->producto->sku ?? 'N/A' }}</p>
                                 </td>
                                 <td class="px-4 py-4 text-center font-medium text-gray-700 dark:text-gray-300">
                                     {{ $detalle->cantidad }}
@@ -168,7 +168,7 @@
             <div class="rounded-2xl bg-gray-900 px-6 py-8 shadow-md dark:border dark:border-neutral-700 dark:bg-neutral-900 text-white relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-br from-brand-600/20 to-transparent z-0"></div>
                 <div class="relative z-10">
-                    <p class="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-1">Monto Total de Compra</p>
+                    <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Monto Total de Compra</p>
                     <p class="text-4xl font-black tabular-nums tracking-tight">
                         ${{ number_format($compra->total, 2) }}
                     </p>
@@ -195,15 +195,15 @@
                 </div>
                 <div class="p-5 space-y-4">
                     <div>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">Tipo Compra</p>
-                        <span class="inline-flex rounded bg-{{ $compra->tipo_compra_badge_color }}-50 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-{{ $compra->tipo_compra_badge_color }}-700 ring-1 ring-inset ring-{{ $compra->tipo_compra_badge_color }}-600/20 dark:bg-{{ $compra->tipo_compra_badge_color }}-400/10 dark:text-{{ $compra->tipo_compra_badge_color }}-400">
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-0.5">Tipo Compra</p>
+                        <span class="inline-flex rounded bg-{{ $compra->tipo_compra_badge_color }}-50 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-{{ $compra->tipo_compra_badge_color }}-700 ring-1 ring-inset ring-{{ $compra->tipo_compra_badge_color }}-600/20 dark:bg-{{ $compra->tipo_compra_badge_color }}-400/10 dark:text-{{ $compra->tipo_compra_badge_color }}-400">
                             {{ $compra->tipo_compra }}
                         </span>
                     </div>
 
                     @if ($compra->tipo_compra === 'credito')
                     <div>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">Fecha Vencimiento</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-0.5">Fecha Vencimiento</p>
                         <p class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                             <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             {{ $compra->fecha_vencimiento ? $compra->fecha_vencimiento->format('d/m/Y') : 'Sin especificar' }}
@@ -213,13 +213,13 @@
 
                     @if ($compra->metodo_pago)
                     <div>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">Medio de Pago</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-0.5">Medio de Pago</p>
                         <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $compra->metodo_pago }}</p>
                     </div>
                     @endif
 
                     <div>
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">Sucursal de Destino</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-0.5">Sucursal de Destino</p>
                         <div class="flex items-center gap-1.5 mt-0.5">
                             <span class="w-2 h-2 rounded-full bg-brand-500"></span>
                             <span class="text-sm font-medium text-gray-800 dark:text-white">{{ $compra->sucursal->nombre }}</span>
@@ -227,7 +227,7 @@
                     </div>
                     
                     <div class="pt-4 mt-2 border-t border-gray-100 dark:border-neutral-800">
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">Ingresado Por</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-0.5">Ingresado Por</p>
                         <p class="text-sm text-gray-700 dark:text-gray-300">{{ $compra->usuario->name }}</p>
                     </div>
                 </div>

@@ -22,7 +22,60 @@ use App\Http\Controllers\GastoController;
 use App\Http\Controllers\CategoriaGastoController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WooCommerceController;
 use Illuminate\Support\Facades\Route;
+
+// ============================================================
+// SITIO WEB PÚBLICO / LANDING PAGE (WavePos SaaS Landing)
+// Acceso directo: /website o /landing
+// ============================================================
+Route::get('/landing', function () {
+    return redirect('/website');
+});
+
+Route::get('/website/{path?}', function ($path = null) {
+    $baseDir = public_path('website');
+    $trimmedPath = trim($path ?? '', '/');
+
+    if (empty($trimmedPath)) {
+        $file = $baseDir . DIRECTORY_SEPARATOR . 'index.html';
+    } else {
+        $directFile = $baseDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $trimmedPath);
+        if (is_file($directFile)) {
+            $file = $directFile;
+        } elseif (is_file($directFile . '.html')) {
+            $file = $directFile . '.html';
+        } elseif (is_file($directFile . DIRECTORY_SEPARATOR . 'index.html')) {
+            $file = $directFile . DIRECTORY_SEPARATOR . 'index.html';
+        } else {
+            $file = $baseDir . DIRECTORY_SEPARATOR . '404.html';
+        }
+    }
+
+    if (!file_exists($file)) {
+        abort(404);
+    }
+
+    $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+    $mime = match ($extension) {
+        'html' => 'text/html; charset=UTF-8',
+        'css'  => 'text/css; charset=UTF-8',
+        'js', 'mjs' => 'application/javascript; charset=UTF-8',
+        'svg'  => 'image/svg+xml',
+        'png'  => 'image/png',
+        'jpg', 'jpeg' => 'image/jpeg',
+        'webp' => 'image/webp',
+        'woff2'=> 'font/woff2',
+        'woff' => 'font/woff',
+        'ttf'  => 'font/ttf',
+        'mp4'  => 'video/mp4',
+        'json' => 'application/json',
+        'xml'  => 'application/xml',
+        default=> mime_content_type($file) ?: 'application/octet-stream'
+    };
+
+    return response()->file($file, ['Content-Type' => $mime]);
+})->where('path', '.*')->name('website');
 
 // authentication pages
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
@@ -263,4 +316,68 @@ Route::middleware(['auth', 'active_user'])->group(function () {
         Route::post('/{factura}/send-email', [\App\Http\Controllers\FacturaElectronicaController::class, 'sendEmail'])->name('sendEmail');
     });
 
+    // ============================================================
+    // INTEGRACIÓN WOOCOMMERCE
+    // ============================================================
+    Route::prefix('woocommerce')->name('woocommerce.')->group(function () {
+        Route::get('/', [WooCommerceController::class, 'index'])->name('index');
+        Route::get('/cobro', [WooCommerceController::class, 'cobroIndex'])->name('cobro');
+        Route::post('/cobro/{orderId}', [WooCommerceController::class, 'cobrarPedido'])->name('cobro.procesar');
+        Route::get('/test-connection', [WooCommerceController::class, 'testConnection'])->name('test');
+        Route::post('/settings', [WooCommerceController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/sync-all', [WooCommerceController::class, 'syncAll'])->name('sync.all');
+        Route::post('/pull-all', [WooCommerceController::class, 'pullAll'])->name('pull.all');
+        Route::post('/sync-product/{producto}', [WooCommerceController::class, 'syncProduct'])->name('sync.product');
+        Route::post('/unlink-product/{producto}', [WooCommerceController::class, 'unlinkProduct'])->name('unlink.product');
+    });
+
 });
+
+// ============================================================
+// SERVERLESS / VERCEL - EJECUTOR DE MIGRACIONES Y ARTISAN
+// Permite correr migraciones y mantenimiento en Vercel de forma segura
+// Ejemplo: /vercel-artisan?key=TU_CLAVE_SECRETA&cmd=migrate
+// ============================================================
+Route::get('/vercel-artisan', function (\Illuminate\Http\Request $request) {
+    $secret = env('ARTISAN_KEY');
+
+    if (empty($secret) || $request->query('key') !== $secret) {
+        abort(403, 'Acceso denegado. Se requiere una clave válida en el parámetro ?key= coincidente con ARTISAN_KEY.');
+    }
+
+    $command = $request->query('cmd', 'migrate');
+    $allowed = [
+        'migrate'        => ['--force' => true],
+        'migrate:status' => [],
+        'db:seed'        => ['--force' => true],
+        'optimize:clear' => [],
+        'config:clear'   => [],
+        'view:clear'     => [],
+        'route:clear'    => [],
+    ];
+
+    if (!array_key_exists($command, $allowed)) {
+        return response()->json([
+            'status'           => 'error',
+            'message'          => "Comando '{$command}' no permitido.",
+            'allowed_commands' => array_keys($allowed),
+        ], 400);
+    }
+
+    try {
+        \Illuminate\Support\Facades\Artisan::call($command, $allowed[$command]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+
+        return response()->json([
+            'status'  => 'success',
+            'command' => $command,
+            'output'  => $output ?: 'Comando ejecutado con éxito sin salida de consola.',
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status'  => 'error',
+            'command' => $command,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+})->name('vercel.artisan');

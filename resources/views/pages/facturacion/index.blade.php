@@ -132,12 +132,12 @@
                                 <input type="checkbox" class="w-4 h-4 text-brand-600 bg-gray-100 border-gray-300 rounded focus:ring-brand-500 dark:focus:ring-brand-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600">
                             </div>
                         </th>
-                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-[10px]">ID de Factura</th>
-                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-[10px] flex items-center">Cliente <svg class="w-3 h-3 ml-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 15V9m4 6V9m4 6V9m-8 6h8m-8-6h8"/></svg></th>
-                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-[10px]">Correo Electrónico</th>
-                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-[10px] flex items-center">Fecha de Creación <svg class="w-3 h-3 ml-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 15V9m4 6V9m4 6V9m-8 6h8m-8-6h8"/></svg></th>
-                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-[10px]">Cantidad</th>
-                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-[10px] flex items-center">Estado <svg class="w-3 h-3 ml-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 15V9m4 6V9m4 6V9m-8 6h8m-8-6h8"/></svg></th>
+                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-xs">ID de Factura</th>
+                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-xs flex items-center">Cliente <svg class="w-3 h-3 ml-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 15V9m4 6V9m4 6V9m-8 6h8m-8-6h8"/></svg></th>
+                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-xs">Correo Electrónico</th>
+                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-xs flex items-center">Fecha de Creación <svg class="w-3 h-3 ml-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 15V9m4 6V9m4 6V9m-8 6h8m-8-6h8"/></svg></th>
+                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-xs">Cantidad</th>
+                        <th scope="col" class="px-4 py-3 font-semibold uppercase tracking-widest text-xs flex items-center">Estado <svg class="w-3 h-3 ml-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 15V9m4 6V9m4 6V9m-8 6h8m-8-6h8"/></svg></th>
                         <th scope="col" class="px-4 py-3 w-10"></th>
                     </tr>
                 </thead>

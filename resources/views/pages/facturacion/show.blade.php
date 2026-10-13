@@ -182,7 +182,7 @@
             @if($cufe)
             <dl class="flex flex-col sm:flex-row gap-x-3 text-sm">
                 <dt class="min-w-36 max-w-50 text-gray-500 dark:text-neutral-400">CUFE:</dt>
-                <dd class="font-mono text-[11px] break-all text-gray-600 dark:text-neutral-400">{{ $cufe }}</dd>
+                <dd class="font-mono text-xs break-all text-gray-600 dark:text-neutral-400">{{ $cufe }}</dd>
             </dl>
             @endif
         </div>

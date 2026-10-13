@@ -35,10 +35,15 @@ class Producto extends Model
         'tasa_impuesto',
         'is_excluded',
         'unidad_medida_dian_id',
+        'woocommerce_id',
+        'sincronizar_woocommerce',
+        'ultima_sincronizacion_wc',
     ];
 
     protected $casts = [
         'estado' => 'boolean',
+        'sincronizar_woocommerce' => 'boolean',
+        'ultima_sincronizacion_wc' => 'datetime',
         'precio_compra' => 'decimal:2',
         'precio_venta' => 'decimal:2',
         'precio_minimo' => 'decimal:2',
@@ -67,9 +72,22 @@ class Producto extends Model
 
     public function getImagenUrlAttribute()
     {
-        if ($this->imagen && Storage::disk('public')->exists($this->imagen)) {
+        if (!$this->imagen) {
+            return null;
+        }
+
+        if (str_starts_with($this->imagen, 'http://') || str_starts_with($this->imagen, 'https://')) {
+            return $this->imagen;
+        }
+
+        if (Storage::disk('public')->exists($this->imagen)) {
             return asset('storage/' . $this->imagen);
         }
+
+        if (file_exists(public_path('storage/' . $this->imagen))) {
+            return asset('storage/' . $this->imagen);
+        }
+
         return null;
     }
 }
