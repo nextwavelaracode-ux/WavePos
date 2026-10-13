@@ -7,7 +7,8 @@
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.4",
-      "maxDuration": 30
+      "maxDuration": 30,
+      "excludeFiles": "{node_modules/**,automark-1.0.0/**,public/images/**,public/video/**,public/website/**,tests/**}"
     }
   },
   "routes": [
@@ -30,6 +31,10 @@
       "dest": "/public/video/$1"
     },
     {
+      "src": "/website/?",
+      "dest": "/public/website/index.html"
+    },
+    {
       "src": "/website/(.*)",
       "dest": "/public/website/$1"
     },
@@ -44,6 +49,7 @@
   ],
   "env": {
     "APP_ENV": "production",
+    "VERCEL_SUPPORT_LARGE_FUNCTIONS": "1",
     "APP_CONFIG_CACHE": "/tmp/bootstrap/cache/config.php",
     "APP_EVENTS_CACHE": "/tmp/bootstrap/cache/events.php",
     "APP_PACKAGES_CACHE": "/tmp/bootstrap/cache/packages.php",
